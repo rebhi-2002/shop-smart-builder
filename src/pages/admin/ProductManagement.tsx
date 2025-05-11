@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -47,6 +46,7 @@ const productSchema = z.object({
 type ProductFormData = z.infer<typeof productSchema>;
 
 const ProductManagement: React.FC = () => {
+  
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
@@ -129,9 +129,14 @@ const ProductManagement: React.FC = () => {
       toast.success('Product updated successfully');
     } else {
       // Add new product
+      // Fix: Ensure all required properties are provided for the Product type
       const newProduct: Product = {
-        ...data,
-        id: Math.random().toString(36).substring(2, 11)
+        id: Math.random().toString(36).substring(2, 11),
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        image: data.image
       };
       setProducts([...products, newProduct]);
       toast.success('Product added successfully');
@@ -140,6 +145,7 @@ const ProductManagement: React.FC = () => {
     setIsAddProductOpen(false);
     setEditingProduct(null);
   };
+  
   
   const filteredProducts = searchTerm
     ? products.filter(product => 
