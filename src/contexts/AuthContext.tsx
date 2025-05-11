@@ -59,25 +59,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     
-    // Simulate API request delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const foundUser = MOCK_USERS.find(
-      u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-    
-    if (foundUser) {
-      // Remove password before storing in state/localStorage
-      const { password: _, ...safeUser } = foundUser;
-      setUser(safeUser);
-      localStorage.setItem('currentUser', JSON.stringify(safeUser));
-      toast.success(`Welcome back, ${safeUser.name}!`);
-    } else {
-      toast.error("Invalid email or password");
-      throw new Error('Invalid email or password');
+    try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const foundUser = MOCK_USERS.find(
+        u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+      );
+      
+      if (foundUser) {
+        // Remove password before storing in state/localStorage
+        const { password: _, ...safeUser } = foundUser;
+        setUser(safeUser);
+        localStorage.setItem('currentUser', JSON.stringify(safeUser));
+        toast.success(`Welcome back, ${safeUser.name}!`);
+      } else {
+        toast.error("Invalid email or password");
+        throw new Error('Invalid email or password');
+      }
+    } catch (error) {
+      toast.error("Login failed. Please try again.");
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
   
   const logout = () => {
@@ -89,33 +94,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     
-    // Simulate API request delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Check if user already exists
-    const userExists = MOCK_USERS.some(
-      u => u.email.toLowerCase() === email.toLowerCase()
-    );
-    
-    if (userExists) {
-      toast.error("Email already in use");
+    try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Check if user already exists
+      const userExists = MOCK_USERS.some(
+        u => u.email.toLowerCase() === email.toLowerCase()
+      );
+      
+      if (userExists) {
+        toast.error("Email already in use");
+        throw new Error('Email already in use');
+      }
+      
+      // In a real app, this would make an API call to create a user
+      // For demo, we'll just create a simulated user
+      const newUser = {
+        id: Math.random().toString(36).substring(2, 9),
+        email,
+        name,
+        role: 'user' as const
+      };
+      
+      // Add the user to mock database (this would persist only until page refresh)
+      MOCK_USERS.push({ ...newUser, password });
+      
+      setUser(newUser);
+      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      toast.success("Account created successfully!");
+    } catch (error) {
+      toast.error("Registration failed. Please try again.");
+      throw error;
+    } finally {
       setIsLoading(false);
-      throw new Error('Email already in use');
     }
-    
-    // In a real app, this would make an API call to create a user
-    // For demo, we'll just create a simulated user
-    const newUser = {
-      id: Math.random().toString(36).substring(2, 9),
-      email,
-      name,
-      role: 'user' as const
-    };
-    
-    setUser(newUser);
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-    toast.success("Account created successfully!");
-    setIsLoading(false);
   };
   
   return (

@@ -1,31 +1,41 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams, useParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
 import { Filter, Search, ChevronDown, ChevronRight, LayoutGrid, LayoutList } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
 
 const ProductList = () => {
   const location = useLocation();
+  const { category: categoryParam } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [sortBy, setSortBy] = useState('featured');
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8;
   
-  // Get the category from URL path if present
-  const pathParts = location.pathname.split('/');
-  const categoryFromPath = pathParts[pathParts.length - 1] !== 'products' 
-    ? pathParts[pathParts.length - 1] 
-    : null;
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, priceRange, categoryParam]);
   
   // Get all products
   const { data: products = [], isLoading } = useQuery({
@@ -47,8 +57,8 @@ const ProductList = () => {
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
     
     // Filter by category if specified in path
-    const matchesCategory = !categoryFromPath || 
-      product.category.toLowerCase() === decodeURIComponent(categoryFromPath).toLowerCase();
+    const matchesCategory = !categoryParam || 
+      product.category.toLowerCase() === decodeURIComponent(categoryParam).toLowerCase();
     
     // Filter by price range
     const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
@@ -70,6 +80,12 @@ const ProductList = () => {
     }
   });
   
+  // Get paginated products
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Update URL with search query
@@ -84,21 +100,26 @@ const ProductList = () => {
     setFiltersVisible(!filtersVisible);
   };
   
+  const handleCategorySelect = (category: string) => {
+    // This will navigate by updating the categoryParam
+    window.location.href = `/categories/${category}`;
+  };
+  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">
-          {categoryFromPath ? decodeURIComponent(categoryFromPath) : 'All Products'}
+          {categoryParam ? decodeURIComponent(categoryParam) : 'All Products'}
         </h1>
         <div className="flex items-center text-sm mt-2">
           <a href="/" className="text-muted-foreground hover:text-foreground">Home</a>
           <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />
           <a href="/products" className="text-muted-foreground hover:text-foreground">Products</a>
-          {categoryFromPath && (
+          {categoryParam && (
             <>
               <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />
-              <span className="font-medium">{decodeURIComponent(categoryFromPath)}</span>
+              <span className="font-medium">{decodeURIComponent(categoryParam)}</span>
             </>
           )}
         </div>
@@ -179,7 +200,11 @@ const ProductList = () => {
               <div className="space-y-2">
                 {categories.map((category) => (
                   <div key={category} className="flex items-center space-x-2">
-                    <Checkbox id={`category-${category}`} />
+                    <Checkbox 
+                      id={`category-${category}`}
+                      checked={categoryParam === category}
+                      onCheckedChange={() => handleCategorySelect(category)}
+                    />
                     <label 
                       htmlFor={`category-${category}`}
                       className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -220,7 +245,11 @@ const ProductList = () => {
                 <div className="space-y-2">
                   {categories.map((category) => (
                     <div key={category} className="flex items-center space-x-2">
-                      <Checkbox id={`desktop-category-${category}`} />
+                      <Checkbox 
+                        id={`desktop-category-${category}`}
+                        checked={categoryParam === category}
+                        onCheckedChange={() => handleCategorySelect(category)}
+                      />
                       <label 
                         htmlFor={`desktop-category-${category}`}
                         className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -265,13 +294,13 @@ const ProductList = () => {
             </div>
           ) : viewMode === 'grid' ? (
             <div className="product-grid">
-              {sortedProducts.map((product) => (
+              {currentProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
             <div className="space-y-4">
-              {sortedProducts.map((product) => (
+              {currentProducts.map((product) => (
                 <div key={product.id} className="flex flex-col sm:flex-row border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                   <div className="sm:w-48 h-48">
                     <img 
@@ -297,15 +326,52 @@ const ProductList = () => {
           )}
           
           {/* Pagination */}
-          {sortedProducts.length > 0 && (
+          {sortedProducts.length > 0 && totalPages > 1 && (
             <div className="flex justify-center mt-8">
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" disabled>Previous</Button>
-                <Button variant="outline" className="bg-primary text-primary-foreground">1</Button>
-                <Button variant="outline">2</Button>
-                <Button variant="outline">3</Button>
-                <Button variant="outline">Next</Button>
-              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                      aria-disabled={currentPage === 1}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+                    // Show first page, last page, current page, and pages around current
+                    let pageNumber = i + 1;
+                    if (totalPages > 5) {
+                      if (currentPage <= 3) {
+                        pageNumber = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNumber = totalPages - 4 + i;
+                      } else {
+                        pageNumber = currentPage - 2 + i;
+                      }
+                    }
+                    
+                    return (
+                      <PaginationItem key={i}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(pageNumber)}
+                          isActive={currentPage === pageNumber}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                      aria-disabled={currentPage === totalPages}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </div>

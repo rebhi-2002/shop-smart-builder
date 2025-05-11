@@ -1,32 +1,52 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Plus, Minus, RefreshCcw, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
+import { toast } from '@/components/ui/sonner';
 
 const Cart = () => {
-  const { cartItems, updateQuantity, removeFromCart, getTotalPrice } = useCart();
-  const { toast } = useToast();
+  const { cartItems, updateQuantity, removeFromCart, getTotalPrice, applyPromoCode, promoDiscount, activePromoCode } = useCart();
+  const { toast: uiToast } = useToast();
+  const navigate = useNavigate();
+  const [promoCode, setPromoCode] = useState('');
   
   const handleRemove = (productId: string, productName: string) => {
     removeFromCart(productId);
-    toast({
+    uiToast({
       title: "Item Removed",
       description: `${productName} has been removed from your cart.`,
     });
   };
 
   const handleCheckout = () => {
-    // This would typically redirect to a checkout page or process
-    toast({
-      title: "Checkout Initiated",
-      description: "This is where we would start the checkout process.",
-    });
+    navigate('/checkout');
   };
+  
+  const handleApplyPromo = () => {
+    if (!promoCode.trim()) {
+      toast.error('Please enter a promo code');
+      return;
+    }
+    
+    const success = applyPromoCode(promoCode);
+    if (success) {
+      toast.success(`Promo code ${promoCode.toUpperCase()} applied successfully!`);
+      setPromoCode('');
+    } else {
+      toast.error('Invalid promo code');
+    }
+  };
+  
+  const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const discountAmount = subtotal * promoDiscount;
+  const shipping = 0; // Free shipping
+  const tax = getTotalPrice() * 0.07;
+  const finalTotal = getTotalPrice() * 1.07;
   
   if (cartItems.length === 0) {
     return (
@@ -128,22 +148,30 @@ const Cart = () => {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${getTotalPrice().toFixed(2)}</span>
+                  <span>${subtotal.toFixed(2)}</span>
                 </div>
+                
+                {promoDiscount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount ({activePromoCode})</span>
+                    <span>-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
                   <span>Free</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax</span>
-                  <span>${(getTotalPrice() * 0.07).toFixed(2)}</span>
+                  <span>${tax.toFixed(2)}</span>
                 </div>
               </div>
               
               <div className="border-t pt-4 mb-6">
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>${(getTotalPrice() * 1.07).toFixed(2)}</span>
+                  <span>${finalTotal.toFixed(2)}</span>
                 </div>
               </div>
               
@@ -154,9 +182,25 @@ const Cart = () => {
               <div className="mt-4">
                 <h4 className="font-semibold mb-2">Promo Code</h4>
                 <div className="flex">
-                  <Input placeholder="Enter code" className="rounded-r-none" />
-                  <Button variant="secondary" className="rounded-l-none">Apply</Button>
+                  <Input 
+                    placeholder="Enter code" 
+                    className="rounded-r-none"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                  />
+                  <Button 
+                    variant="secondary" 
+                    className="rounded-l-none"
+                    onClick={handleApplyPromo}
+                  >
+                    Apply
+                  </Button>
                 </div>
+                {activePromoCode && (
+                  <p className="text-green-600 text-sm mt-1">
+                    {activePromoCode} ({(promoDiscount * 100).toFixed(0)}% off) applied
+                  </p>
+                )}
               </div>
             </CardContent>
             
