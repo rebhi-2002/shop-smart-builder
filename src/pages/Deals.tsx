@@ -7,6 +7,7 @@ import { ChevronRight } from 'lucide-react';
 import { productService } from '@/services/productService';
 import ProductCard from '@/components/ProductCard';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import { toast } from "@/components/ui/sonner";
 
 const Deals = () => {
   const { data: discountedProducts = [], isLoading } = useQuery({
@@ -100,9 +101,8 @@ const Deals = () => {
             <p className="mb-4">Get 10% off your first order when you sign up for our newsletter.</p>
             <Button variant="outline" onClick={() => {
               navigator.clipboard.writeText('WELCOME10');
-              toast({
-                title: "Code Copied",
-                description: "WELCOME10 has been copied to your clipboard.",
+              toast("Code Copied", {
+                description: "WELCOME10 has been copied to your clipboard."
               });
             }}>
               Copy Code
@@ -120,9 +120,8 @@ const Deals = () => {
             <p className="mb-4">Summer special! Take 20% off select seasonal items.</p>
             <Button variant="outline" onClick={() => {
               navigator.clipboard.writeText('SUMMER20');
-              toast({
-                title: "Code Copied",
-                description: "SUMMER20 has been copied to your clipboard.",
+              toast("Code Copied", {
+                description: "SUMMER20 has been copied to your clipboard."
               });
             }}>
               Copy Code
@@ -140,9 +139,8 @@ const Deals = () => {
             <p className="mb-4">Get 15% off and free shipping on orders $75+.</p>
             <Button variant="outline" onClick={() => {
               navigator.clipboard.writeText('FREESHIP');
-              toast({
-                title: "Code Copied",
-                description: "FREESHIP has been copied to your clipboard.",
+              toast("Code Copied", {
+                description: "FREESHIP has been copied to your clipboard."
               });
             }}>
               Copy Code

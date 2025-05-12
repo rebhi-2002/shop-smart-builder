@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 const AboutUs = () => {
   return (
@@ -16,181 +17,134 @@ const AboutUs = () => {
         </div>
       </div>
       
-      {/* Hero Section */}
-      <div className="relative h-80 rounded-lg overflow-hidden mb-12">
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <img 
-          src="https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?q=80&w=2076&auto=format&fit=crop" 
-          alt="ShopHub Team" 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 flex items-center justify-center text-center">
-          <div className="max-w-2xl text-white">
-            <h2 className="text-4xl font-bold mb-4">We're ShopHub</h2>
-            <p className="text-xl opacity-90">
-              Creating exceptional online shopping experiences since 2015
+      {/* Company Story */}
+      <div className="mb-16">
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Our Story</h2>
+            <p className="mb-4">
+              Founded in 2015, ShopHub began with a simple vision: to create an online shopping experience that combines convenience, quality, and personalization. What started as a small operation in a garage has grown into a thriving e-commerce platform serving thousands of customers worldwide.
+            </p>
+            <p>
+              Our journey has been defined by a commitment to innovation and customer satisfaction. We've continuously evolved our platform, expanded our product range, and refined our services based on customer feedback and changing market trends.
             </p>
           </div>
-        </div>
-      </div>
-      
-      {/* Our Story */}
-      <div className="max-w-3xl mx-auto mb-16">
-        <h2 className="text-2xl font-semibold mb-6">Our Story</h2>
-        <p className="mb-4">
-          ShopHub was founded in 2015 with a simple mission: to make online shopping better for everyone. 
-          What started as a small store with just a few products has grown into a comprehensive marketplace 
-          offering thousands of quality items across multiple categories.
-        </p>
-        <p className="mb-4">
-          Our founders, Alex and Samantha Chen, recognized that online shopping often lacked the personal 
-          touch and quality assurance that customers experience in physical stores. They set out to create 
-          an e-commerce platform that combines the convenience of online shopping with the trust and 
-          service of traditional retail.
-        </p>
-        <p>
-          Today, ShopHub serves customers worldwide, partnering with trusted manufacturers and brands 
-          to bring you the best products at competitive prices. We've maintained our commitment to 
-          quality, affordability, and exceptional customer service throughout our journey.
-        </p>
-      </div>
-      
-      {/* Our Values */}
-      <div className="bg-muted/30 py-16 px-4 mb-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-semibold text-center mb-10">Our Values</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-background p-6 rounded-lg text-center">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">Quality First</h3>
-              <p className="text-muted-foreground">
-                We carefully curate our product offerings to ensure everything we sell meets our high standards. 
-                Every item is tested and verified before becoming part of our catalog.
-              </p>
-            </div>
-            
-            <div className="bg-background p-6 rounded-lg text-center">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">Customer-Centric</h3>
-              <p className="text-muted-foreground">
-                Our customers are at the heart of everything we do. We actively listen to feedback and continually 
-                improve our products and services to exceed your expectations.
-              </p>
-            </div>
-            
-            <div className="bg-background p-6 rounded-lg text-center">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">Ethical Business</h3>
-              <p className="text-muted-foreground">
-                We prioritize ethical sourcing and fair business practices. This means reasonable pricing, fair 
-                treatment of suppliers, and a commitment to reducing our environmental impact.
-              </p>
-            </div>
+          <div className="rounded-lg overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80" 
+              alt="Company office" 
+              className="w-full h-auto"
+            />
           </div>
         </div>
       </div>
       
-      {/* Meet Our Team */}
-      <div className="max-w-5xl mx-auto mb-16">
-        <h2 className="text-2xl font-semibold text-center mb-10">Meet Our Leadership Team</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Mission & Values */}
+      <div className="mb-16">
+        <h2 className="text-2xl font-bold mb-6 text-center">Our Mission & Values</h2>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Quality First</h3>
+            <p className="text-muted-foreground">We meticulously curate our product catalog, working only with trusted brands and suppliers who share our commitment to excellence.</p>
+          </div>
+          
+          <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Customer Happiness</h3>
+            <p className="text-muted-foreground">Our customers are at the heart of everything we do. We're dedicated to providing exceptional service, from browsing to delivery and beyond.</p>
+          </div>
+          
+          <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Innovation</h3>
+            <p className="text-muted-foreground">We continuously explore new technologies and approaches to improve the shopping experience and make it more personalized and efficient.</p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Team Section */}
+      <div className="mb-16">
+        <h2 className="text-2xl font-bold mb-6 text-center">Meet Our Team</h2>
+        
+        <div className="grid md:grid-cols-4 gap-6">
           <div className="text-center">
-            <div className="aspect-square rounded-full overflow-hidden mb-4">
+            <div className="rounded-full overflow-hidden w-40 h-40 mx-auto mb-4">
               <img 
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=60" 
-                alt="Alex Chen" 
+                src="https://randomuser.me/api/portraits/men/32.jpg" 
+                alt="CEO" 
                 className="w-full h-full object-cover"
               />
             </div>
-            <h3 className="font-semibold text-lg">Alex Chen</h3>
-            <p className="text-muted-foreground text-sm">Co-Founder & CEO</p>
+            <h3 className="font-semibold text-lg">Michael Brown</h3>
+            <p className="text-primary">CEO & Founder</p>
           </div>
           
           <div className="text-center">
-            <div className="aspect-square rounded-full overflow-hidden mb-4">
+            <div className="rounded-full overflow-hidden w-40 h-40 mx-auto mb-4">
               <img 
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=60" 
-                alt="Samantha Chen" 
+                src="https://randomuser.me/api/portraits/women/44.jpg" 
+                alt="COO" 
                 className="w-full h-full object-cover"
               />
             </div>
-            <h3 className="font-semibold text-lg">Samantha Chen</h3>
-            <p className="text-muted-foreground text-sm">Co-Founder & COO</p>
+            <h3 className="font-semibold text-lg">Sarah Johnson</h3>
+            <p className="text-primary">Chief Operations Officer</p>
           </div>
           
           <div className="text-center">
-            <div className="aspect-square rounded-full overflow-hidden mb-4">
+            <div className="rounded-full overflow-hidden w-40 h-40 mx-auto mb-4">
               <img 
-                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&auto=format&fit=crop&q=60" 
-                alt="Michael Rodriguez" 
+                src="https://randomuser.me/api/portraits/men/67.jpg" 
+                alt="CTO" 
                 className="w-full h-full object-cover"
               />
             </div>
-            <h3 className="font-semibold text-lg">Michael Rodriguez</h3>
-            <p className="text-muted-foreground text-sm">CTO</p>
+            <h3 className="font-semibold text-lg">David Chen</h3>
+            <p className="text-primary">Chief Technology Officer</p>
           </div>
           
           <div className="text-center">
-            <div className="aspect-square rounded-full overflow-hidden mb-4">
+            <div className="rounded-full overflow-hidden w-40 h-40 mx-auto mb-4">
               <img 
-                src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&auto=format&fit=crop&q=60" 
-                alt="Aisha Johnson" 
+                src="https://randomuser.me/api/portraits/women/17.jpg" 
+                alt="CMO" 
                 className="w-full h-full object-cover"
               />
             </div>
-            <h3 className="font-semibold text-lg">Aisha Johnson</h3>
-            <p className="text-muted-foreground text-sm">CMO</p>
+            <h3 className="font-semibold text-lg">Amelia Rodriguez</h3>
+            <p className="text-primary">Chief Marketing Officer</p>
           </div>
         </div>
       </div>
       
-      {/* Our Achievements */}
-      <div className="bg-muted/30 py-16 px-4 mb-16">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-semibold text-center mb-10">Our Achievements</h2>
-          <div className="grid md:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">1M+</div>
-              <p className="font-medium">Happy Customers</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">50k+</div>
-              <p className="font-medium">Products</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">30+</div>
-              <p className="font-medium">Countries Served</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">98%</div>
-              <p className="font-medium">Satisfaction Rate</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Join Our Team */}
-      <div className="max-w-3xl mx-auto text-center mb-16">
-        <h2 className="text-2xl font-semibold mb-6">Join Our Team</h2>
-        <p className="mb-6">
-          We're always looking for talented, passionate people to join our growing team. If you're 
-          interested in working with us, check out our current openings.
+      {/* Contact CTA */}
+      <div className="bg-primary/5 rounded-lg p-8 text-center mb-16">
+        <h2 className="text-2xl font-bold mb-4">Want to Join Our Team?</h2>
+        <p className="max-w-2xl mx-auto mb-6">
+          We're always looking for talented individuals who are passionate about e-commerce and creating exceptional customer experiences.
         </p>
-        <Button asChild>
-          <Link to="/careers">View Career Opportunities</Link>
-        </Button>
+        <div className="flex justify-center gap-4">
+          <Button asChild>
+            <Link to="/careers">View Open Positions</Link>
+          </Button>
+          <Button variant="outline">
+            <Link to="/contact">Contact Us</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );

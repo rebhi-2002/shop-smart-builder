@@ -25,8 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
     
     addToCart(product);
     
-    toast({
-      title: "Added to Cart",
+    toast("Added to Cart", {
       description: `${product.name} has been added to your cart.`,
     });
   };
@@ -37,14 +36,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
     
     if (inWishlist) {
       removeFromWishlist(product.id);
-      toast({
-        title: "Removed from Wishlist",
+      toast("Removed from Wishlist", {
         description: `${product.name} has been removed from your wishlist.`,
       });
     } else {
       addToWishlist(product);
-      toast({
-        title: "Added to Wishlist",
+      toast("Added to Wishlist", {
         description: `${product.name} has been added to your wishlist.`,
       });
     }
