@@ -27,7 +27,8 @@ import { useCart } from '@/hooks/useCart';
 import { productService } from '@/services/productService';
 
 const Header: React.FC = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  // Fix #1: Replace isAuthenticated check with user != null
+  const { user, logout } = useAuth();
   const { getTotalItems } = useCart();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -108,7 +109,7 @@ const Header: React.FC = () => {
                   <Link to="/products" className="hover:text-primary transition-colors">All Products</Link>
                 </SheetClose>
                 
-                {isAuthenticated ? (
+                {user ? (
                   <>
                     <SheetClose asChild>
                       <Link to="/account" className="hover:text-primary transition-colors">My Account</Link>
@@ -200,11 +201,11 @@ const Header: React.FC = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {isAuthenticated ? (
+                {user ? (
                   <>
                     <div className="px-2 py-1.5 text-sm">
-                      <p className="font-medium">Welcome, {user?.displayName || user?.email}</p>
-                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      <p className="font-medium">Welcome, {user.name || user.email}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
