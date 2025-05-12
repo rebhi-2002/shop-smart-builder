@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation, useSearchParams, useParams } from 'react-router-dom';
+import { useLocation, useSearchParams, useParams, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { 
   Pagination, 
   PaginationContent, 
@@ -16,7 +17,7 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from '@/components/ui/pagination';
-import { Filter, Search, ChevronDown, ChevronRight, LayoutGrid, LayoutList } from 'lucide-react';
+import { Filter, Search, ChevronDown, ChevronRight, LayoutGrid, LayoutList, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
 
@@ -32,10 +33,34 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
   
+  // Get categories from URL params
+  const categoryParams = searchParams.getAll('category');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    categoryParam ? [categoryParam] : categoryParams
+  );
+  
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, priceRange, categoryParam]);
+  }, [searchQuery, priceRange, selectedCategories]);
+  
+  // Update URL when categories change
+  useEffect(() => {
+    if (selectedCategories.length > 0 && !categoryParam) {
+      // Create a new URLSearchParams to preserve other params
+      const newParams = new URLSearchParams(searchParams);
+      
+      // Remove all existing category params
+      newParams.delete('category');
+      
+      // Add each selected category
+      selectedCategories.forEach(category => {
+        newParams.append('category', category);
+      });
+      
+      setSearchParams(newParams);
+    }
+  }, [selectedCategories, categoryParam, searchParams, setSearchParams]);
   
   // Get all products
   const { data: products = [], isLoading } = useQuery({
@@ -56,9 +81,9 @@ const ProductList = () => {
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Filter by category if specified in path
-    const matchesCategory = !categoryParam || 
-      product.category.toLowerCase() === decodeURIComponent(categoryParam).toLowerCase();
+    // Filter by categories
+    const matchesCategory = selectedCategories.length === 0 || 
+      selectedCategories.includes(product.category);
     
     // Filter by price range
     const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
@@ -89,20 +114,25 @@ const ProductList = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Update URL with search query
+    const newParams = new URLSearchParams(searchParams);
     if (searchQuery) {
-      setSearchParams({ q: searchQuery });
+      newParams.set('q', searchQuery);
     } else {
-      setSearchParams({});
+      newParams.delete('q');
     }
+    setSearchParams(newParams);
   };
   
   const toggleFilters = () => {
     setFiltersVisible(!filtersVisible);
   };
   
-  const handleCategorySelect = (category: string) => {
-    // This will navigate by updating the categoryParam
-    window.location.href = `/categories/${category}`;
+  const handleCategoryToggle = (category: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCategories(prev => [...prev, category]);
+    } else {
+      setSelectedCategories(prev => prev.filter(c => c !== category));
+    }
   };
   
   return (
@@ -113,9 +143,9 @@ const ProductList = () => {
           {categoryParam ? decodeURIComponent(categoryParam) : 'All Products'}
         </h1>
         <div className="flex items-center text-sm mt-2">
-          <a href="/" className="text-muted-foreground hover:text-foreground">Home</a>
+          <Link to="/" className="text-muted-foreground hover:text-foreground">Home</Link>
           <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />
-          <a href="/products" className="text-muted-foreground hover:text-foreground">Products</a>
+          <Link to="/products" className="text-muted-foreground hover:text-foreground">Products</Link>
           {categoryParam && (
             <>
               <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />
@@ -124,6 +154,38 @@ const ProductList = () => {
           )}
         </div>
       </div>
+      
+      {/* Selected Category Tags (only visible when multiple categories are selected) */}
+      {selectedCategories.length > 0 && !categoryParam && (
+        <div className="mb-4">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium">Filtered by:</span>
+            {selectedCategories.map(category => (
+              <Badge key={category} variant="outline" className="flex items-center gap-1">
+                {category}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                  onClick={() => handleCategoryToggle(category, false)}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            ))}
+            {selectedCategories.length > 1 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 text-xs"
+                onClick={() => setSelectedCategories([])}
+              >
+                Clear All
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
       
       {/* Search and Filters Bar */}
       <div className="bg-card rounded-lg shadow-sm border p-4 mb-8">
@@ -202,8 +264,8 @@ const ProductList = () => {
                   <div key={category} className="flex items-center space-x-2">
                     <Checkbox 
                       id={`category-${category}`}
-                      checked={categoryParam === category}
-                      onCheckedChange={() => handleCategorySelect(category)}
+                      checked={selectedCategories.includes(category)}
+                      onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
                     />
                     <label 
                       htmlFor={`category-${category}`}
@@ -247,8 +309,8 @@ const ProductList = () => {
                     <div key={category} className="flex items-center space-x-2">
                       <Checkbox 
                         id={`desktop-category-${category}`}
-                        checked={categoryParam === category}
-                        onCheckedChange={() => handleCategorySelect(category)}
+                        checked={selectedCategories.includes(category)}
+                        onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
                       />
                       <label 
                         htmlFor={`desktop-category-${category}`}

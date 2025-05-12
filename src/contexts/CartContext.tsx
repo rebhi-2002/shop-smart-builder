@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface Product {
   id: string;
@@ -61,40 +62,58 @@ const validPromoCodes: Record<string, number> = {
 const MAX_RECENTLY_VIEWED = 10;
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+  const userId = user?.id || 'guest';
+  
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [activePromoCode, setActivePromoCode] = useState<string | null>(null);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
   
-  // Load data from localStorage on initial load
+  // User-specific storage keys
+  const getCartKey = () => `cart_${userId}`;
+  const getWishlistKey = () => `wishlist_${userId}`;
+  const getPromoKey = () => `promoCode_${userId}`;
+  const getRecentlyViewedKey = () => `recentlyViewed_${userId}`;
+  
+  // Load data from localStorage on initial load and when user changes
   useEffect(() => {
     const loadStoredData = () => {
       try {
         // Load cart
-        const savedCart = localStorage.getItem('cart');
+        const savedCart = localStorage.getItem(getCartKey());
         if (savedCart) {
           setCartItems(JSON.parse(savedCart));
+        } else {
+          setCartItems([]);
         }
         
         // Load wishlist
-        const savedWishlist = localStorage.getItem('wishlist');
+        const savedWishlist = localStorage.getItem(getWishlistKey());
         if (savedWishlist) {
           setWishlistItems(JSON.parse(savedWishlist));
+        } else {
+          setWishlistItems([]);
         }
         
         // Load promo code
-        const savedPromo = localStorage.getItem('promoCode');
+        const savedPromo = localStorage.getItem(getPromoKey());
         if (savedPromo) {
           const { code, discount } = JSON.parse(savedPromo);
           setActivePromoCode(code);
           setPromoDiscount(discount);
+        } else {
+          setActivePromoCode(null);
+          setPromoDiscount(0);
         }
         
         // Load recently viewed
-        const savedRecentlyViewed = localStorage.getItem('recentlyViewed');
+        const savedRecentlyViewed = localStorage.getItem(getRecentlyViewedKey());
         if (savedRecentlyViewed) {
           setRecentlyViewed(JSON.parse(savedRecentlyViewed));
+        } else {
+          setRecentlyViewed([]);
         }
       } catch (error) {
         console.error('Failed to load data from localStorage:', error);
@@ -102,34 +121,34 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     
     loadStoredData();
-  }, []);
+  }, [userId]);
   
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    localStorage.setItem(getCartKey(), JSON.stringify(cartItems));
+  }, [cartItems, userId]);
   
   // Save wishlist to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
-  }, [wishlistItems]);
+    localStorage.setItem(getWishlistKey(), JSON.stringify(wishlistItems));
+  }, [wishlistItems, userId]);
   
   // Save promo code to localStorage whenever it changes
   useEffect(() => {
     if (activePromoCode && promoDiscount > 0) {
-      localStorage.setItem('promoCode', JSON.stringify({
+      localStorage.setItem(getPromoKey(), JSON.stringify({
         code: activePromoCode,
         discount: promoDiscount
       }));
     } else {
-      localStorage.removeItem('promoCode');
+      localStorage.removeItem(getPromoKey());
     }
-  }, [activePromoCode, promoDiscount]);
+  }, [activePromoCode, promoDiscount, userId]);
   
   // Save recently viewed to localStorage
   useEffect(() => {
-    localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
-  }, [recentlyViewed]);
+    localStorage.setItem(getRecentlyViewedKey(), JSON.stringify(recentlyViewed));
+  }, [recentlyViewed, userId]);
   
   const addToCart = (product: Product, quantity: number = 1) => {
     setCartItems(prevItems => {

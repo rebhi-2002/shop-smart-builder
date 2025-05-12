@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from "@/components/ui/sonner";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   name: string;
@@ -16,6 +16,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (name: string, email: string, password: string) => Promise<void>;
+  requireAuth: (requiredRole?: 'user' | 'admin') => boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -131,6 +132,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
+  // Helper function to check if a user has the required role
+  const requireAuth = (requiredRole?: 'user' | 'admin'): boolean => {
+    if (!user) {
+      toast.error("You must be logged in to access this page");
+      return false;
+    }
+    
+    if (requiredRole && user.role !== requiredRole && requiredRole === 'admin') {
+      toast.error("You don't have permission to access this page");
+      return false;
+    }
+    
+    return true;
+  };
+  
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -138,7 +154,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAdmin: user?.role === 'admin',
       login, 
       logout,
-      register
+      register,
+      requireAuth
     }}>
       {children}
     </AuthContext.Provider>

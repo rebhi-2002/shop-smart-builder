@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,6 +42,15 @@ const Checkout: React.FC = () => {
   const { cartItems, getTotalPrice, clearCart, promoDiscount, activePromoCode } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'credit-card' | 'paypal'>('credit-card');
+  const [orderCompleted, setOrderCompleted] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
+  
+  useEffect(() => {
+    // Check if cart is empty and redirect if it is
+    if (cartItems.length === 0 && !orderCompleted) {
+      navigate('/cart');
+    }
+  }, [cartItems, navigate, orderCompleted]);
   
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const discountAmount = subtotal * promoDiscount;
@@ -69,16 +78,66 @@ const Checkout: React.FC = () => {
     // Simulate payment processing
     setIsProcessing(true);
     
-    // In a real app, this would send the data to Stripe or another payment processor
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Simulating successful payment
-    toast.success('Payment successful! Your order is being processed.');
-    clearCart();
-    navigate('/order-confirmation');
+    try {
+      // Simulate API call for payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Generate a random order number
+      const generatedOrderNumber = 'ORD-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+      setOrderNumber(generatedOrderNumber);
+      
+      // Show success message
+      toast.success('Payment successful! Your order is being processed.');
+      
+      // Save order to localStorage (in a real app, this would go to a database)
+      const orderData = {
+        id: generatedOrderNumber,
+        customer: {
+          name: data.name,
+          email: data.email,
+          address: `${data.address}, ${data.city}, ${data.state} ${data.zipCode}`,
+        },
+        items: cartItems,
+        payment: {
+          method: paymentMethod,
+          total: finalTotal,
+          subtotal,
+          tax,
+          discount: discountAmount,
+          shipping,
+        },
+        status: 'processing',
+        date: new Date().toISOString(),
+        notes: data.notes,
+      };
+      
+      // Store in localStorage (user-specific)
+      const userId = user?.id || 'guest';
+      const existingOrders = JSON.parse(localStorage.getItem(`orders_${userId}`) || '[]');
+      localStorage.setItem(`orders_${userId}`, JSON.stringify([...existingOrders, orderData]));
+      
+      // Set order completed flag to prevent cart emptying immediately
+      setOrderCompleted(true);
+      
+      // Clear cart after successful payment
+      clearCart();
+      
+      // Navigate to confirmation page
+      navigate('/order-confirmation', { 
+        state: { 
+          orderNumber: generatedOrderNumber,
+          orderData
+        } 
+      });
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      toast.error('There was an error processing your payment. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
   
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0 && !orderCompleted) {
     return (
       <div className="container py-16 text-center">
         <div className="mx-auto max-w-md">

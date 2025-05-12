@@ -1,156 +1,204 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  ShoppingCart, 
-  Users, 
-  Package, 
-  Tags, 
-  BarChart4, 
-  Settings 
-} from 'lucide-react';
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
+  Legend, ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts';
+import { useAuth } from '@/contexts/AuthContext';
+import { productService } from '@/services/productService';
 
-interface StatCardProps {
-  title: string;
-  value: string;
-  description: string;
-  icon: React.ReactNode;
-}
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, description, icon }) => (
-  <Card>
-    <CardHeader className="flex flex-row items-center justify-between pb-2">
-      <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-      {icon}
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold">{value}</div>
-      <p className="text-xs text-muted-foreground">{description}</p>
-    </CardContent>
-  </Card>
-);
-
-const AdminDashboard: React.FC = () => {
+const Dashboard = () => {
+  const { user, requireAuth, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
   
-  React.useEffect(() => {
-    if (!isAdmin) {
+  useEffect(() => {
+    if (!requireAuth('admin')) {
       navigate('/login');
     }
-  }, [isAdmin, navigate]);
+  }, [requireAuth, navigate]);
   
-  if (!isAdmin) {
-    return <div className="container py-10">Please log in as admin to view this page.</div>;
+  const { data: products = [] } = useQuery({
+    queryKey: ['products'],
+    queryFn: productService.getProducts,
+    enabled: !!user && isAdmin
+  });
+  
+  // If not authenticated as admin, don't render the dashboard
+  if (!user || !isAdmin) {
+    return null;
   }
   
+  // Mock data for charts
+  const salesData = [
+    { name: 'Jan', sales: 4000 },
+    { name: 'Feb', sales: 3000 },
+    { name: 'Mar', sales: 5000 },
+    { name: 'Apr', sales: 2780 },
+    { name: 'May', sales: 1890 },
+    { name: 'Jun', sales: 2390 },
+    { name: 'Jul', sales: 3490 },
+    { name: 'Aug', sales: 2000 },
+    { name: 'Sep', sales: 2500 },
+    { name: 'Oct', sales: 3200 },
+    { name: 'Nov', sales: 4500 },
+    { name: 'Dec', sales: 6000 },
+  ];
+  
+  const orderStatusData = [
+    { name: 'Completed', value: 540 },
+    { name: 'Processing', value: 280 },
+    { name: 'Shipped', value: 120 },
+    { name: 'Canceled', value: 60 },
+  ];
+  
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  
+  // Group products by category for chart
+  const categoryData = products.reduce((acc: Record<string, number>, product) => {
+    const { category } = product;
+    acc[category] = (acc[category] || 0) + 1;
+    return acc;
+  }, {});
+  
+  const categoryChartData = Object.entries(categoryData).map(([name, value]) => ({
+    name,
+    value,
+  }));
+  
   return (
-    <div className="container py-10">
-      <div className="flex flex-col gap-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <div className="flex gap-2">
-            <span className="text-muted-foreground">Welcome, {user?.name}</span>
-          </div>
-        </div>
+    <div className="container py-8">
+      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+      
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Revenue
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$45,231.89</div>
+            <p className="text-xs text-muted-foreground">
+              +20.1% from last month
+            </p>
+          </CardContent>
+        </Card>
         
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <StatCard 
-            title="Total Orders" 
-            value="128" 
-            description="12% increase from last month"
-            icon={<ShoppingCart className="h-4 w-4 text-muted-foreground" />}
-          />
-          <StatCard 
-            title="Total Customers" 
-            value="832" 
-            description="4% increase from last month"
-            icon={<Users className="h-4 w-4 text-muted-foreground" />}
-          />
-          <StatCard 
-            title="Products" 
-            value="24" 
-            description="8 added this month"
-            icon={<Package className="h-4 w-4 text-muted-foreground" />}
-          />
-        </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Products
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{products.length}</div>
+            <p className="text-xs text-muted-foreground">
+              {products.length} products in {Object.keys(categoryData).length} categories
+            </p>
+          </CardContent>
+        </Card>
         
-        <h2 className="text-xl font-semibold mt-6">Quick Actions</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Button variant="outline" className="h-auto flex flex-col items-center justify-center p-4 gap-2" onClick={() => navigate('/admin/products')}>
-            <Package className="h-6 w-6 mb-1" />
-            <div className="text-sm font-medium">Manage Products</div>
-          </Button>
-          <Button variant="outline" className="h-auto flex flex-col items-center justify-center p-4 gap-2" onClick={() => navigate('/admin/orders')}>
-            <ShoppingCart className="h-6 w-6 mb-1" />
-            <div className="text-sm font-medium">View Orders</div>
-          </Button>
-          <Button variant="outline" className="h-auto flex flex-col items-center justify-center p-4 gap-2" onClick={() => navigate('/admin/customers')}>
-            <Users className="h-6 w-6 mb-1" />
-            <div className="text-sm font-medium">Customer List</div>
-          </Button>
-          <Button variant="outline" className="h-auto flex flex-col items-center justify-center p-4 gap-2" onClick={() => navigate('/admin/categories')}>
-            <Tags className="h-6 w-6 mb-1" />
-            <div className="text-sm font-medium">Categories</div>
-          </Button>
-        </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Orders
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+573</div>
+            <p className="text-xs text-muted-foreground">
+              +201 this week
+            </p>
+          </CardContent>
+        </Card>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Sales Overview</CardTitle>
-              <CardDescription>Daily sales performance for past 30 days</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[300px] flex items-center justify-center bg-muted/20">
-              <div className="text-muted-foreground">
-                <BarChart4 className="h-16 w-16 mx-auto mb-2 opacity-70" />
-                <p>Chart will be displayed here</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Latest store updates</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                <div>
-                  <p className="text-sm font-medium">New order received</p>
-                  <p className="text-xs text-muted-foreground">10 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                <div>
-                  <p className="text-sm font-medium">Product "Wireless Headphones" low on stock</p>
-                  <p className="text-xs text-muted-foreground">1 hour ago</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-amber-500"></div>
-                <div>
-                  <p className="text-sm font-medium">3 new customer reviews</p>
-                  <p className="text-xs text-muted-foreground">3 hours ago</p>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="ghost" className="w-full">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Active Users
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+2350</div>
+            <p className="text-xs text-muted-foreground">
+              +180 this week
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid gap-6 mt-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Monthly Sales</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={salesData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="sales" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Order Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={orderStatusData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {orderStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="mt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Products by Category</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={categoryChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 };
 
-export default AdminDashboard;
+export default Dashboard;
