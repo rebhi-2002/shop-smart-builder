@@ -177,11 +177,16 @@ const Search: React.FC = () => {
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-                  disabled={currentPage === 1}
-                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-                />
+                {currentPage === 1 ? (
+                  <PaginationPrevious 
+                    className="pointer-events-none opacity-50"
+                    onClick={() => {}}
+                  />
+                ) : (
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} 
+                  />
+                )}
               </PaginationItem>
               
               {Array.from({ length: totalPages }).map((_, i) => (
@@ -196,11 +201,16 @@ const Search: React.FC = () => {
               ))}
               
               <PaginationItem>
-                <PaginationNext 
-                  onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
-                />
+                {currentPage === totalPages ? (
+                  <PaginationNext 
+                    className="pointer-events-none opacity-50"
+                    onClick={() => {}}
+                  />
+                ) : (
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                  />
+                )}
               </PaginationItem>
             </PaginationContent>
           </Pagination>
