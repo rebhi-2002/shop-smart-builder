@@ -22,6 +22,8 @@ import MyAccount from "./pages/account/MyAccount";
 import MyOrders from "./pages/account/MyOrders";
 import Categories from "./pages/Categories";
 import Search from "./pages/Search";
+import Wishlist from "./pages/Wishlist";
+import Deals from "./pages/Deals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const App = () => (
                 <Route path="categories" element={<Categories />} />
                 <Route path="categories/:category" element={<ProductList />} />
                 <Route path="search" element={<Search />} />
+                <Route path="wishlist" element={<Wishlist />} />
+                <Route path="deals" element={<Deals />} />
                 <Route path="cart" element={<Cart />} />
                 <Route path="checkout" element={<Checkout />} />
                 <Route path="order-confirmation" element={<OrderConfirmation />} />

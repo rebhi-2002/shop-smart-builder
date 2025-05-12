@@ -13,10 +13,11 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from '@/components/ui/pagination';
-import { LayoutGrid, LayoutList, Search as SearchIcon } from 'lucide-react';
+import { LayoutGrid, LayoutList, Search as SearchIcon, ChevronRight } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/contexts/CartContext';
 import { productService } from '@/services/productService';
+import RecentlyViewed from '@/components/RecentlyViewed';
 
 const PAGE_SIZE = 8;
 
@@ -47,7 +48,9 @@ const Search: React.FC = () => {
     return (
       product.name.toLowerCase().includes(searchLower) ||
       product.description.toLowerCase().includes(searchLower) ||
-      product.category.toLowerCase().includes(searchLower)
+      product.category.toLowerCase().includes(searchLower) ||
+      (product.tags && product.tags.some(tag => tag.toLowerCase().includes(searchLower))) ||
+      (product.seller && product.seller.toLowerCase().includes(searchLower))
     );
   });
   
@@ -65,6 +68,13 @@ const Search: React.FC = () => {
   
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Breadcrumbs */}
+      <div className="flex items-center text-sm mb-4">
+        <Link to="/" className="text-muted-foreground hover:text-foreground">Home</Link>
+        <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground" />
+        <span className="font-medium">Search</span>
+      </div>
+      
       {/* Search Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Search Products</h1>
@@ -216,6 +226,9 @@ const Search: React.FC = () => {
           </Pagination>
         </div>
       )}
+      
+      {/* Recently Viewed */}
+      <RecentlyViewed />
     </div>
   );
 };
