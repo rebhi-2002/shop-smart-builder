@@ -34,6 +34,16 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { Product } from '@/contexts/CartContext';
 import { productService } from '@/services/productService';
+import { useQuery } from '@tanstack/react-query';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 
 // Define a validation schema for the product form
 const productSchema = z.object({
@@ -42,6 +52,12 @@ const productSchema = z.object({
   price: z.number().min(0.01, 'Price must be greater than 0'),
   image: z.string().url('Image must be a valid URL'),
   category: z.string().min(1, 'Category is required'),
+  discount: z.number().min(0).max(100).optional(),
+  stock: z.number().min(0).int().optional(),
+  rating: z.number().min(0).max(5).optional(),
+  reviews: z.number().min(0).int().optional(),
+  seller: z.string().optional(),
+  tags: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -49,11 +65,27 @@ type ProductFormData = z.infer<typeof productSchema>;
 const ProductManagement: React.FC = () => {
   
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
-  const [products, setProducts] = useState<Product[]>([]);
+  const { isAdmin, user } = useAuth();
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Get products using react-query
+  const { 
+    data: products = [], 
+    isLoading, 
+    refetch 
+  } = useQuery({
+    queryKey: ['adminProducts'],
+    queryFn: productService.getProducts,
+  });
+  
+  // Get categories for the dropdown
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: productService.getCategories,
+  });
   
   // Initialize form
   const form = useForm<ProductFormData>({
@@ -64,25 +96,22 @@ const ProductManagement: React.FC = () => {
       price: 0,
       image: '',
       category: '',
+      discount: 0,
+      stock: 100,
+      rating: 0,
+      reviews: 0,
+      seller: '',
+      tags: '',
     }
   });
 
   // Redirect non-admin users
   useEffect(() => {
     if (!isAdmin) {
+      toast.error("Admin access required");
       navigate('/login');
     }
   }, [isAdmin, navigate]);
-
-  // Load products on mount
-  useEffect(() => {
-    const loadProducts = async () => {
-      const loadedProducts = await productService.getProducts();
-      setProducts(loadedProducts);
-    };
-    
-    loadProducts();
-  }, []);
 
   // Update form values when editing a product
   useEffect(() => {
@@ -93,6 +122,12 @@ const ProductManagement: React.FC = () => {
         price: editingProduct.price,
         image: editingProduct.image,
         category: editingProduct.category,
+        discount: editingProduct.discount || 0,
+        stock: editingProduct.stock || 100,
+        rating: editingProduct.rating || 0,
+        reviews: editingProduct.reviews || 0,
+        seller: editingProduct.seller || '',
+        tags: editingProduct.tags ? editingProduct.tags.join(', ') : '',
       });
     } else {
       form.reset({
@@ -101,14 +136,25 @@ const ProductManagement: React.FC = () => {
         price: 0,
         image: '',
         category: '',
+        discount: 0,
+        stock: 100,
+        rating: 0,
+        reviews: 0,
+        seller: '',
+        tags: '',
       });
     }
   }, [editingProduct, form]);
 
-  const handleDeleteProduct = (productId: string) => {
-    // In a real app, you would call an API here
-    setProducts(products.filter(product => product.id !== productId));
-    toast.success('Product deleted successfully');
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await productService.deleteProduct(productId);
+      refetch(); // Refresh the product list
+      toast.success('Product deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete product');
+      console.error('Delete product error:', error);
+    }
   };
 
   const handleEditProduct = (product: Product) => {
@@ -116,35 +162,41 @@ const ProductManagement: React.FC = () => {
     setIsAddProductOpen(true);
   };
 
-  const onSubmit = (data: ProductFormData) => {
-    if (editingProduct) {
-      // Update existing product
-      const updatedProducts = products.map(product =>
-        product.id === editingProduct.id
-          ? { ...product, ...data }
-          : product
-      );
-      setProducts(updatedProducts);
-      toast.success('Product updated successfully');
-    } else {
-      // Add new product
-      // Fix: Ensure all required properties are provided for the Product type
-      const newProduct: Product = {
-        id: Math.random().toString(36).substring(2, 11),
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        category: data.category,
-        image: data.image
-      };
-      setProducts([...products, newProduct]);
-      toast.success('Product added successfully');
-    }
+  const onSubmit = async (data: ProductFormData) => {
+    setIsSubmitting(true);
     
-    setIsAddProductOpen(false);
-    setEditingProduct(null);
+    try {
+      const productData = {
+        ...data,
+        tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : [],
+      };
+      
+      if (editingProduct) {
+        // Update existing product
+        await productService.updateProduct({
+          id: editingProduct.id,
+          ...productData,
+        });
+        toast.success('Product updated successfully');
+      } else {
+        // Add new product
+        await productService.createProduct(productData);
+        toast.success('Product added successfully');
+      }
+      
+      // Refresh product list
+      refetch();
+      
+      // Close dialog and reset form
+      setIsAddProductOpen(false);
+      setEditingProduct(null);
+    } catch (error) {
+      toast.error(editingProduct ? 'Failed to update product' : 'Failed to add product');
+      console.error('Product submission error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-  
   
   const filteredProducts = searchTerm
     ? products.filter(product => 
@@ -180,58 +232,69 @@ const ProductManagement: React.FC = () => {
 
       {/* Products Table */}
       <div className="border rounded-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredProducts.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditProduct(product)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteProduct(product.id)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredProducts.length === 0 && (
+        {isLoading ? (
+          <div className="flex justify-center items-center p-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <span className="ml-2">Loading products...</span>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  No products found
-                </TableCell>
+                <TableHead>Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Discount</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredProducts.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell>{product.category}</TableCell>
+                  <TableCell>${product.price.toFixed(2)}</TableCell>
+                  <TableCell>{product.discount ? `${product.discount}%` : 'None'}</TableCell>
+                  <TableCell>{product.stock || 'Unlimited'}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditProduct(product)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteProduct(product.id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredProducts.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    No products found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       {/* Add/Edit Product Dialog */}
@@ -271,7 +334,11 @@ const ProductManagement: React.FC = () => {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Input placeholder="Product description" {...field} />
+                      <Textarea 
+                        placeholder="Product description" 
+                        className="min-h-[100px]" 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -304,8 +371,63 @@ const ProductManagement: React.FC = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="discount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Discount (%)</FormLabel>
                       <FormControl>
-                        <Input placeholder="Product category" {...field} />
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="stock"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stock</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -327,6 +449,36 @@ const ProductManagement: React.FC = () => {
                 )}
               />
 
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="seller"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Seller</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Seller name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="tags"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tags (comma-separated)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="tag1, tag2, tag3" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <DialogFooter>
                 <Button
                   type="button"
@@ -335,11 +487,19 @@ const ProductManagement: React.FC = () => {
                     setIsAddProductOpen(false);
                     setEditingProduct(null);
                   }}
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {editingProduct ? 'Update Product' : 'Add Product'}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {editingProduct ? 'Updating...' : 'Adding...'}
+                    </>
+                  ) : (
+                    <>{editingProduct ? 'Update Product' : 'Add Product'}</>
+                  )}
                 </Button>
               </DialogFooter>
             </form>

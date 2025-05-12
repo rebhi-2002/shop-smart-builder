@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
@@ -10,10 +10,16 @@ import RecentlyViewed from '@/components/RecentlyViewed';
 import { toast } from "@/components/ui/sonner";
 
 const Deals = () => {
+  const navigate = useNavigate();
+  
   const { data: discountedProducts = [], isLoading } = useQuery({
     queryKey: ['discountedProducts'],
     queryFn: productService.getDiscountedProducts,
   });
+  
+  const handleViewAllDeals = () => {
+    navigate('/products?discount=true');
+  };
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -36,8 +42,12 @@ const Deals = () => {
           <p className="text-lg opacity-90 mb-6">
             Explore our limited-time offers, flash sales, and exclusive discounts on a wide range of products.
           </p>
-          <Button asChild size="lg" className="bg-white text-shop-900 hover:bg-gray-100">
-            <Link to="/products?discount=true">View All Deals</Link>
+          <Button 
+            size="lg" 
+            className="bg-white text-shop-900 hover:bg-gray-100"
+            onClick={handleViewAllDeals}
+          >
+            View All Deals
           </Button>
         </div>
         <div className="hidden md:block absolute right-0 top-0 h-full w-2/5 bg-[url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center">
@@ -49,8 +59,11 @@ const Deals = () => {
       <div id="deals" className="mb-12">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Current Deals</h2>
-          <Button asChild variant="outline">
-            <Link to="/products?discount=true">View All Deals</Link>
+          <Button 
+            variant="outline" 
+            onClick={handleViewAllDeals}
+          >
+            View All Deals
           </Button>
         </div>
         

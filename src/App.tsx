@@ -31,6 +31,7 @@ import TermsConditions from "./pages/TermsConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
+import Careers from "./pages/Careers";
 
 const queryClient = new QueryClient();
 
@@ -63,13 +64,14 @@ const App = () => (
                 <Route path="admin/products" element={<ProductManagement />} />
                 <Route path="admin/orders" element={<OrdersPage />} />
                 
-                {/* New pages */}
+                {/* Support pages */}
                 <Route path="faq" element={<FAQ />} />
                 <Route path="shipping-returns" element={<ShippingReturns />} />
                 <Route path="terms-conditions" element={<TermsConditions />} />
                 <Route path="privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="about-us" element={<AboutUs />} />
                 <Route path="contact" element={<Contact />} />
+                <Route path="careers" element={<Careers />} />
                 
                 <Route path="*" element={<NotFound />} />
               </Route>
