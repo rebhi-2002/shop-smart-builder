@@ -36,7 +36,7 @@ const Deals = () => {
             Explore our limited-time offers, flash sales, and exclusive discounts on a wide range of products.
           </p>
           <Button asChild size="lg" className="bg-white text-shop-900 hover:bg-gray-100">
-            <Link to="#deals">View All Deals</Link>
+            <Link to="/products?discount=true">View All Deals</Link>
           </Button>
         </div>
         <div className="hidden md:block absolute right-0 top-0 h-full w-2/5 bg-[url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center">
@@ -46,7 +46,12 @@ const Deals = () => {
       
       {/* Current Deals */}
       <div id="deals" className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">Current Deals</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Current Deals</h2>
+          <Button asChild variant="outline">
+            <Link to="/products?discount=true">View All Deals</Link>
+          </Button>
+        </div>
         
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -93,7 +98,13 @@ const Deals = () => {
               <div className="bg-primary text-white text-sm font-medium px-2 py-1 rounded">10% OFF</div>
             </div>
             <p className="mb-4">Get 10% off your first order when you sign up for our newsletter.</p>
-            <Button variant="outline" onClick={() => navigator.clipboard.writeText('WELCOME10')}>
+            <Button variant="outline" onClick={() => {
+              navigator.clipboard.writeText('WELCOME10');
+              toast({
+                title: "Code Copied",
+                description: "WELCOME10 has been copied to your clipboard.",
+              });
+            }}>
               Copy Code
             </Button>
           </div>
@@ -107,7 +118,13 @@ const Deals = () => {
               <div className="bg-primary text-white text-sm font-medium px-2 py-1 rounded">20% OFF</div>
             </div>
             <p className="mb-4">Summer special! Take 20% off select seasonal items.</p>
-            <Button variant="outline" onClick={() => navigator.clipboard.writeText('SUMMER20')}>
+            <Button variant="outline" onClick={() => {
+              navigator.clipboard.writeText('SUMMER20');
+              toast({
+                title: "Code Copied",
+                description: "SUMMER20 has been copied to your clipboard.",
+              });
+            }}>
               Copy Code
             </Button>
           </div>
@@ -121,7 +138,13 @@ const Deals = () => {
               <div className="bg-primary text-white text-sm font-medium px-2 py-1 rounded">15% OFF</div>
             </div>
             <p className="mb-4">Get 15% off and free shipping on orders $75+.</p>
-            <Button variant="outline" onClick={() => navigator.clipboard.writeText('FREESHIP')}>
+            <Button variant="outline" onClick={() => {
+              navigator.clipboard.writeText('FREESHIP');
+              toast({
+                title: "Code Copied",
+                description: "FREESHIP has been copied to your clipboard.",
+              });
+            }}>
               Copy Code
             </Button>
           </div>

@@ -25,6 +25,12 @@ import Search from "./pages/Search";
 import Wishlist from "./pages/Wishlist";
 import Deals from "./pages/Deals";
 import NotFound from "./pages/NotFound";
+import FAQ from "./pages/FAQ";
+import ShippingReturns from "./pages/ShippingReturns";
+import TermsConditions from "./pages/TermsConditions";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AboutUs from "./pages/AboutUs";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +62,15 @@ const App = () => (
                 <Route path="admin" element={<AdminDashboard />} />
                 <Route path="admin/products" element={<ProductManagement />} />
                 <Route path="admin/orders" element={<OrdersPage />} />
+                
+                {/* New pages */}
+                <Route path="faq" element={<FAQ />} />
+                <Route path="shipping-returns" element={<ShippingReturns />} />
+                <Route path="terms-conditions" element={<TermsConditions />} />
+                <Route path="privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="about-us" element={<AboutUs />} />
+                <Route path="contact" element={<Contact />} />
+                
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
