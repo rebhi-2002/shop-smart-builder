@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useRecentlyViewed } from '@/hooks/useCart';
 import ProductCard from './ProductCard';
 import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { 
   Carousel, 
