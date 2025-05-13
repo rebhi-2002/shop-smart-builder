@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ShoppingBag } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface Order {
   id: string;
@@ -20,6 +21,7 @@ interface Order {
     quantity: number;
     price: number;
   }[];
+  address?: string;
 }
 
 // This would be replaced by a real API call
@@ -37,7 +39,8 @@ const fetchOrders = async (): Promise<Order[]> => {
         { id: '1', name: 'Wireless Headphones', quantity: 1, price: 249.99 },
         { id: '3', name: 'Organic Cotton T-Shirt', quantity: 1, price: 29.99 },
         { id: '5', name: 'Stainless Steel Water Bottle', quantity: 1, price: 34.99 }
-      ]
+      ],
+      address: '123 Main St, New York, NY 10001'
     },
     {
       id: 'ORD-5678',
@@ -47,7 +50,8 @@ const fetchOrders = async (): Promise<Order[]> => {
       items: [
         { id: '7', name: 'Yoga Mat', quantity: 1, price: 49.99 },
         { id: '8', name: 'Ceramic Coffee Mug', quantity: 2, price: 24.99 }
-      ]
+      ],
+      address: '456 Elm St, Los Angeles, CA 90001'
     },
     {
       id: 'ORD-9012',
@@ -56,7 +60,8 @@ const fetchOrders = async (): Promise<Order[]> => {
       status: 'delivered',
       items: [
         { id: '2', name: 'Smart Watch', quantity: 1, price: 199.99 }
-      ]
+      ],
+      address: '789 Oak St, Chicago, IL 60007'
     }
   ];
 };
@@ -81,6 +86,8 @@ const getStatusColor = (status: Order['status']) => {
 const MyOrders: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
   const { data: orders, isLoading } = useQuery({
     queryKey: ['orders'],
@@ -88,10 +95,16 @@ const MyOrders: React.FC = () => {
     enabled: !!user
   });
 
-  if (!user) {
-    navigate('/login', { state: { from: '/account/orders' } });
-    return null;
-  }
+  React.useEffect(() => {
+    if (!user) {
+      navigate('/login', { state: { from: '/account/orders' } });
+    }
+  }, [user, navigate]);
+
+  const viewOrderDetails = (order: Order) => {
+    setSelectedOrder(order);
+    setIsDetailsOpen(true);
+  };
   
   return (
     <div className="container max-w-4xl py-10">
@@ -154,7 +167,7 @@ const MyOrders: React.FC = () => {
                 
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-4 pt-2">
                   <p className="font-bold text-lg">Total: ${order.total.toFixed(2)}</p>
-                  <Button size="sm" className="mt-2 sm:mt-0">
+                  <Button size="sm" className="mt-2 sm:mt-0" onClick={() => viewOrderDetails(order)}>
                     View Order Details
                   </Button>
                 </div>
@@ -178,6 +191,79 @@ const MyOrders: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Order Details Dialog */}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Order #{selectedOrder?.id}</DialogTitle>
+            <DialogDescription>
+              Placed on {selectedOrder?.date && new Date(selectedOrder.date).toLocaleDateString()}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <h3 className="font-medium">Order Status</h3>
+                <Badge className={selectedOrder ? getStatusColor(selectedOrder.status) : ''}>
+                  {selectedOrder?.status.charAt(0).toUpperCase()}{selectedOrder?.status.slice(1)}
+                </Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="font-medium">Shipping Address</h3>
+                <p className="text-muted-foreground">{selectedOrder?.address || 'No address provided'}</p>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-medium mb-2">Order Items</h3>
+              <div className="border rounded-md">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-muted/50">
+                      <th className="text-left p-3">Product</th>
+                      <th className="text-center p-3">Quantity</th>
+                      <th className="text-right p-3">Price</th>
+                      <th className="text-right p-3">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedOrder?.items.map((item) => (
+                      <tr key={item.id} className="border-t">
+                        <td className="p-3">{item.name}</td>
+                        <td className="text-center p-3">{item.quantity}</td>
+                        <td className="text-right p-3">${item.price.toFixed(2)}</td>
+                        <td className="text-right p-3">${(item.price * item.quantity).toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t font-medium">
+                      <td colSpan={3} className="text-right p-3">Subtotal:</td>
+                      <td className="text-right p-3">${selectedOrder?.total.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3} className="text-right p-3">Shipping:</td>
+                      <td className="text-right p-3">Free</td>
+                    </tr>
+                    <tr className="font-bold">
+                      <td colSpan={3} className="text-right p-3">Total:</td>
+                      <td className="text-right p-3">${selectedOrder?.total.toFixed(2)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2 pt-2">
+              <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>Close</Button>
+              <Button>Track Order</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

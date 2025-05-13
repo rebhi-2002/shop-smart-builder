@@ -37,8 +37,10 @@ import {
 } from '@/components/ui/pagination';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { MoreHorizontal, Search, Eye, RotateCw, Check, X } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { MoreHorizontal, Search, Eye, RotateCw, Check, X, Trash2, Edit, Printer, ArrowDownToLine } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Order {
   id: string;
@@ -54,6 +56,8 @@ interface Order {
     price: number;
   }[];
   address: string;
+  notes?: string;
+  paymentMethod?: string;
 }
 
 const mockOrders: Order[] = [
@@ -69,7 +73,9 @@ const mockOrders: Order[] = [
       { id: '3', name: 'Organic Cotton T-Shirt', quantity: 1, price: 29.99 },
       { id: '5', name: 'Stainless Steel Water Bottle', quantity: 1, price: 34.99 }
     ],
-    address: '123 Main St, New York, NY 10001'
+    address: '123 Main St, New York, NY 10001',
+    paymentMethod: 'Credit Card',
+    notes: 'Please leave package at the front door'
   },
   {
     id: 'ORD-5678',
@@ -82,7 +88,8 @@ const mockOrders: Order[] = [
       { id: '7', name: 'Yoga Mat', quantity: 1, price: 49.99 },
       { id: '8', name: 'Ceramic Coffee Mug', quantity: 2, price: 24.99 }
     ],
-    address: '456 Elm St, Los Angeles, CA 90001'
+    address: '456 Elm St, Los Angeles, CA 90001',
+    paymentMethod: 'PayPal'
   },
   {
     id: 'ORD-9012',
@@ -94,7 +101,8 @@ const mockOrders: Order[] = [
     items: [
       { id: '2', name: 'Smart Watch', quantity: 1, price: 199.99 }
     ],
-    address: '789 Oak St, Chicago, IL 60007'
+    address: '789 Oak St, Chicago, IL 60007',
+    paymentMethod: 'Credit Card'
   },
   {
     id: 'ORD-3456',
@@ -107,7 +115,8 @@ const mockOrders: Order[] = [
       { id: '4', name: 'Leather Wallet', quantity: 1, price: 59.99 },
       { id: '8', name: 'Ceramic Coffee Mug', quantity: 1, price: 24.99 }
     ],
-    address: '101 Pine St, Seattle, WA 98101'
+    address: '101 Pine St, Seattle, WA 98101',
+    paymentMethod: 'Credit Card'
   },
   {
     id: 'ORD-7890',
@@ -120,7 +129,8 @@ const mockOrders: Order[] = [
       { id: '5', name: 'Stainless Steel Water Bottle', quantity: 1, price: 34.99 },
       { id: '3', name: 'Organic Cotton T-Shirt', quantity: 1, price: 29.99 }
     ],
-    address: '202 Maple St, Austin, TX 78701'
+    address: '202 Maple St, Austin, TX 78701',
+    paymentMethod: 'PayPal'
   }
 ];
 
@@ -147,8 +157,13 @@ const OrdersPage: React.FC = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [orders, setOrders] = useState<Order[]>(mockOrders);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editedStatus, setEditedStatus] = useState<Order['status']>('pending');
+  const [editedNotes, setEditedNotes] = useState('');
   
   React.useEffect(() => {
     if (!isAdmin) {
@@ -159,7 +174,7 @@ const OrdersPage: React.FC = () => {
   const ordersPerPage = 10;
   
   // Filter orders based on search
-  const filteredOrders = mockOrders.filter(order => 
+  const filteredOrders = orders.filter(order => 
     order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -174,6 +189,10 @@ const OrdersPage: React.FC = () => {
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
   
   const handleStatusChange = (orderId: string, newStatus: Order['status']) => {
+    const updatedOrders = orders.map(order => 
+      order.id === orderId ? { ...order, status: newStatus } : order
+    );
+    setOrders(updatedOrders);
     toast({
       title: "Order Status Updated",
       description: `Order ${orderId} has been marked as ${newStatus}.`
@@ -183,6 +202,57 @@ const OrdersPage: React.FC = () => {
   const viewOrderDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsDetailsOpen(true);
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    const orderToDelete = orders.find(order => order.id === orderId);
+    if (orderToDelete) {
+      setSelectedOrder(orderToDelete);
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
+  const confirmDeleteOrder = () => {
+    if (selectedOrder) {
+      const updatedOrders = orders.filter(order => order.id !== selectedOrder.id);
+      setOrders(updatedOrders);
+      setIsDeleteDialogOpen(false);
+      setSelectedOrder(null);
+      toast({
+        title: "Order Deleted",
+        description: `Order ${selectedOrder.id} has been deleted.`
+      });
+    }
+  };
+
+  const handleEditOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setEditedStatus(order.status);
+    setEditedNotes(order.notes || '');
+    setIsEditDialogOpen(true);
+  };
+
+  const saveOrderChanges = () => {
+    if (selectedOrder) {
+      const updatedOrders = orders.map(order => 
+        order.id === selectedOrder.id 
+          ? { ...order, status: editedStatus, notes: editedNotes } 
+          : order
+      );
+      setOrders(updatedOrders);
+      setIsEditDialogOpen(false);
+      toast({
+        title: "Order Updated",
+        description: `Order ${selectedOrder.id} has been updated.`
+      });
+    }
+  };
+
+  const handleExportOrders = () => {
+    toast({
+      title: "Orders Exported",
+      description: "All orders have been exported to CSV"
+    });
   };
   
   return (
@@ -194,7 +264,7 @@ const OrdersPage: React.FC = () => {
             Manage and process customer orders
           </p>
         </div>
-        <div className="mt-4 md:mt-0">
+        <div className="mt-4 md:mt-0 space-x-2 flex">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -204,6 +274,10 @@ const OrdersPage: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <Button variant="outline" onClick={handleExportOrders}>
+            <ArrowDownToLine className="mr-2 h-4 w-4" />
+            Export
+          </Button>
         </div>
       </div>
       
@@ -256,6 +330,17 @@ const OrdersPage: React.FC = () => {
                         <DropdownMenuItem onClick={() => viewOrderDetails(order)}>
                           <Eye className="h-4 w-4 mr-2" /> View Details
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEditOrder(order)}>
+                          <Edit className="h-4 w-4 mr-2" /> Edit Order
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          toast({
+                            title: "Printing Order",
+                            description: "Order has been sent to printer"
+                          });
+                        }}>
+                          <Printer className="h-4 w-4 mr-2" /> Print
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Update Status</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'processing')}>
@@ -269,6 +354,13 @@ const OrdersPage: React.FC = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'cancelled')}>
                           <X className="h-4 w-4 mr-2 text-red-500" /> Cancel Order
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          onClick={() => handleDeleteOrder(order.id)}
+                          className="text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" /> Delete Order
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -344,6 +436,18 @@ const OrdersPage: React.FC = () => {
             </div>
             
             <div>
+              <h3 className="text-sm font-semibold mb-1">Payment Method</h3>
+              <p className="text-muted-foreground">{selectedOrder?.paymentMethod || "Not specified"}</p>
+            </div>
+            
+            {selectedOrder?.notes && (
+              <div>
+                <h3 className="text-sm font-semibold mb-1">Order Notes</h3>
+                <p className="text-muted-foreground">{selectedOrder?.notes}</p>
+              </div>
+            )}
+            
+            <div>
               <h3 className="text-sm font-semibold mb-2">Order Items</h3>
               <Table>
                 <TableHeader>
@@ -351,6 +455,7 @@ const OrdersPage: React.FC = () => {
                     <TableHead>Product</TableHead>
                     <TableHead className="text-right">Qty</TableHead>
                     <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -359,10 +464,11 @@ const OrdersPage: React.FC = () => {
                       <TableCell>{item.name}</TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
                       <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">${(item.quantity * item.price).toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell colSpan={2} className="text-right font-bold">Total</TableCell>
+                    <TableCell colSpan={3} className="text-right font-bold">Total</TableCell>
                     <TableCell className="text-right font-bold">${selectedOrder?.total.toFixed(2)}</TableCell>
                   </TableRow>
                 </TableBody>
@@ -378,7 +484,9 @@ const OrdersPage: React.FC = () => {
               </div>
               
               <div className="space-x-2">
-                <Button variant="outline" size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm"
                   onClick={() => {
                     setIsDetailsOpen(false);
                     toast({
@@ -387,12 +495,91 @@ const OrdersPage: React.FC = () => {
                     });
                   }}
                 >
+                  <Printer className="h-4 w-4 mr-2" />
                   Print
                 </Button>
-                <Button size="sm">Update Status</Button>
+                <Button size="sm" onClick={() => {
+                  setIsDetailsOpen(false);
+                  if (selectedOrder) handleEditOrder(selectedOrder);
+                }}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Update Status
+                </Button>
               </div>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Order Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Order Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete order {selectedOrder?.id}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="pt-4">
+            <p className="font-medium">Order Summary:</p>
+            <p>Customer: {selectedOrder?.customer}</p>
+            <p>Date: {selectedOrder?.date && new Date(selectedOrder.date).toLocaleDateString()}</p>
+            <p>Total: ${selectedOrder?.total.toFixed(2)}</p>
+          </div>
+          <DialogFooter className="flex space-x-2 justify-end">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteOrder}>
+              Delete Order
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Order Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Order {selectedOrder?.id}</DialogTitle>
+            <DialogDescription>
+              Update the order status and add notes.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Order Status</label>
+              <Select value={editedStatus} onValueChange={(value) => setEditedStatus(value as Order['status'])}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="shipped">Shipped</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Order Notes</label>
+              <Textarea
+                value={editedNotes}
+                onChange={(e) => setEditedNotes(e.target.value)}
+                placeholder="Add notes about this order..."
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveOrderChanges}>
+              Save Changes
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
