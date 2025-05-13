@@ -26,7 +26,7 @@ const Login = () => {
       if (isAdminLogin) {
         // Admin login logic
         if (email === 'admin@example.com' && password === 'admin123') {
-          login({ email, name: 'Admin User', isAdmin: true });
+          await login(email, password);
           toast.success('Welcome back, Admin!');
           navigate('/admin');
         } else {
@@ -34,7 +34,7 @@ const Login = () => {
         }
       } else {
         // Regular user login
-        login({ email, name: 'Test User', isAdmin: false });
+        await login(email, password);
         toast.success('Login successful!');
         navigate('/account');
       }
