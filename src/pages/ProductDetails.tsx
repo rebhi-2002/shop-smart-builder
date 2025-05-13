@@ -26,6 +26,7 @@ import {
 import { productService } from '@/services/productService';
 import ProductCard from '@/components/ProductCard';
 import { useCart, useWishlist, useRecentlyViewed } from '@/hooks/useCart';
+import { Product } from '@/contexts/CartContext';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -45,7 +46,7 @@ const ProductDetails = () => {
   });
   
   // Get related products
-  const { data: relatedProducts = [] } = useQuery({
+  const { data: relatedProducts = [] } = useQuery<Product[]>({
     queryKey: ['relatedProducts', id],
     queryFn: () => productService.getRelatedProducts(id || ''),
     enabled: !!id,
@@ -327,7 +328,7 @@ const ProductDetails = () => {
                   {Object.entries(specs).map(([key, value]) => (
                     <div key={key} className="grid grid-cols-3 py-2 text-sm">
                       <dt className="text-muted-foreground">{key}</dt>
-                      <dd className="col-span-2">{value}</dd>
+                      <dd className="col-span-2">{String(value)}</dd>
                     </div>
                   ))}
                 </dl>

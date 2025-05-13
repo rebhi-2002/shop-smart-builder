@@ -1,5 +1,3 @@
-// Adding the getRelatedProducts method to the productService.
-// This would typically be in src/services/productService.ts
 
 import { Product } from '@/contexts/CartContext';
 
@@ -158,9 +156,19 @@ export const productService = {
     return products.find(product => product.id === id);
   },
   
+  // Alias for getProduct to maintain compatibility with existing code
+  getProductById: async (id: string): Promise<Product | undefined> => {
+    return products.find(product => product.id === id);
+  },
+  
   // Get product categories
   getCategories: async (): Promise<string[]> => {
     return [...new Set(products.map(product => product.category))];
+  },
+  
+  // Get discounted products
+  getDiscountedProducts: async (): Promise<Product[]> => {
+    return products.filter(product => product.discount && product.discount > 0);
   },
   
   // Create a new product

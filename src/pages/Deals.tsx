@@ -8,11 +8,12 @@ import { productService } from '@/services/productService';
 import ProductCard from '@/components/ProductCard';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import { toast } from "@/components/ui/sonner";
+import { Product } from '@/contexts/CartContext';
 
 const Deals = () => {
   const navigate = useNavigate();
   
-  const { data: discountedProducts = [], isLoading } = useQuery({
+  const { data: discountedProducts = [], isLoading } = useQuery<Product[]>({
     queryKey: ['discountedProducts'],
     queryFn: productService.getDiscountedProducts,
   });
