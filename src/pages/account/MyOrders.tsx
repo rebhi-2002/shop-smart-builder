@@ -8,7 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ShoppingBag } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import RecentlyViewed from '@/components/RecentlyViewed';
 
 interface Order {
   id: string;
@@ -20,8 +21,11 @@ interface Order {
     name: string;
     quantity: number;
     price: number;
+    image?: string;
   }[];
   address?: string;
+  tracking?: string;
+  paymentMethod?: string;
 }
 
 // This would be replaced by a real API call
@@ -36,11 +40,13 @@ const fetchOrders = async (): Promise<Order[]> => {
       total: 329.97,
       status: 'delivered',
       items: [
-        { id: '1', name: 'Wireless Headphones', quantity: 1, price: 249.99 },
-        { id: '3', name: 'Organic Cotton T-Shirt', quantity: 1, price: 29.99 },
-        { id: '5', name: 'Stainless Steel Water Bottle', quantity: 1, price: 34.99 }
+        { id: '1', name: 'Wireless Headphones', quantity: 1, price: 249.99, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070' },
+        { id: '3', name: 'Organic Cotton T-Shirt', quantity: 1, price: 29.99, image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=1964' },
+        { id: '5', name: 'Stainless Steel Water Bottle', quantity: 1, price: 34.99, image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=1974' }
       ],
-      address: '123 Main St, New York, NY 10001'
+      address: '123 Main St, New York, NY 10001',
+      tracking: 'TRK12345678',
+      paymentMethod: 'Credit Card'
     },
     {
       id: 'ORD-5678',
@@ -48,10 +54,12 @@ const fetchOrders = async (): Promise<Order[]> => {
       total: 139.97,
       status: 'shipped',
       items: [
-        { id: '7', name: 'Yoga Mat', quantity: 1, price: 49.99 },
-        { id: '8', name: 'Ceramic Coffee Mug', quantity: 2, price: 24.99 }
+        { id: '7', name: 'Yoga Mat', quantity: 1, price: 49.99, image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1820' },
+        { id: '8', name: 'Ceramic Coffee Mug', quantity: 2, price: 24.99, image: 'https://images.unsplash.com/photo-1577937927133-3bbfa3dfd628?q=80&w=1974' }
       ],
-      address: '456 Elm St, Los Angeles, CA 90001'
+      address: '456 Elm St, Los Angeles, CA 90001',
+      tracking: 'TRK87654321',
+      paymentMethod: 'PayPal'
     },
     {
       id: 'ORD-9012',
@@ -59,9 +67,11 @@ const fetchOrders = async (): Promise<Order[]> => {
       total: 199.99,
       status: 'delivered',
       items: [
-        { id: '2', name: 'Smart Watch', quantity: 1, price: 199.99 }
+        { id: '2', name: 'Smart Watch', quantity: 1, price: 199.99, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999' }
       ],
-      address: '789 Oak St, Chicago, IL 60007'
+      address: '789 Oak St, Chicago, IL 60007',
+      tracking: 'TRK11223344',
+      paymentMethod: 'Credit Card'
     }
   ];
 };
@@ -83,13 +93,30 @@ const getStatusColor = (status: Order['status']) => {
   }
 };
 
+const getStatusStep = (status: Order['status']) => {
+  switch (status) {
+    case 'pending':
+      return 1;
+    case 'processing':
+      return 2;
+    case 'shipped':
+      return 3;
+    case 'delivered':
+      return 4;
+    case 'cancelled':
+      return 0;
+    default:
+      return 1;
+  }
+};
+
 const MyOrders: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
-  const { data: orders, isLoading } = useQuery({
+  const { data: orders = [], isLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: fetchOrders,
     enabled: !!user
@@ -156,9 +183,16 @@ const MyOrders: React.FC = () => {
                 <div className="space-y-2">
                   {order.items.map((item) => (
                     <div key={item.id} className="flex justify-between border-b pb-2">
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                      <div className="flex items-center">
+                        {item.image && (
+                          <div className="w-10 h-10 rounded overflow-hidden mr-3">
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                        </div>
                       </div>
                       <p className="font-medium">${item.price.toFixed(2)}</p>
                     </div>
@@ -203,17 +237,56 @@ const MyOrders: React.FC = () => {
           </DialogHeader>
           
           <div className="space-y-6">
+            {/* Order Status Progress */}
+            {selectedOrder && selectedOrder.status !== 'cancelled' && (
+              <div className="py-4">
+                <h3 className="font-medium mb-4">Order Status</h3>
+                <div className="relative">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-xs">Placed</span>
+                    <span className="text-xs">Processing</span>
+                    <span className="text-xs">Shipped</span>
+                    <span className="text-xs">Delivered</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full w-full">
+                    <div 
+                      className="h-2 bg-primary rounded-full transition-all duration-300" 
+                      style={{ width: `${(getStatusStep(selectedOrder.status) / 4) * 100}%` }} 
+                    />
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <div className={`h-4 w-4 rounded-full ${getStatusStep(selectedOrder.status) >= 1 ? 'bg-primary' : 'bg-muted-foreground'}`} style={{ marginLeft: '-2px' }}></div>
+                    <div className={`h-4 w-4 rounded-full ${getStatusStep(selectedOrder.status) >= 2 ? 'bg-primary' : 'bg-muted-foreground'}`} style={{ marginLeft: '-2px' }}></div>
+                    <div className={`h-4 w-4 rounded-full ${getStatusStep(selectedOrder.status) >= 3 ? 'bg-primary' : 'bg-muted-foreground'}`} style={{ marginLeft: '-2px' }}></div>
+                    <div className={`h-4 w-4 rounded-full ${getStatusStep(selectedOrder.status) >= 4 ? 'bg-primary' : 'bg-muted-foreground'}`} style={{ marginRight: '-2px' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <h3 className="font-medium">Order Status</h3>
                 <Badge className={selectedOrder ? getStatusColor(selectedOrder.status) : ''}>
                   {selectedOrder?.status.charAt(0).toUpperCase()}{selectedOrder?.status.slice(1)}
                 </Badge>
+                
+                {selectedOrder?.tracking && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium">Tracking Number</p>
+                    <p className="text-muted-foreground">{selectedOrder.tracking}</p>
+                  </div>
+                )}
               </div>
               
               <div className="space-y-2">
                 <h3 className="font-medium">Shipping Address</h3>
                 <p className="text-muted-foreground">{selectedOrder?.address || 'No address provided'}</p>
+                
+                <div className="mt-4">
+                  <p className="text-sm font-medium">Payment Method</p>
+                  <p className="text-muted-foreground">{selectedOrder?.paymentMethod || 'Unknown payment method'}</p>
+                </div>
               </div>
             </div>
             
@@ -232,7 +305,16 @@ const MyOrders: React.FC = () => {
                   <tbody>
                     {selectedOrder?.items.map((item) => (
                       <tr key={item.id} className="border-t">
-                        <td className="p-3">{item.name}</td>
+                        <td className="p-3">
+                          <div className="flex items-center">
+                            {item.image && (
+                              <div className="w-10 h-10 rounded overflow-hidden mr-3">
+                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                            <span>{item.name}</span>
+                          </div>
+                        </td>
                         <td className="text-center p-3">{item.quantity}</td>
                         <td className="text-right p-3">${item.price.toFixed(2)}</td>
                         <td className="text-right p-3">${(item.price * item.quantity).toFixed(2)}</td>
@@ -257,13 +339,20 @@ const MyOrders: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex justify-end space-x-2 pt-2">
+            <DialogFooter className="flex justify-end space-x-2 pt-2">
               <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>Close</Button>
-              <Button>Track Order</Button>
-            </div>
+              {selectedOrder && ['shipped', 'processing'].includes(selectedOrder.status) && (
+                <Button>Track Order</Button>
+              )}
+            </DialogFooter>
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Recently Viewed */}
+      <div className="mt-10">
+        <RecentlyViewed variant="minimal" />
+      </div>
     </div>
   );
 };

@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ChevronRight, ArrowRight, ArrowLeft, RotateCcw, Star, Truck, ShieldCheck, Clock } from 'lucide-react';
+import { ChevronRight, ArrowRight, RotateCcw, Star, Truck, ShieldCheck, Clock } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
 import {
@@ -15,10 +15,14 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
+import RecentlyViewed from '@/components/RecentlyViewed';
+import useEmblaCarousel from 'embla-carousel-react';
 
 const Index = () => {
   const [featuredCategory, setFeaturedCategory] = useState<string>('Electronics');
-  
+  const [autoplayInterval, setAutoplayInterval] = useState<NodeJS.Timeout | null>(null);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+
   // Get product categories
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
@@ -73,14 +77,47 @@ const Index = () => {
     }
   ];
 
+  // Set up autoplay for hero carousel
+  useEffect(() => {
+    if (emblaApi) {
+      const interval = setInterval(() => {
+        emblaApi.scrollNext();
+      }, 5000); // Auto-scroll every 5 seconds
+      
+      setAutoplayInterval(interval);
+      
+      // Clear the interval when the component unmounts
+      return () => {
+        if (autoplayInterval) clearInterval(autoplayInterval);
+      };
+    }
+  }, [emblaApi]);
+
+  // Reset the autoplay when user manually interacts with the carousel
+  const handleCarouselInteraction = () => {
+    if (autoplayInterval) {
+      clearInterval(autoplayInterval);
+      
+      const interval = setInterval(() => {
+        emblaApi?.scrollNext();
+      }, 5000);
+      
+      setAutoplayInterval(interval);
+    }
+  };
+
   return (
     <div>
       {/* Hero Carousel Section */}
       <section className="mb-8">
-        <Carousel className="w-full">
-          <CarouselContent>
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex">
             {heroSlides.map((slide, index) => (
-              <CarouselItem key={index}>
+              <div 
+                key={index} 
+                className="flex-[0_0_100%] min-w-0"
+                onClick={handleCarouselInteraction}
+              >
                 <div className={`relative bg-gradient-to-r ${slide.color} text-white h-[500px] w-full rounded-lg overflow-hidden`}>
                   <div className="absolute inset-0 bg-black/30"></div>
                   <img 
@@ -96,12 +133,26 @@ const Index = () => {
                     </Button>
                   </div>
                 </div>
-              </CarouselItem>
+              </div>
             ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-4" />
-          <CarouselNext className="right-4" />
-        </Carousel>
+          </div>
+        </div>
+        <div className="flex justify-center mt-4 gap-2">
+          {heroSlides.map((_, index) => (
+            <Button 
+              key={index}
+              variant="ghost" 
+              size="icon" 
+              className={`w-3 h-3 p-0 rounded-full ${
+                emblaApi?.selectedScrollSnap() === index ? 'bg-primary' : 'bg-muted'
+              }`}
+              onClick={() => {
+                emblaApi?.scrollTo(index);
+                handleCarouselInteraction();
+              }}
+            />
+          ))}
+        </div>
       </section>
       
       {/* Categories Quick Links */}
@@ -328,6 +379,9 @@ const Index = () => {
             ))}
         </div>
       </section>
+      
+      {/* Recently Viewed Products */}
+      <RecentlyViewed />
       
       {/* Newsletter Section */}
       <section className="py-16 bg-primary text-white">

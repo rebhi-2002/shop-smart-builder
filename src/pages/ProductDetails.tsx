@@ -25,8 +25,11 @@ import {
 } from 'lucide-react';
 import { productService } from '@/services/productService';
 import ProductCard from '@/components/ProductCard';
+import RecentlyViewed from '@/components/RecentlyViewed';
 import { useCart, useWishlist, useRecentlyViewed } from '@/hooks/useCart';
 import { Product } from '@/contexts/CartContext';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Slider } from '@/components/ui/slider';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +44,7 @@ const ProductDetails = () => {
   // Get product details
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
-    queryFn: () => productService.getProductById(id || ''),
+    queryFn: () => productService.getProduct(id || ''),
     enabled: !!id,
   });
   
@@ -136,6 +139,14 @@ const ProductDetails = () => {
   const inWishlist = isInWishlist(product.id);
   const specs = product.specs || {};
   
+  // Generate additional product images
+  const additionalImages = [
+    product.image,
+    `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&v=1`,
+    `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&v=2`,
+    `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&v=3`
+  ];
+  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumbs */}
@@ -155,28 +166,30 @@ const ProductDetails = () => {
       <div className="grid md:grid-cols-2 gap-8 mb-12">
         {/* Product Images */}
         <div>
-          <div className="aspect-square overflow-hidden rounded-lg mb-4">
+          <AspectRatio ratio={1 / 1} className="overflow-hidden rounded-lg mb-4 bg-muted/20">
             <img 
               src={activeImage} 
               alt={product.name} 
               className="w-full h-full object-cover"
             />
-          </div>
+          </AspectRatio>
           
           <div className="grid grid-cols-4 gap-2">
-            <div 
-              className={`aspect-square border rounded cursor-pointer overflow-hidden ${
-                activeImage === product.image ? 'ring-2 ring-primary' : ''
-              }`}
-              onClick={() => setActiveImage(product.image)}
-            >
-              <img 
-                src={product.image} 
-                alt={product.name} 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            {/* More images would go here */}
+            {additionalImages.map((img, index) => (
+              <div 
+                key={index}
+                className={`aspect-square border rounded cursor-pointer overflow-hidden ${
+                  activeImage === img ? 'ring-2 ring-primary' : ''
+                }`}
+                onClick={() => setActiveImage(img)}
+              >
+                <img 
+                  src={img} 
+                  alt={`${product.name} - Image ${index + 1}`} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
           </div>
         </div>
         
@@ -303,38 +316,117 @@ const ProductDetails = () => {
             </div>
           </div>
           
-          {/* Description */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between cursor-pointer border-b py-3" onClick={() => setActiveTab(activeTab === 'description' ? '' : 'description')}>
-              <h3 className="font-medium">Description</h3>
-              <ChevronDown className={`h-5 w-5 transition-transform ${activeTab === 'description' ? 'rotate-180' : ''}`} />
-            </div>
-            {activeTab === 'description' && (
-              <div className="py-3 text-muted-foreground">
-                <p>{product.description}</p>
-              </div>
-            )}
-          </div>
-          
-          {/* Specifications */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between cursor-pointer border-b py-3" onClick={() => setActiveTab(activeTab === 'specs' ? '' : 'specs')}>
-              <h3 className="font-medium">Specifications</h3>
-              <ChevronDown className={`h-5 w-5 transition-transform ${activeTab === 'specs' ? 'rotate-180' : ''}`} />
-            </div>
-            {activeTab === 'specs' && (
-              <div className="py-3">
-                <dl className="divide-y">
-                  {Object.entries(specs).map(([key, value]) => (
+          {/* Product details tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="description">Description</TabsTrigger>
+              <TabsTrigger value="specs">Specifications</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="description" className="py-4">
+              <p className="text-muted-foreground">{product.description}</p>
+            </TabsContent>
+            
+            <TabsContent value="specs" className="py-4">
+              <dl className="divide-y">
+                {Object.entries(specs).length > 0 ? (
+                  Object.entries(specs).map(([key, value]) => (
                     <div key={key} className="grid grid-cols-3 py-2 text-sm">
                       <dt className="text-muted-foreground">{key}</dt>
                       <dd className="col-span-2">{String(value)}</dd>
                     </div>
-                  ))}
-                </dl>
+                  ))
+                ) : (
+                  <div className="py-4 text-center text-muted-foreground">
+                    <p>No specifications available for this product.</p>
+                    <p className="text-sm mt-1">Typical specifications for {product.category} products include:</p>
+                    <ul className="mt-2 list-disc list-inside text-left mx-auto max-w-md">
+                      {product.category === 'Electronics' && (
+                        <>
+                          <li>Dimensions: 10 x 5 x 2 inches</li>
+                          <li>Weight: 1.2 lbs</li>
+                          <li>Battery Life: 12 hours</li>
+                          <li>Connectivity: Bluetooth 5.0, USB-C</li>
+                          <li>Warranty: 2 years</li>
+                        </>
+                      )}
+                      {product.category === 'Fashion' && (
+                        <>
+                          <li>Material: 100% Cotton</li>
+                          <li>Care: Machine washable</li>
+                          <li>Origin: Imported</li>
+                          <li>Fit: Regular fit</li>
+                          <li>Dimensions: See size chart</li>
+                        </>
+                      )}
+                      {product.category === 'Home' && (
+                        <>
+                          <li>Material: Eco-friendly</li>
+                          <li>Dimensions: Various sizes available</li>
+                          <li>Care: Wipe clean with damp cloth</li>
+                          <li>Assembly: Required</li>
+                          <li>Warranty: 1 year</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </dl>
+            </TabsContent>
+            
+            <TabsContent value="reviews" className="py-4">
+              <div className="space-y-6">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                  <div className="text-center">
+                    <div className="text-5xl font-bold">{product.rating?.toFixed(1) || '0.0'}</div>
+                    <div className="flex justify-center my-2 text-amber-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className="h-4 w-4 fill-current" 
+                          fill={i < Math.floor(product.rating || 0) ? "currentColor" : "none"} 
+                        />
+                      ))}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Based on {product.reviews || 0} reviews</div>
+                  </div>
+                  
+                  <div className="flex-1 space-y-2 w-full">
+                    {[5, 4, 3, 2, 1].map((star) => {
+                      // Calculate percentage for each star rating (mock data)
+                      const percent = star === 5 ? 60 :
+                                     star === 4 ? 25 :
+                                     star === 3 ? 10 :
+                                     star === 2 ? 4 :
+                                     1;
+                      return (
+                        <div key={star} className="flex items-center gap-4">
+                          <div className="flex items-center w-16">
+                            <span className="text-sm mr-1">{star}</span>
+                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                          </div>
+                          <div className="w-full max-w-md">
+                            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-amber-400" 
+                                style={{ width: `${percent}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                          <span className="text-sm text-muted-foreground w-10">{percent}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                
+                <div className="border-t pt-6">
+                  <Button variant="outline" className="w-full">Write a Review</Button>
+                </div>
               </div>
-            )}
-          </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
       
@@ -349,6 +441,9 @@ const ProductDetails = () => {
           </div>
         </div>
       )}
+      
+      {/* Recently Viewed */}
+      <RecentlyViewed />
     </div>
   );
 };
