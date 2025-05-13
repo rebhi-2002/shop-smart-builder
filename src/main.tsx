@@ -2,10 +2,16 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { FramerMotionProvider } from './providers/FramerMotionProvider' 
+import { FramerMotionProvider } from './providers/FramerMotionProvider'
+import { AuthProvider } from './contexts/AuthContext'
+import { CartProvider } from './contexts/CartContext'
 
 createRoot(document.getElementById("root")!).render(
   <FramerMotionProvider>
-    <App />
+    <AuthProvider>
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </AuthProvider>
   </FramerMotionProvider>
 );
