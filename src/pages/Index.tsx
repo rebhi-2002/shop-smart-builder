@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ChevronRight, ArrowRight, ArrowLeft, ArrowRightCircle, Star, Truck, ShieldCheck, Clock } from 'lucide-react';
+import { ChevronRight, ArrowRight, ArrowLeft, RotateCcw, Star, Truck, ShieldCheck, Clock } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
 import {
@@ -301,7 +301,7 @@ const Index = () => {
           </div>
           
           <div className="flex flex-col items-center text-center p-6 border rounded-lg">
-            <ArrowLeftCircle className="h-10 w-10 text-primary mb-4" />
+            <RotateCcw className="h-10 w-10 text-primary mb-4" />
             <h3 className="text-lg font-bold mb-2">Easy Returns</h3>
             <p className="text-muted-foreground text-sm">30-day return policy</p>
           </div>

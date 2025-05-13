@@ -1,345 +1,211 @@
+// Adding the getRelatedProducts method to the productService.
+// This would typically be in src/services/productService.ts
+
 import { Product } from '@/contexts/CartContext';
 
-// Mock function to simulate fetching products from an API
-const fetchProducts = async (): Promise<Product[]> => {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  return [
-    {
-      id: '1',
-      name: 'Wireless Headphones',
-      description: 'High-quality wireless headphones with noise cancellation and long battery life.',
-      price: 249.99,
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
-      category: 'Electronics',
-      rating: 4.5,
-      reviews: 120,
-      stock: 50,
-      seller: 'AudioTech',
-      discount: 10,
-      tags: ['wireless', 'audio', 'headphones']
-    },
-    {
-      id: '2',
-      name: 'Smart Watch',
-      description: 'Advanced smartwatch with fitness tracking, notifications, and app support.',
-      price: 199.99,
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf0c',
-      category: 'Electronics',
-      rating: 4.2,
-      reviews: 95,
-      stock: 30,
-      seller: 'TechGear',
-      discount: 5,
-      tags: ['smartwatch', 'wearable', 'fitness']
-    },
-    {
-      id: '3',
-      name: 'Organic Cotton T-Shirt',
-      description: 'Comfortable and eco-friendly t-shirt made from 100% organic cotton.',
-      price: 29.99,
-      image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a',
-      category: 'Fashion',
-      rating: 4.0,
-      reviews: 68,
-      stock: 100,
-      seller: 'EcoThreads',
-      discount: 15,
-      tags: ['organic', 'cotton', 't-shirt']
-    },
-    {
-      id: '4',
-      name: 'Leather Wallet',
-      description: 'Genuine leather wallet with multiple card slots and a sleek design.',
-      price: 59.99,
-      image: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6',
-      category: 'Fashion',
-      rating: 4.3,
-      reviews: 75,
-      stock: 40,
-      seller: 'LuxuryLeathers',
-      discount: 20,
-      tags: ['leather', 'wallet', 'accessories']
-    },
-    {
-      id: '5',
-      name: 'Stainless Steel Water Bottle',
-      description: 'Reusable water bottle made from high-quality stainless steel.',
-      price: 34.99,
-      image: 'https://images.unsplash.com/photo-1549097185-320bbca27645',
-      category: 'Home',
-      rating: 4.6,
-      reviews: 110,
-      stock: 60,
-      seller: 'AquaPure',
-      discount: 0,
-      tags: ['stainless steel', 'water bottle', 'eco-friendly']
-    },
-    {
-      id: '6',
-      name: 'Ergonomic Office Chair',
-      description: 'Ergonomic office chair with adjustable height, lumbar support, and breathable mesh back.',
-      price: 299.99,
-      image: 'https://images.unsplash.com/photo-1560525794-8884c2550f14',
-      category: 'Home',
-      rating: 4.7,
-      reviews: 135,
-      stock: 25,
-      seller: 'ComfortPlus',
-      discount: 25,
-      tags: ['ergonomic', 'office chair', 'furniture']
-    },
-    {
-      id: '7',
-      name: 'Yoga Mat',
-      description: 'Non-slip yoga mat for comfortable and effective workouts.',
-      price: 49.99,
-      image: 'https://images.unsplash.com/photo-1581579151994-14044a995a36',
-      category: 'Sports',
-      rating: 4.4,
-      reviews: 88,
-      stock: 55,
-      seller: 'FitLife',
-      discount: 0,
-      tags: ['yoga', 'mat', 'fitness']
-    },
-    {
-      id: '8',
-      name: 'Ceramic Coffee Mug',
-      description: 'Stylish ceramic coffee mug with a comfortable handle and a glossy finish.',
-      price: 24.99,
-      image: 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8',
-      category: 'Home',
-      rating: 4.1,
-      reviews: 72,
-      stock: 80,
-      seller: 'ClayCraft',
-      discount: 10,
-      tags: ['ceramic', 'coffee mug', 'kitchen']
-    }
-  ];
-};
-
-// Mock function to simulate fetching categories from an API
-const fetchCategories = async (): Promise<string[]> => {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  return ['Electronics', 'Fashion', 'Home', 'Sports'];
-};
-
-// Mock function to simulate searching products from an API
-const searchProducts = async (query: string): Promise<Product[]> => {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 400));
-  
-  const allProducts = await fetchProducts();
-  
-  return allProducts.filter(product =>
-    product.name.toLowerCase().includes(query.toLowerCase()) ||
-    product.description.toLowerCase().includes(query.toLowerCase()) ||
-    product.category.toLowerCase().includes(query.toLowerCase())
-  );
-};
-
-// Mock function to simulate fetching discounted products from an API
-const fetchDiscountedProducts = async (): Promise<Product[]> => {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
-  const allProducts = await fetchProducts();
-  
-  return allProducts.filter(product => product.discount && product.discount > 0);
-};
-
-// Mock database
-let products: Product[] = [
+// Mock product database
+const products: Product[] = [
   {
     id: '1',
-    name: 'Wireless Headphones',
-    description: 'High-quality wireless headphones with noise cancellation and long battery life.',
-    price: 249.99,
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
+    name: 'Gaming Laptop',
+    description: 'High-performance laptop for gaming enthusiasts.',
+    price: 1200,
+    image: 'https://source.unsplash.com/random/300x300?gaminglaptop',
     category: 'Electronics',
-    rating: 4.5,
-    reviews: 120,
-    stock: 50,
-    seller: 'AudioTech',
     discount: 10,
-    tags: ['wireless', 'audio', 'headphones']
+    stock: 50,
+    rating: 4.5,
+    reviews: 25,
+    seller: 'TechStore',
+    tags: ['gaming', 'laptop', 'high-performance'],
   },
   {
     id: '2',
-    name: 'Smart Watch',
-    description: 'Advanced smartwatch with fitness tracking, notifications, and app support.',
-    price: 199.99,
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf0c',
-    category: 'Electronics',
+    name: 'Running Shoes',
+    description: 'Comfortable and durable shoes for running.',
+    price: 80,
+    image: 'https://source.unsplash.com/random/300x300?runningshoes',
+    category: 'Fashion',
+    discount: 15,
+    stock: 100,
     rating: 4.2,
-    reviews: 95,
-    stock: 30,
-    seller: 'TechGear',
-    discount: 5,
-    tags: ['smartwatch', 'wearable', 'fitness']
+    reviews: 30,
+    seller: 'FitLife',
+    tags: ['running', 'shoes', 'sports'],
   },
   {
     id: '3',
-    name: 'Organic Cotton T-Shirt',
-    description: 'Comfortable and eco-friendly t-shirt made from 100% organic cotton.',
-    price: 29.99,
-    image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a',
-    category: 'Fashion',
+    name: 'Coffee Maker',
+    description: 'Automatic coffee maker for home use.',
+    price: 50,
+    image: 'https://source.unsplash.com/random/300x300?coffeemaker',
+    category: 'Home',
+    discount: 5,
+    stock: 75,
     rating: 4.0,
-    reviews: 68,
-    stock: 100,
-    seller: 'EcoThreads',
-    discount: 15,
-    tags: ['organic', 'cotton', 't-shirt']
+    reviews: 20,
+    seller: 'HomeNeeds',
+    tags: ['coffee', 'maker', 'kitchen'],
   },
   {
     id: '4',
-    name: 'Leather Wallet',
-    description: 'Genuine leather wallet with multiple card slots and a sleek design.',
-    price: 59.99,
-    image: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6',
-    category: 'Fashion',
-    rating: 4.3,
-    reviews: 75,
-    stock: 40,
-    seller: 'LuxuryLeathers',
+    name: 'Smart Watch',
+    description: 'Advanced smart watch with fitness tracking.',
+    price: 250,
+    image: 'https://source.unsplash.com/random/300x300?smartwatch',
+    category: 'Electronics',
     discount: 20,
-    tags: ['leather', 'wallet', 'accessories']
+    stock: 40,
+    rating: 4.7,
+    reviews: 40,
+    seller: 'TechStore',
+    tags: ['smartwatch', 'fitness', 'wearable'],
   },
   {
     id: '5',
-    name: 'Stainless Steel Water Bottle',
-    description: 'Reusable water bottle made from high-quality stainless steel.',
-    price: 34.99,
-    image: 'https://images.unsplash.com/photo-1549097185-320bbca27645',
-    category: 'Home',
-    rating: 4.6,
-    reviews: 110,
-    stock: 60,
-    seller: 'AquaPure',
-    discount: 0,
-    tags: ['stainless steel', 'water bottle', 'eco-friendly']
+    name: 'Denim Jeans',
+    description: 'Classic denim jeans for everyday wear.',
+    price: 60,
+    image: 'https://source.unsplash.com/random/300x300?denimjeans',
+    category: 'Fashion',
+    discount: 10,
+    stock: 90,
+    rating: 4.3,
+    reviews: 28,
+    seller: 'StyleHub',
+    tags: ['denim', 'jeans', 'casual'],
   },
   {
     id: '6',
-    name: 'Ergonomic Office Chair',
-    description: 'Ergonomic office chair with adjustable height, lumbar support, and breathable mesh back.',
-    price: 299.99,
-    image: 'https://images.unsplash.com/photo-1560525794-8884c2550f14',
+    name: 'Blender',
+    description: 'High-speed blender for smoothies and shakes.',
+    price: 70,
+    image: 'https://source.unsplash.com/random/300x300?blender',
     category: 'Home',
-    rating: 4.7,
-    reviews: 135,
-    stock: 25,
-    seller: 'ComfortPlus',
-    discount: 25,
-    tags: ['ergonomic', 'office chair', 'furniture']
+    discount: 15,
+    stock: 60,
+    rating: 4.1,
+    reviews: 15,
+    seller: 'KitchenPro',
+    tags: ['blender', 'smoothie', 'kitchen'],
   },
   {
     id: '7',
-    name: 'Yoga Mat',
-    description: 'Non-slip yoga mat for comfortable and effective workouts.',
-    price: 49.99,
-    image: 'https://images.unsplash.com/photo-1581579151994-14044a995a36',
-    category: 'Sports',
-    rating: 4.4,
-    reviews: 88,
-    stock: 55,
-    seller: 'FitLife',
-    discount: 0,
-    tags: ['yoga', 'mat', 'fitness']
+    name: 'Wireless Headphones',
+    description: 'Over-ear wireless headphones with noise cancellation.',
+    price: 180,
+    image: 'https://source.unsplash.com/random/300x300?wirelessheadphones',
+    category: 'Electronics',
+    discount: 5,
+    stock: 35,
+    rating: 4.6,
+    reviews: 35,
+    seller: 'AudioTech',
+    tags: ['headphones', 'wireless', 'audio'],
   },
   {
     id: '8',
-    name: 'Ceramic Coffee Mug',
-    description: 'Stylish ceramic coffee mug with a comfortable handle and a glossy finish.',
-    price: 24.99,
-    image: 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8',
-    category: 'Home',
-    rating: 4.1,
-    reviews: 72,
+    name: 'Summer Dress',
+    description: 'Light and airy summer dress for women.',
+    price: 45,
+    image: 'https://source.unsplash.com/random/300x300?summerdress',
+    category: 'Fashion',
+    discount: 20,
     stock: 80,
-    seller: 'ClayCraft',
+    rating: 4.4,
+    reviews: 22,
+    seller: 'StyleHub',
+    tags: ['dress', 'summer', 'women'],
+  },
+  {
+    id: '9',
+    name: 'Toaster Oven',
+    description: 'Compact toaster oven for small kitchens.',
+    price: 65,
+    image: 'https://source.unsplash.com/random/300x300?toasteroven',
+    category: 'Home',
     discount: 10,
-    tags: ['ceramic', 'coffee mug', 'kitchen']
-  }
+    stock: 55,
+    rating: 3.9,
+    reviews: 18,
+    seller: 'HomeNeeds',
+    tags: ['toaster', 'oven', 'kitchen'],
+  },
+  {
+    id: '10',
+    name: 'Bluetooth Speaker',
+    description: 'Portable Bluetooth speaker with loud sound.',
+    price: 90,
+    image: 'https://source.unsplash.com/random/300x300?bluetoothspeaker',
+    category: 'Electronics',
+    discount: 15,
+    stock: 45,
+    rating: 4.8,
+    reviews: 45,
+    seller: 'AudioTech',
+    tags: ['speaker', 'bluetooth', 'portable'],
+  },
 ];
 
-// Replace with your actual service implementation
 export const productService = {
+  // Get all products
   getProducts: async (): Promise<Product[]> => {
-    return fetchProducts();
-  },
-  
-  getProductById: async (id: string): Promise<Product | undefined> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const allProducts = await fetchProducts();
-    return allProducts.find(product => product.id === id);
-  },
-  
-  getCategories: async (): Promise<string[]> => {
-    return fetchCategories();
-  },
-  
-  searchProducts: async (query: string): Promise<Product[]> => {
-    return searchProducts(query);
-  },
-  
-  getProductsByCategory: async (category: string): Promise<Product[]> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
-    const allProducts = await fetchProducts();
-    return allProducts.filter(product => product.category === category);
-  },
-  
-  getDiscountedProducts: async (): Promise<Product[]> => {
-    return fetchDiscountedProducts();
+    return products;
   },
 
-  // Admin functions for managing products
-  createProduct: async (productData: Omit<Product, 'id'>): Promise<Product> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
+  // Get a single product by ID
+  getProduct: async (id: string): Promise<Product | undefined> => {
+    return products.find(product => product.id === id);
+  },
+  
+  // Get product categories
+  getCategories: async (): Promise<string[]> => {
+    return [...new Set(products.map(product => product.category))];
+  },
+  
+  // Create a new product
+  createProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
     const newProduct: Product = {
-      ...productData,
-      id: Math.random().toString(36).substring(2, 11), // Generate random ID
+      id: String(products.length + 1),
+      ...product,
     };
-    
-    products.unshift(newProduct);
+    products.push(newProduct);
     return newProduct;
   },
-  
-  updateProduct: async (product: Product): Promise<Product> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const index = products.findIndex(p => p.id === product.id);
-    if (index >= 0) {
-      products[index] = { ...product };
-      return products[index];
+
+  // Update an existing product
+  updateProduct: async (updatedProduct: Product): Promise<Product> => {
+    const index = products.findIndex(product => product.id === updatedProduct.id);
+    if (index !== -1) {
+      products[index] = updatedProduct;
+      return updatedProduct;
+    } else {
+      throw new Error(`Product with id ${updatedProduct.id} not found`);
     }
-    
-    throw new Error('Product not found');
+  },
+
+  // Delete a product
+  deleteProduct: async (id: string): Promise<void> => {
+    const index = products.findIndex(product => product.id === id);
+    if (index !== -1) {
+      products.splice(index, 1);
+    } else {
+      throw new Error(`Product with id ${id} not found`);
+    }
   },
   
-  deleteProduct: async (productId: string): Promise<void> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
+  // Get related products based on category
+  getRelatedProducts: async (productId: string): Promise<Product[]> => {
+    // Find the current product
+    const product = products.find(p => p.id === productId);
     
-    const index = products.findIndex(p => p.id === productId);
-    if (index >= 0) {
-      products.splice(index, 1);
-      return;
+    if (!product) {
+      return [];
     }
     
-    throw new Error('Product not found');
+    // Find products in the same category, excluding the current product
+    return products
+      .filter(p => p.category === product.category && p.id !== productId)
+      .slice(0, 4); // Return up to 4 related products
   }
 };

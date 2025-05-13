@@ -175,12 +175,34 @@ const ProductManagement: React.FC = () => {
         // Update existing product
         await productService.updateProduct({
           id: editingProduct.id,
-          ...productData,
+          name: productData.name,
+          description: productData.description,
+          price: productData.price,
+          image: productData.image,
+          category: productData.category,
+          discount: productData.discount,
+          stock: productData.stock,
+          rating: productData.rating,
+          reviews: productData.reviews,
+          seller: productData.seller,
+          tags: productData.tags,
         });
         toast.success('Product updated successfully');
       } else {
         // Add new product
-        await productService.createProduct(productData);
+        await productService.createProduct({
+          name: productData.name,
+          description: productData.description,
+          price: productData.price,
+          image: productData.image,
+          category: productData.category,
+          discount: productData.discount,
+          stock: productData.stock,
+          rating: productData.rating,
+          reviews: productData.reviews,
+          seller: productData.seller,
+          tags: productData.tags,
+        });
         toast.success('Product added successfully');
       }
       
