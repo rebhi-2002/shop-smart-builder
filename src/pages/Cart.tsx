@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -8,19 +7,38 @@ import { useToast } from "@/hooks/use-toast";
 import { Trash2, Plus, Minus, RefreshCcw, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { toast } from '@/components/ui/sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, 
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter, 
+  AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { motion } from 'framer-motion';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice, applyPromoCode, promoDiscount, activePromoCode } = useCart();
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
   const [promoCode, setPromoCode] = useState('');
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [itemNameToDelete, setItemNameToDelete] = useState<string | null>(null);
   
-  const handleRemove = (productId: string, productName: string) => {
-    removeFromCart(productId);
-    uiToast({
-      title: "Item Removed",
-      description: `${productName} has been removed from your cart.`,
-    });
+  const openDeleteDialog = (productId: string, productName: string) => {
+    setItemToDelete(productId);
+    setItemNameToDelete(productName);
+  };
+  
+  const closeDeleteDialog = () => {
+    setItemToDelete(null);
+    setItemNameToDelete(null);
+  };
+  
+  const confirmRemove = () => {
+    if (itemToDelete && itemNameToDelete) {
+      removeFromCart(itemToDelete);
+      toast.success("Item Removed", {
+        description: `${itemNameToDelete} has been removed from your cart.`,
+        icon: <Trash2 className="h-4 w-4 text-red-500" />
+      });
+      closeDeleteDialog();
+    }
   };
 
   const handleCheckout = () => {
@@ -71,63 +89,71 @@ const Cart = () => {
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => (
-            <Card key={item.id} className="overflow-hidden">
-              <div className="flex flex-col sm:flex-row">
-                {/* Product Image */}
-                <div className="w-full sm:w-48 h-48">
-                  <Link to={`/products/${item.id}`}>
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </Link>
-                </div>
-                
-                {/* Product Info */}
-                <CardContent className="flex-1 p-4 flex flex-col justify-between">
-                  <div>
-                    <Link to={`/products/${item.id}`} className="hover:underline">
-                      <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
+            <motion.div 
+              key={item.id} 
+              initial={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              layout
+              className="w-full"
+            >
+              <Card className="overflow-hidden">
+                <div className="flex flex-col sm:flex-row">
+                  {/* Product Image */}
+                  <div className="w-full sm:w-48 h-48">
+                    <Link to={`/products/${item.id}`}>
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
                     </Link>
-                    <p className="text-sm text-muted-foreground mb-2">{item.category}</p>
-                    <p className="font-bold">${item.price.toFixed(2)}</p>
                   </div>
                   
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        disabled={item.quantity <= 1}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="w-8 text-center">{item.quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
+                  {/* Product Info */}
+                  <CardContent className="flex-1 p-4 flex flex-col justify-between">
+                    <div>
+                      <Link to={`/products/${item.id}`} className="hover:underline">
+                        <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
+                      </Link>
+                      <p className="text-sm text-muted-foreground mb-2">{item.category}</p>
+                      <p className="font-bold">${item.price.toFixed(2)}</p>
                     </div>
                     
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleRemove(item.id, item.name)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" /> Remove
-                    </Button>
-                  </div>
-                </CardContent>
-              </div>
-            </Card>
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          disabled={item.quantity <= 1}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-8 text-center">{item.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => openDeleteDialog(item.id, item.name)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" /> Remove
+                      </Button>
+                    </div>
+                  </CardContent>
+                </div>
+              </Card>
+            </motion.div>
           ))}
           
           <div className="flex justify-between items-center">
@@ -175,9 +201,11 @@ const Cart = () => {
                 </div>
               </div>
               
-              <Button className="w-full" size="lg" onClick={handleCheckout}>
-                Proceed to Checkout
-              </Button>
+              <motion.div whileTap={{ scale: 0.97 }}>
+                <Button className="w-full" size="lg" onClick={handleCheckout}>
+                  Proceed to Checkout
+                </Button>
+              </motion.div>
               
               <div className="mt-4">
                 <h4 className="font-semibold mb-2">Promo Code</h4>
@@ -227,6 +255,24 @@ const Cart = () => {
           </Card>
         </div>
       </div>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!itemToDelete} onOpenChange={() => closeDeleteDialog()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Item</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove "{itemNameToDelete}" from your cart?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove} className="bg-red-500 hover:bg-red-600">
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
