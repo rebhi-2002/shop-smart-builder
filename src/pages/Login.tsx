@@ -1,117 +1,182 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogIn, User } from 'lucide-react';
+import { Lock, UserCircle2, Key } from 'lucide-react';
 
-const formSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters')
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-const Login: React.FC = () => {
+const Login = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
-  
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: ''
-    }
-  });
-  
-  const onSubmit = async (data: FormData) => {
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     try {
-      await login(data.email, data.password);
-      navigate('/');
+      if (isAdminLogin) {
+        // Admin login logic
+        if (email === 'admin@example.com' && password === 'admin123') {
+          login({ email, name: 'Admin User', isAdmin: true });
+          toast.success('Welcome back, Admin!');
+          navigate('/admin');
+        } else {
+          toast.error('Invalid admin credentials');
+        }
+      } else {
+        // Regular user login
+        login({ email, name: 'Test User', isAdmin: false });
+        toast.success('Login successful!');
+        navigate('/account');
+      }
     } catch (error) {
-      // Error is handled in AuthContext
+      toast.error('Login failed. Please check your credentials.');
     }
   };
-  
+
   return (
-    <div className="container max-w-md mx-auto py-10">
-      <Card>
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Sign in</CardTitle>
-          <CardDescription className="text-center">
-            Enter your email and password to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="pt-2">
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Signing in...' : 'Sign In'}
-                  <LogIn className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <div className="text-sm text-muted-foreground text-center w-full">
-            <span>New user? </span>
-            <Link to="/register" className="text-primary hover:underline">
-              Create an account
-            </Link>
-          </div>
+    <div className="container mx-auto px-4 py-12">
+      <div className="max-w-md mx-auto">
+        <Card>
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-2xl">Sign in to your account</CardTitle>
+            <CardDescription>
+              Enter your email and password to access your account
+            </CardDescription>
+          </CardHeader>
           
-          <div className="text-xs text-muted-foreground text-center w-full">
-            <p>Demo Accounts:</p>
-            <p>Admin: admin@example.com / admin123</p>
-            <p>User: user@example.com / user123</p>
-          </div>
-        </CardFooter>
-      </Card>
+          <Tabs defaultValue="user" className="px-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="user" onClick={() => setIsAdminLogin(false)}>User</TabsTrigger>
+              <TabsTrigger value="admin" onClick={() => setIsAdminLogin(true)}>Admin</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="user">
+              <form onSubmit={handleLogin}>
+                <CardContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <UserCircle2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-9"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Password</Label>
+                      <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-9"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="remember"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => 
+                        setRememberMe(checked as boolean)
+                      }
+                    />
+                    <Label htmlFor="remember" className="text-sm font-normal">
+                      Remember me
+                    </Label>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex flex-col space-y-4">
+                  <Button type="submit" className="w-full">
+                    Sign In
+                  </Button>
+                  <div className="text-center text-sm">
+                    Don't have an account?{" "}
+                    <Link to="/register" className="text-primary hover:underline">
+                      Sign up
+                    </Link>
+                  </div>
+                </CardFooter>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="admin">
+              <form onSubmit={handleLogin}>
+                <CardContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-email">Admin Email</Label>
+                    <div className="relative">
+                      <UserCircle2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="admin-email"
+                        type="email"
+                        placeholder="admin@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-9"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-password">Admin Password</Label>
+                    <div className="relative">
+                      <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="admin-password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-9"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-sm text-amber-800">
+                      <strong>Admin Login:</strong> 
+                      <br />Email: admin@example.com
+                      <br />Password: admin123
+                    </p>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" className="w-full">
+                    Admin Login
+                  </Button>
+                </CardFooter>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </Card>
+      </div>
     </div>
   );
 };

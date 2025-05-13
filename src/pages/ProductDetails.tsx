@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -36,6 +35,7 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState('');
   const [activeTab, setActiveTab] = useState('description');
+  const [productImages, setProductImages] = useState<string[]>([]);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToRecentlyViewed } = useRecentlyViewed();
@@ -55,11 +55,20 @@ const ProductDetails = () => {
     enabled: !!id,
   });
   
-  // Update recently viewed on product load
+  // Generate and set product images when product loads
   useEffect(() => {
     if (product) {
+      // Create unique image URLs for this product using its ID for cache-busting
+      const images = [
+        product.image,
+        `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&id=${product.id}&v=1`,
+        `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&id=${product.id}&v=2`,
+        `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&id=${product.id}&v=3`
+      ];
+      
+      setProductImages(images);
+      setActiveImage(images[0]);
       addToRecentlyViewed(product);
-      setActiveImage(product.image);
     }
   }, [product, addToRecentlyViewed]);
   
@@ -137,15 +146,51 @@ const ProductDetails = () => {
     : null;
   
   const inWishlist = isInWishlist(product.id);
-  const specs = product.specs || {};
   
-  // Generate additional product images
-  const additionalImages = [
-    product.image,
-    `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&v=1`,
-    `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&v=2`,
-    `https://source.unsplash.com/random/600x600?${product.category.toLowerCase()}&v=3`
-  ];
+  // Sample specifications based on product category
+  const getProductSpecs = (product: Product) => {
+    const baseSpecs = {
+      Brand: product.seller || 'Generic',
+      'Model Number': `${product.category.substring(0, 3)}-${Math.floor(Math.random() * 1000)}`,
+      'Warranty': '2 years limited',
+    };
+    
+    if (product.category === 'Electronics') {
+      return {
+        ...baseSpecs,
+        'Dimensions': '10 x 5 x 2 inches',
+        'Weight': '1.2 lbs',
+        'Battery Life': '12 hours',
+        'Connectivity': 'Bluetooth 5.0, USB-C',
+        'Material': 'Aluminum and plastic',
+        'Color': 'Silver/Black',
+      };
+    } else if (product.category === 'Fashion') {
+      return {
+        ...baseSpecs,
+        'Material': '100% Cotton',
+        'Care': 'Machine washable',
+        'Origin': 'Imported',
+        'Fit': 'Regular fit',
+        'Color': 'Multiple options',
+        'Size': 'S, M, L, XL available',
+      };
+    } else if (product.category === 'Home') {
+      return {
+        ...baseSpecs,
+        'Material': 'Eco-friendly',
+        'Dimensions': 'Various sizes available',
+        'Care': 'Wipe clean with damp cloth',
+        'Assembly': 'Required',
+        'Style': 'Contemporary',
+        'Color': 'Multiple options',
+      };
+    }
+    
+    return baseSpecs;
+  };
+  
+  const specs = product.specs || getProductSpecs(product);
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -175,7 +220,7 @@ const ProductDetails = () => {
           </AspectRatio>
           
           <div className="grid grid-cols-4 gap-2">
-            {additionalImages.map((img, index) => (
+            {productImages.map((img, index) => (
               <div 
                 key={index}
                 className={`aspect-square border rounded cursor-pointer overflow-hidden ${
@@ -340,36 +385,6 @@ const ProductDetails = () => {
                 ) : (
                   <div className="py-4 text-center text-muted-foreground">
                     <p>No specifications available for this product.</p>
-                    <p className="text-sm mt-1">Typical specifications for {product.category} products include:</p>
-                    <ul className="mt-2 list-disc list-inside text-left mx-auto max-w-md">
-                      {product.category === 'Electronics' && (
-                        <>
-                          <li>Dimensions: 10 x 5 x 2 inches</li>
-                          <li>Weight: 1.2 lbs</li>
-                          <li>Battery Life: 12 hours</li>
-                          <li>Connectivity: Bluetooth 5.0, USB-C</li>
-                          <li>Warranty: 2 years</li>
-                        </>
-                      )}
-                      {product.category === 'Fashion' && (
-                        <>
-                          <li>Material: 100% Cotton</li>
-                          <li>Care: Machine washable</li>
-                          <li>Origin: Imported</li>
-                          <li>Fit: Regular fit</li>
-                          <li>Dimensions: See size chart</li>
-                        </>
-                      )}
-                      {product.category === 'Home' && (
-                        <>
-                          <li>Material: Eco-friendly</li>
-                          <li>Dimensions: Various sizes available</li>
-                          <li>Care: Wipe clean with damp cloth</li>
-                          <li>Assembly: Required</li>
-                          <li>Warranty: 1 year</li>
-                        </>
-                      )}
-                    </ul>
                   </div>
                 )}
               </dl>

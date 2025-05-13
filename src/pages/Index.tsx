@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ChevronRight, ArrowRight, RotateCcw, Star, Truck, ShieldCheck, Clock } from 'lucide-react';
+import { ChevronRight, ArrowRight, RotateCcw, Star, Truck, ShieldCheck, Clock, ChevronLeft } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
 import {
@@ -68,7 +67,7 @@ const Index = () => {
       color: "from-purple-900 to-purple-700"
     },
     {
-      image: "https://images.unsplash.com/photo-1632829882891-5047ccc0e3e3?q=80&w=2070&auto=format&fit=crop",
+      image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=2070&auto=format&fit=crop",
       title: "Home & Living",
       description: "Transform your space with our collection",
       buttonText: "Explore",
@@ -128,7 +127,7 @@ const Index = () => {
   return (
     <div>
       {/* Hero Carousel Section */}
-      <section className="mb-8">
+      <section className="mb-8 relative">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {heroSlides.map((slide, index) => (
@@ -156,6 +155,32 @@ const Index = () => {
             ))}
           </div>
         </div>
+
+        {/* Navigation Arrows */}
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-white/80 hover:bg-white"
+          onClick={() => {
+            emblaApi?.scrollPrev();
+            handleCarouselInteraction();
+          }}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+        
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-white/80 hover:bg-white"
+          onClick={() => {
+            emblaApi?.scrollNext();
+            handleCarouselInteraction();
+          }}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
+        
         <div className="flex justify-center mt-4 gap-2">
           {heroSlides.map((_, index) => (
             <Button 
