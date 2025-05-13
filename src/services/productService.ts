@@ -16,6 +16,15 @@ const products: Product[] = [
     reviews: 25,
     seller: 'TechStore',
     tags: ['gaming', 'laptop', 'high-performance'],
+    specs: {
+      'Processor': 'Intel i9-12900K',
+      'Graphics': 'NVIDIA RTX 3080',
+      'RAM': '32GB DDR5',
+      'Storage': '1TB NVMe SSD',
+      'Display': '17.3" 4K 144Hz',
+      'Battery': '8 hours',
+      'Weight': '2.4kg'
+    }
   },
   {
     id: '2',
@@ -30,6 +39,13 @@ const products: Product[] = [
     reviews: 30,
     seller: 'FitLife',
     tags: ['running', 'shoes', 'sports'],
+    specs: {
+      'Material': 'Breathable mesh, synthetic',
+      'Sole': 'Rubber with cushioning',
+      'Weight': '280g',
+      'Closure': 'Lace-up',
+      'Features': 'Shock absorption, arch support'
+    }
   },
   {
     id: '3',
@@ -44,6 +60,13 @@ const products: Product[] = [
     reviews: 20,
     seller: 'HomeNeeds',
     tags: ['coffee', 'maker', 'kitchen'],
+    specs: {
+      'Capacity': '12 cups',
+      'Functions': 'Brew strength control, timer',
+      'Material': 'Stainless steel, glass',
+      'Power': '1000W',
+      'Dimensions': '25cm x 18cm x 35cm'
+    }
   },
   {
     id: '4',
@@ -58,6 +81,13 @@ const products: Product[] = [
     reviews: 40,
     seller: 'TechStore',
     tags: ['smartwatch', 'fitness', 'wearable'],
+    specs: {
+      'Display': '1.4" AMOLED',
+      'Battery': '48 hours',
+      'Sensors': 'Heart rate, GPS, Accelerometer',
+      'Water Resistance': '50m',
+      'Compatibility': 'iOS, Android'
+    }
   },
   {
     id: '5',
@@ -72,6 +102,13 @@ const products: Product[] = [
     reviews: 28,
     seller: 'StyleHub',
     tags: ['denim', 'jeans', 'casual'],
+    specs: {
+      'Material': '98% Cotton, 2% Elastane',
+      'Style': 'Straight leg',
+      'Rise': 'Mid-rise',
+      'Closure': 'Button and zipper fly',
+      'Care': 'Machine wash cold'
+    }
   },
   {
     id: '6',
@@ -86,6 +123,13 @@ const products: Product[] = [
     reviews: 15,
     seller: 'KitchenPro',
     tags: ['blender', 'smoothie', 'kitchen'],
+    specs: {
+      'Power': '800W',
+      'Speed Settings': '5 + Pulse',
+      'Capacity': '1.5L',
+      'Blades': 'Stainless steel',
+      'Functions': 'Blend, crush, puree'
+    }
   },
   {
     id: '7',
@@ -100,6 +144,13 @@ const products: Product[] = [
     reviews: 35,
     seller: 'AudioTech',
     tags: ['headphones', 'wireless', 'audio'],
+    specs: {
+      'Type': 'Over-ear, Closed-back',
+      'Connectivity': 'Bluetooth 5.0, 3.5mm',
+      'Battery Life': 'Up to 30 hours',
+      'Features': 'Active Noise Cancellation',
+      'Microphone': 'Integrated'
+    }
   },
   {
     id: '8',
@@ -114,6 +165,13 @@ const products: Product[] = [
     reviews: 22,
     seller: 'StyleHub',
     tags: ['dress', 'summer', 'women'],
+    specs: {
+      'Material': '100% Cotton',
+      'Length': 'Knee-length',
+      'Style': 'A-line',
+      'Closure': 'Back zip',
+      'Care': 'Machine wash cold'
+    }
   },
   {
     id: '9',
@@ -128,6 +186,13 @@ const products: Product[] = [
     reviews: 18,
     seller: 'HomeNeeds',
     tags: ['toaster', 'oven', 'kitchen'],
+    specs: {
+      'Capacity': '12L',
+      'Power': '1200W',
+      'Functions': 'Toast, bake, broil',
+      'Timer': '30 minutes',
+      'Dimensions': '40cm x 30cm x 25cm'
+    }
   },
   {
     id: '10',
@@ -142,6 +207,13 @@ const products: Product[] = [
     reviews: 45,
     seller: 'AudioTech',
     tags: ['speaker', 'bluetooth', 'portable'],
+    specs: {
+      'Power': '20W',
+      'Battery Life': '12 hours',
+      'Connectivity': 'Bluetooth 5.0, Aux',
+      'Water Resistance': 'IPX7',
+      'Features': 'Built-in mic, voice assistant'
+    }
   },
   {
     id: '11',
@@ -156,6 +228,13 @@ const products: Product[] = [
     reviews: 38,
     seller: 'PhotoTech',
     tags: ['camera', 'photography', '4k'],
+    specs: {
+      'Sensor': '24.2MP APS-C CMOS',
+      'ISO Range': '100-25600',
+      'Video': '4K UHD',
+      'Lens Mount': 'Standard',
+      'Stabilization': '5-axis'
+    }
   },
   {
     id: '12',
@@ -170,6 +249,13 @@ const products: Product[] = [
     reviews: 27,
     seller: 'BagWorld',
     tags: ['backpack', 'leather', 'accessories'],
+    specs: {
+      'Material': 'Genuine leather',
+      'Capacity': '18L',
+      'Compartments': 'Laptop sleeve, 3 pockets',
+      'Dimensions': '30cm x 45cm x 15cm',
+      'Features': 'Water resistant, padded straps'
+    }
   },
 ];
 

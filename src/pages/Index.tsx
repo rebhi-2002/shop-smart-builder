@@ -68,7 +68,7 @@ const Index = () => {
       color: "from-purple-900 to-purple-700"
     },
     {
-      image: "https://images.unsplash.com/photo-1519687076676-f53e65632cd7?q=80&w=2070&auto=format&fit=crop",
+      image: "https://images.unsplash.com/photo-1632829882891-5047ccc0e3e3?q=80&w=2070&auto=format&fit=crop",
       title: "Home & Living",
       description: "Transform your space with our collection",
       buttonText: "Explore",
@@ -80,6 +80,11 @@ const Index = () => {
   // Set up autoplay for hero carousel
   useEffect(() => {
     if (emblaApi) {
+      // Clear any existing interval
+      if (autoplayInterval) {
+        clearInterval(autoplayInterval);
+      }
+      
       const interval = setInterval(() => {
         emblaApi.scrollNext();
       }, 5000); // Auto-scroll every 5 seconds
@@ -88,7 +93,7 @@ const Index = () => {
       
       // Clear the interval when the component unmounts
       return () => {
-        if (autoplayInterval) clearInterval(autoplayInterval);
+        if (interval) clearInterval(interval);
       };
     }
   }, [emblaApi]);
@@ -103,6 +108,20 @@ const Index = () => {
       }, 5000);
       
       setAutoplayInterval(interval);
+    }
+  };
+
+  // Get category images for the circles
+  const getCategoryImage = (category: string) => {
+    switch(category) {
+      case 'Electronics':
+        return "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?q=80&w=500&auto=format&fit=crop";
+      case 'Fashion':
+        return "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=500&auto=format&fit=crop";
+      case 'Home':
+        return "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=500&auto=format&fit=crop";
+      default:
+        return `https://source.unsplash.com/random/100x100?${category.toLowerCase()}`;
     }
   };
 
@@ -164,11 +183,11 @@ const Index = () => {
               to={`/categories/${category}`} 
               className="flex flex-col items-center p-4 rounded-lg hover:bg-muted transition-colors text-center"
             >
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-3">
+              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-3 overflow-hidden">
                 <img 
-                  src={`https://source.unsplash.com/random/100x100?${category.toLowerCase()}`}
+                  src={getCategoryImage(category)}
                   alt={category}
-                  className="w-10 h-10 object-cover rounded-full"
+                  className="w-16 h-16 object-cover"
                 />
               </div>
               <span className="font-medium text-sm">{category}</span>
