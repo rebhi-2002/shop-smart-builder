@@ -1,5 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { createContext, useState, useEffect } from 'react';
 
 export interface Product {
   id: string;
@@ -8,12 +7,22 @@ export interface Product {
   price: number;
   image: string;
   category: string;
+  discount?: number;
+  stock?: number;
   rating?: number;
   reviews?: number;
-  stock?: number;
+  savedForLater?: boolean;
+  quantity?: number;
+  selectedColor?: string | null;
+  selectedSize?: string | null;
   seller?: string;
-  discount?: number;
   tags?: string[];
+  // Add missing properties used in ProductDetails
+  colors?: string[];
+  sizes?: string[];
+  additionalImages?: string[];
+  longDescription?: string;
+  specifications?: Record<string, string | number>;
   specs?: Record<string, string>;
 }
 
@@ -22,288 +31,177 @@ export interface CartItem extends Product {
   savedForLater?: boolean;
 }
 
-export interface WishlistItem extends Product {
-  dateAdded: Date;
-}
-
 interface CartContextType {
   cartItems: CartItem[];
-  wishlistItems: WishlistItem[];
+  wishlistItems: Product[];
+  recentlyViewed: Product[];
   addToCart: (product: Product, quantity?: number) => void;
+  updateCartItemQuantity: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  getTotalItems: () => number;
-  getTotalPrice: () => number;
-  applyPromoCode: (code: string) => boolean;
-  saveForLater: (productId: string) => void;
-  moveToCart: (productId: string) => void;
   addToWishlist: (product: Product) => void;
   removeFromWishlist: (productId: string) => void;
   isInWishlist: (productId: string) => boolean;
-  promoDiscount: number;
-  activePromoCode: string | null;
-  recentlyViewed: Product[];
+  saveForLater: (productId: string) => void;
+  moveToCart: (productId: string) => void;
   addToRecentlyViewed: (product: Product) => void;
 }
 
-// Export the CartContext so it can be imported by useCart.ts
-export const CartContext = createContext<CartContextType | undefined>(undefined);
+// Create the context
+export const CartContext = createContext<CartContextType>({
+  cartItems: [],
+  wishlistItems: [],
+  recentlyViewed: [],
+  addToCart: () => {},
+  updateCartItemQuantity: () => {},
+  removeFromCart: () => {},
+  clearCart: () => {},
+  addToWishlist: () => {},
+  removeFromWishlist: () => {},
+  isInWishlist: () => false,
+  saveForLater: () => {},
+  moveToCart: () => {},
+  addToRecentlyViewed: () => {},
+});
 
-// Valid promo codes and their discount percentages
-const validPromoCodes: Record<string, number> = {
-  'WELCOME10': 0.1,  // 10% discount
-  'SUMMER20': 0.2,   // 20% discount
-  'SPECIAL50': 0.5,  // 50% discount
-  'FREESHIP': 0.15,  // 15% discount
-  'FLASH25': 0.25,   // 25% discount
-};
-
-const MAX_RECENTLY_VIEWED = 10;
-
+// Create a provider component
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
-  const userId = user?.id || 'guest';
-  
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
-  const [promoDiscount, setPromoDiscount] = useState(0);
-  const [activePromoCode, setActivePromoCode] = useState<string | null>(null);
-  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
-  
-  // User-specific storage keys
-  const getCartKey = () => `cart_${userId}`;
-  const getWishlistKey = () => `wishlist_${userId}`;
-  const getPromoKey = () => `promoCode_${userId}`;
-  const getRecentlyViewedKey = () => `recentlyViewed_${userId}`;
-  
-  // Load data from localStorage on initial load and when user changes
-  useEffect(() => {
-    const loadStoredData = () => {
-      try {
-        // Load cart
-        const savedCart = localStorage.getItem(getCartKey());
-        if (savedCart) {
-          setCartItems(JSON.parse(savedCart));
-        } else {
-          setCartItems([]);
-        }
-        
-        // Load wishlist
-        const savedWishlist = localStorage.getItem(getWishlistKey());
-        if (savedWishlist) {
-          setWishlistItems(JSON.parse(savedWishlist));
-        } else {
-          setWishlistItems([]);
-        }
-        
-        // Load promo code
-        const savedPromo = localStorage.getItem(getPromoKey());
-        if (savedPromo) {
-          const { code, discount } = JSON.parse(savedPromo);
-          setActivePromoCode(code);
-          setPromoDiscount(discount);
-        } else {
-          setActivePromoCode(null);
-          setPromoDiscount(0);
-        }
-        
-        // Load recently viewed
-        const savedRecentlyViewed = localStorage.getItem(getRecentlyViewedKey());
-        if (savedRecentlyViewed) {
-          setRecentlyViewed(JSON.parse(savedRecentlyViewed));
-        } else {
-          setRecentlyViewed([]);
-        }
-      } catch (error) {
-        console.error('Failed to load data from localStorage:', error);
-      }
-    };
-    
-    loadStoredData();
-  }, [userId]);
-  
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem(getCartKey(), JSON.stringify(cartItems));
-  }, [cartItems, userId]);
-  
-  // Save wishlist to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem(getWishlistKey(), JSON.stringify(wishlistItems));
-  }, [wishlistItems, userId]);
-  
-  // Save promo code to localStorage whenever it changes
-  useEffect(() => {
-    if (activePromoCode && promoDiscount > 0) {
-      localStorage.setItem(getPromoKey(), JSON.stringify({
-        code: activePromoCode,
-        discount: promoDiscount
-      }));
-    } else {
-      localStorage.removeItem(getPromoKey());
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const storedCartItems = localStorage.getItem('cartItems');
+      return storedCartItems ? JSON.parse(storedCartItems) : [];
+    } catch (error) {
+      console.error("Failed to load cart items from local storage:", error);
+      return [];
     }
-  }, [activePromoCode, promoDiscount, userId]);
+  });
+  const [wishlistItems, setWishlistItems] = useState<Product[]>(() => {
+    try {
+      const storedWishlistItems = localStorage.getItem('wishlistItems');
+      return storedWishlistItems ? JSON.parse(storedWishlistItems) : [];
+    } catch (error) {
+      console.error("Failed to load wishlist items from local storage:", error);
+      return [];
+    }
+  });
+  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>(() => {
+    try {
+      const storedRecentlyViewed = localStorage.getItem('recentlyViewed');
+      return storedRecentlyViewed ? JSON.parse(storedRecentlyViewed) : [];
+    } catch (error) {
+      console.error("Failed to load recently viewed items from local storage:", error);
+      return [];
+    }
+  });
   
-  // Save recently viewed to localStorage
   useEffect(() => {
-    localStorage.setItem(getRecentlyViewedKey(), JSON.stringify(recentlyViewed));
-  }, [recentlyViewed, userId]);
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }, [cartItems]);
   
+  useEffect(() => {
+    localStorage.setItem('wishlistItems', JSON.stringify(wishlistItems));
+  }, [wishlistItems]);
+  
+  useEffect(() => {
+    localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
+  }, [recentlyViewed]);
+
   const addToCart = (product: Product, quantity: number = 1) => {
-    setCartItems(prevItems => {
-      const existingItemIndex = prevItems.findIndex(item => item.id === product.id);
-      
-      if (existingItemIndex >= 0) {
-        const existingItem = prevItems[existingItemIndex];
-        
-        // If item was saved for later, move it back to active cart
-        if (existingItem.savedForLater) {
-          const updatedItems = [...prevItems];
-          updatedItems[existingItemIndex] = {
-            ...existingItem,
-            quantity: quantity,
-            savedForLater: false
-          };
-          return updatedItems;
-        } else {
-          // Otherwise just update quantity
-          return prevItems.map(item => 
-            item.id === product.id 
-              ? { ...item, quantity: item.quantity + quantity } 
-              : item
-          );
-        }
+    const existingItemIndex = cartItems.findIndex(item => item.id === product.id && item.selectedColor === product.selectedColor && item.selectedSize === product.selectedSize);
+
+    if (existingItemIndex !== -1) {
+      const updatedCartItems = [...cartItems];
+      updatedCartItems[existingItemIndex].quantity += quantity;
+      setCartItems(updatedCartItems);
+    } else {
+      setCartItems([...cartItems, { ...product, quantity }]);
+    }
+  };
+
+  const updateCartItemQuantity = (productId: string, quantity: number) => {
+    const updatedCartItems = cartItems.map(item =>
+      item.id === productId ? { ...item, quantity } : item
+    );
+    setCartItems(updatedCartItems);
+  };
+
+  const removeFromCart = (productId: string) => {
+    const updatedCartItems = cartItems.filter(item => item.id !== productId);
+    setCartItems(updatedCartItems);
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+  };
+  
+  const addToWishlist = (product: Product) => {
+    setWishlistItems(prevItems => {
+      if (prevItems.find(item => item.id === product.id)) {
+        return prevItems;
       } else {
-        return [...prevItems, { ...product, quantity, savedForLater: false }];
+        return [...prevItems, product];
       }
     });
   };
   
-  const removeFromCart = (productId: string) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
-  };
-  
-  const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      )
-    );
-  };
-  
-  const clearCart = () => {
-    setCartItems([]);
-    setPromoDiscount(0);
-    setActivePromoCode(null);
-  };
-  
-  const getTotalItems = () => {
-    return cartItems
-      .filter(item => !item.savedForLater)
-      .reduce((total, item) => total + item.quantity, 0);
-  };
-  
-  const getTotalPrice = () => {
-    const subtotal = cartItems
-      .filter(item => !item.savedForLater)
-      .reduce((total, item) => {
-        const discountedPrice = item.discount 
-          ? item.price * (1 - item.discount / 100) 
-          : item.price;
-        return total + discountedPrice * item.quantity;
-      }, 0);
-    
-    return subtotal * (1 - promoDiscount);
-  };
-  
-  const applyPromoCode = (code: string): boolean => {
-    const normalizedCode = code.trim().toUpperCase();
-    
-    if (validPromoCodes[normalizedCode]) {
-      setPromoDiscount(validPromoCodes[normalizedCode]);
-      setActivePromoCode(normalizedCode);
-      return true;
-    }
-    
-    return false;
-  };
-  
-  // Save for later functionality
-  const saveForLater = (productId: string) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, savedForLater: true } : item
-      )
-    );
-  };
-  
-  const moveToCart = (productId: string) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, savedForLater: false } : item
-      )
-    );
-  };
-  
-  // Wishlist functionality
-  const addToWishlist = (product: Product) => {
-    if (!wishlistItems.some(item => item.id === product.id)) {
-      setWishlistItems(prevItems => [
-        ...prevItems,
-        { ...product, dateAdded: new Date() }
-      ]);
-    }
-  };
-  
   const removeFromWishlist = (productId: string) => {
-    setWishlistItems(prevItems => 
-      prevItems.filter(item => item.id !== productId)
-    );
+    setWishlistItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
   
   const isInWishlist = (productId: string) => {
     return wishlistItems.some(item => item.id === productId);
   };
+
+  const saveForLater = (productId: string) => {
+    const itemToMove = cartItems.find(item => item.id === productId);
+    if (itemToMove) {
+      // Remove from cart
+      removeFromCart(productId);
+      
+      // Add to cart with savedForLater flag
+      setCartItems(prevItems => [...prevItems, { ...itemToMove, savedForLater: true }]);
+    }
+  };
+
+  const moveToCart = (productId: string) => {
+    const itemToMove = cartItems.find(item => item.id === productId);
+    if (itemToMove) {
+      // Remove from cart
+      removeFromCart(productId);
+      
+      // Add to cart without savedForLater flag
+      setCartItems(prevItems => [...prevItems, { ...itemToMove, savedForLater: false }]);
+    }
+  };
   
-  // Recently viewed functionality
   const addToRecentlyViewed = (product: Product) => {
-    setRecentlyViewed(prev => {
-      // Remove product if it already exists
-      const filtered = prev.filter(p => p.id !== product.id);
-      // Add to start of array and limit length
-      return [product, ...filtered].slice(0, MAX_RECENTLY_VIEWED);
+    setRecentlyViewed(prevItems => {
+      const isAlreadyViewed = prevItems.some(item => item.id === product.id);
+      
+      if (isAlreadyViewed) {
+        return prevItems;
+      } else {
+        return [product, ...prevItems];
+      }
     });
   };
-  
-  const value = {
-    cartItems,
-    wishlistItems,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getTotalItems,
-    getTotalPrice,
-    applyPromoCode,
-    saveForLater,
-    moveToCart,
-    addToWishlist,
-    removeFromWishlist,
-    isInWishlist,
-    promoDiscount,
-    activePromoCode,
-    recentlyViewed,
-    addToRecentlyViewed
-  };
-  
+
   return (
-    <CartContext.Provider value={value}>
+    <CartContext.Provider value={{
+      cartItems,
+      wishlistItems,
+      recentlyViewed,
+      addToCart,
+      updateCartItemQuantity,
+      removeFromCart,
+      clearCart,
+      addToWishlist,
+      removeFromWishlist,
+      isInWishlist,
+      saveForLater,
+      moveToCart,
+      addToRecentlyViewed
+    }}>
       {children}
     </CartContext.Provider>
   );
