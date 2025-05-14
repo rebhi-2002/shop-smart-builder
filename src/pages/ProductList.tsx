@@ -60,7 +60,7 @@ const ProductList = () => {
         newParams.append('category', category);
       });
       
-      setSearchParams(newParams);
+      setSearchParams(newParams, { replace: true }); // Use replace: true to prevent adding to history
     }
   }, [selectedCategories, categoryParam, searchParams, setSearchParams]);
   
@@ -79,6 +79,9 @@ const ProductList = () => {
   // Add some additional categories that might not be in the API
   const categories = [...new Set([
     ...fetchedCategories,
+    "Electronics",
+    "Fashion",
+    "Home",
     "Beauty", 
     "Books", 
     "Toys", 
@@ -132,7 +135,7 @@ const ProductList = () => {
     } else {
       newParams.delete('q');
     }
-    setSearchParams(newParams);
+    setSearchParams(newParams, { replace: true });
   };
   
   const toggleFilters = () => {
@@ -383,13 +386,13 @@ const ProductList = () => {
                 setSearchQuery('');
                 setPriceRange([0, 500]);
                 setSelectedCategories([]);
-                setSearchParams({});
+                setSearchParams({}, { replace: true });
               }}>
                 Clear Filters
               </Button>
             </div>
           ) : viewMode === 'grid' ? (
-            <div className="product-grid">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 product-grid">
               {currentProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

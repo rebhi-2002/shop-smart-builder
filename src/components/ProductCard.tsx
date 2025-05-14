@@ -113,23 +113,57 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
     : null;
 
   if (variant === 'compact') {
-    
     return (
-      <Card className="hover-card-animation overflow-hidden h-full">
-        <Link to={`/products/${product.id}`} className="flex flex-col h-full">
-          <div className="relative aspect-square overflow-hidden">
-            <img 
-              src={product.image} 
-              alt={product.name}
-              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-            />
-            {product.discount && product.discount > 0 && (
-              <Badge className="absolute top-2 left-2 bg-red-500">
-                -{product.discount}%
-              </Badge>
-            )}
+      <>
+        <Card className="hover-card-animation overflow-hidden h-full">
+          <Link to={`/products/${product.id}`} className="flex flex-col h-full">
+            <div className="relative aspect-square overflow-hidden">
+              <img 
+                src={product.image} 
+                alt={product.name}
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+              />
+              {product.discount && product.discount > 0 && (
+                <Badge className="absolute top-2 left-2 bg-red-500">
+                  -{product.discount}%
+                </Badge>
+              )}
+            </div>
             
-            {/* Add wishlist button to compact cards too */}
+            <CardContent className="p-3 flex-grow">
+              <div className="flex items-center mb-1">
+                <div className="flex text-amber-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className="h-3 w-3 fill-current" 
+                      fill={i < Math.floor(product.rating || 0) ? "currentColor" : "none"} 
+                    />
+                  ))}
+                </div>
+                <span className="text-xs ml-1">({product.reviews || 0})</span>
+              </div>
+              
+              <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
+              
+              <div className="mt-1 flex items-center gap-1">
+                {discountedPrice ? (
+                  <>
+                    <span className="font-semibold text-sm">${discountedPrice.toFixed(2)}</span>
+                    <span className="text-xs text-muted-foreground line-through">${product.price.toFixed(2)}</span>
+                  </>
+                ) : (
+                  <span className="font-semibold text-sm">${product.price.toFixed(2)}</span>
+                )}
+              </div>
+            </CardContent>
+          </Link>
+          
+          {/* Wishlist button as separate div with higher z-index */}
+          <div 
+            className="absolute top-2 right-2 z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
             <motion.div
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -137,7 +171,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
               <Button 
                 variant="outline" 
                 size="icon" 
-                className="absolute top-2 right-2 rounded-full bg-white/80 hover:bg-white"
+                className="rounded-full bg-white/80 hover:bg-white"
                 onClick={handleWishlistToggle}
               >
                 <Heart 
@@ -146,36 +180,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
               </Button>
             </motion.div>
           </div>
-          
-          <CardContent className="p-3 flex-grow">
-            <div className="flex items-center mb-1">
-              <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className="h-3 w-3 fill-current" 
-                    fill={i < Math.floor(product.rating || 0) ? "currentColor" : "none"} 
-                  />
-                ))}
-              </div>
-              <span className="text-xs ml-1">({product.reviews || 0})</span>
-            </div>
-            
-            <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
-            
-            <div className="mt-1 flex items-center gap-1">
-              {discountedPrice ? (
-                <>
-                  <span className="font-semibold text-sm">${discountedPrice.toFixed(2)}</span>
-                  <span className="text-xs text-muted-foreground line-through">${product.price.toFixed(2)}</span>
-                </>
-              ) : (
-                <span className="font-semibold text-sm">${product.price.toFixed(2)}</span>
-              )}
-            </div>
-          </CardContent>
-        </Link>
-      </Card>
+        </Card>
+        
+        <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove from Wishlist?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to remove "{product.name}" from your wishlist?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmRemoveFromWishlist} className="bg-red-500 hover:bg-red-600">
+                Remove
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
     );
   }
 
@@ -197,22 +220,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
                 </Badge>
               )}
               
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="absolute top-2 right-2 rounded-full bg-white hover:bg-white/90"
-                  onClick={handleWishlistToggle}
-                >
-                  <Heart 
-                    className={`h-4 w-4 ${inWishlist ? 'fill-red-500 text-red-500' : ''}`} 
-                  />
-                </Button>
-              </motion.div>
-              
               {product.stock && product.stock < 10 && (
                 <Badge variant="outline" className="absolute bottom-2 left-2 bg-white text-foreground">
                   Only {product.stock} left
@@ -220,6 +227,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
               )}
             </div>
           </Link>
+          
+          {/* Wishlist button as separate div with higher z-index */}
+          <div 
+            className="absolute top-2 right-2 z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full bg-white hover:bg-white/90"
+                onClick={handleWishlistToggle}
+              >
+                <Heart 
+                  className={`h-4 w-4 ${inWishlist ? 'fill-red-500 text-red-500' : ''}`} 
+                />
+              </Button>
+            </motion.div>
+          </div>
           
           <CardContent className="pt-4 flex-grow">
             <Link to={`/products/${product.id}`}>
