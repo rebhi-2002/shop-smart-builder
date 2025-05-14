@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
 import Layout from '@/components/Layout';
@@ -36,42 +36,40 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <FramerMotionProvider>
-        <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/products" element={<ProductList />} />
-              <Route path="/products/:id" element={<ProductDetails />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/categories/:category" element={<ProductList />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/order-confirmation" element={<OrderConfirmation />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/deals" element={<Deals />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/account" element={<MyAccount />} />
-              <Route path="/account/profile" element={<UserProfile />} />
-              <Route path="/account/orders" element={<MyOrders />} />
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-conditions" element={<TermsConditions />} />
-              <Route path="/shipping-returns" element={<ShippingReturns />} />
-              
-              {/* Admin Routes */}
-              <Route path="/admin" element={<Dashboard />} />
-              <Route path="/admin/orders" element={<Orders />} />
-              <Route path="/admin/products" element={<ProductManagement />} />
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/products" element={<ProductList />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/categories/:category" element={<ProductList />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-confirmation" element={<OrderConfirmation />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/deals" element={<Deals />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/account" element={<MyAccount />} />
+            <Route path="/account/profile" element={<UserProfile />} />
+            <Route path="/account/orders" element={<MyOrders />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-conditions" element={<TermsConditions />} />
+            <Route path="/shipping-returns" element={<ShippingReturns />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<Dashboard />} />
+            <Route path="/admin/orders" element={<Orders />} />
+            <Route path="/admin/products" element={<ProductManagement />} />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
           <Toaster />
-        </Router>
+        </Layout>
       </FramerMotionProvider>
     </QueryClientProvider>
   );
