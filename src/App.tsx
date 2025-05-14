@@ -21,11 +21,13 @@ import TermsConditions from '@/pages/TermsConditions';
 import ShippingReturns from '@/pages/ShippingReturns';
 import MyAccount from '@/pages/account/MyAccount';
 import MyOrders from '@/pages/account/MyOrders';
+import UserProfile from '@/pages/account/UserProfile';
 import Checkout from '@/pages/Checkout';
 import OrderConfirmation from '@/pages/OrderConfirmation';
 import Dashboard from '@/pages/admin/Dashboard';
 import Orders from '@/pages/admin/Orders';
 import ProductManagement from '@/pages/admin/ProductManagement';
+import Deals from '@/pages/Deals';
 import { FramerMotionProvider } from '@/providers/FramerMotionProvider';
 
 const queryClient = new QueryClient();
@@ -47,9 +49,11 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/deals" element={<Deals />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/account" element={<MyAccount />} />
+              <Route path="/account/profile" element={<UserProfile />} />
               <Route path="/account/orders" element={<MyOrders />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/contact" element={<Contact />} />

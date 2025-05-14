@@ -1,204 +1,238 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
-  Legend, ResponsiveContainer, PieChart, Pie, Cell
-} from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
 import { productService } from '@/services/productService';
+import { Loader2, ShoppingBag, Users, DollarSign, TrendingUp } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user, requireAuth, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { user, isAdmin, requireAuth } = useAuth();
   
+  // Authorize the user
   useEffect(() => {
-    if (!requireAuth('admin')) {
-      navigate('/login');
-    }
-  }, [requireAuth, navigate]);
+    requireAuth('admin');
+  }, [requireAuth]);
   
-  const { data: products = [] } = useQuery({
-    queryKey: ['products'],
+  // Fetch products for stats
+  const { data: products = [], isLoading: isLoadingProducts } = useQuery({
+    queryKey: ['adminProducts'],
     queryFn: productService.getProducts,
-    enabled: !!user && isAdmin
+    enabled: !!user && isAdmin,
   });
-  
-  // If not authenticated as admin, don't render the dashboard
-  if (!user || !isAdmin) {
-    return null;
+
+  if (isLoadingProducts) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
   
-  // Mock data for charts
-  const salesData = [
-    { name: 'Jan', sales: 4000 },
-    { name: 'Feb', sales: 3000 },
-    { name: 'Mar', sales: 5000 },
-    { name: 'Apr', sales: 2780 },
-    { name: 'May', sales: 1890 },
-    { name: 'Jun', sales: 2390 },
-    { name: 'Jul', sales: 3490 },
-    { name: 'Aug', sales: 2000 },
-    { name: 'Sep', sales: 2500 },
-    { name: 'Oct', sales: 3200 },
-    { name: 'Nov', sales: 4500 },
-    { name: 'Dec', sales: 6000 },
-  ];
-  
-  const orderStatusData = [
-    { name: 'Completed', value: 540 },
-    { name: 'Processing', value: 280 },
-    { name: 'Shipped', value: 120 },
-    { name: 'Canceled', value: 60 },
-  ];
-  
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-  
-  // Group products by category for chart
-  const categoryData = products.reduce((acc: Record<string, number>, product) => {
-    const { category } = product;
-    acc[category] = (acc[category] || 0) + 1;
-    return acc;
-  }, {});
-  
-  const categoryChartData = Object.entries(categoryData).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  // Mock data for dashboard statistics
+  const stats = {
+    totalSales: 24895.50,
+    orders: 142,
+    customers: 87,
+    averageOrderValue: 175.32,
+    lowStockItems: products.filter(p => p.stock && p.stock < 10).length,
+    topCategories: getTopCategories(products),
+  };
   
   return (
-    <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
       
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Revenue
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Sales
             </CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
+            <div className="text-2xl font-bold">${stats.totalSales.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              +20.1% from last month
+              +18% from last month
             </p>
           </CardContent>
         </Card>
         
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Products
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{products.length}</div>
-            <p className="text-xs text-muted-foreground">
-              {products.length} products in {Object.keys(categoryData).length} categories
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
               Orders
             </CardTitle>
+            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+573</div>
+            <div className="text-2xl font-bold">{stats.orders}</div>
             <p className="text-xs text-muted-foreground">
-              +201 this week
+              +12 since yesterday
             </p>
           </CardContent>
         </Card>
         
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Active Users
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Customers
             </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
+            <div className="text-2xl font-bold">{stats.customers}</div>
             <p className="text-xs text-muted-foreground">
-              +180 this week
+              +5 new customers this week
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Average Order Value
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${stats.averageOrderValue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">
+              +2% from last month
             </p>
           </CardContent>
         </Card>
       </div>
       
-      <div className="grid gap-6 mt-6 md:grid-cols-2">
+      {/* Main Dashboard Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card>
           <CardHeader>
-            <CardTitle>Monthly Sales</CardTitle>
+            <CardTitle>Recent Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={salesData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="sales" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2">Order ID</th>
+                  <th className="text-left py-2">Customer</th>
+                  <th className="text-right py-2">Amount</th>
+                  <th className="text-right py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b">
+                  <td className="py-2">#ORD-5392</td>
+                  <td className="py-2">John Doe</td>
+                  <td className="py-2 text-right">$125.99</td>
+                  <td className="py-2 text-right">
+                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                      Completed
+                    </span>
+                  </td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2">#ORD-5391</td>
+                  <td className="py-2">Sarah Smith</td>
+                  <td className="py-2 text-right">$259.45</td>
+                  <td className="py-2 text-right">
+                    <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                      Processing
+                    </span>
+                  </td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2">#ORD-5390</td>
+                  <td className="py-2">Michael Johnson</td>
+                  <td className="py-2 text-right">$89.99</td>
+                  <td className="py-2 text-right">
+                    <span className="px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
+                      Pending
+                    </span>
+                  </td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2">#ORD-5389</td>
+                  <td className="py-2">Emily Wilson</td>
+                  <td className="py-2 text-right">$432.20</td>
+                  <td className="py-2 text-right">
+                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                      Completed
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="flex justify-center mt-4">
+              <button className="text-sm text-primary hover:underline" onClick={() => navigate('/admin/orders')}>
+                View All Orders
+              </button>
+            </div>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader>
-            <CardTitle>Order Status</CardTitle>
+            <CardTitle>Inventory Status</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={orderStatusData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {orderStatusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Products by Category</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={categoryChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="mb-4">
+              <div className="flex justify-between mb-2">
+                <span>Low Stock Items</span>
+                <span className="font-bold">{stats.lowStockItems}</span>
+              </div>
+              <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="absolute inset-y-0 left-0 bg-red-500 rounded-full" 
+                  style={{ 
+                    width: `${Math.min(100, (stats.lowStockItems / 10) * 100)}%` 
+                  }}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium mb-2">Top Categories</h4>
+              <ul className="space-y-2">
+                {stats.topCategories.map((item, index) => (
+                  <li key={index} className="flex justify-between">
+                    <span>{item.name}</span>
+                    <span>{item.count} products</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="flex justify-center mt-6">
+              <button className="text-sm text-primary hover:underline" onClick={() => navigate('/admin/products')}>
+                Manage Products
+              </button>
+            </div>
           </CardContent>
         </Card>
       </div>
     </div>
   );
 };
+
+// Helper function to get top categories from products
+function getTopCategories(products: any[]) {
+  const categoryCounts: Record<string, number> = {};
+  
+  products.forEach(product => {
+    if (product.category) {
+      categoryCounts[product.category] = (categoryCounts[product.category] || 0) + 1;
+    }
+  });
+  
+  return Object.entries(categoryCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+}
 
 export default Dashboard;

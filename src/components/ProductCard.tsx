@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -33,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
     
     // Create the bubble element
     const bubble = document.createElement('div');
-    bubble.className = 'fixed z-50 flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white shadow-lg';
+    bubble.className = 'fixed z-50 flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white shadow-lg cart-add-animation';
     bubble.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>';
     bubble.style.left = `${x}px`;
     bubble.style.top = `${y}px`;
@@ -127,6 +128,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
                 -{product.discount}%
               </Badge>
             )}
+            
+            {/* Add wishlist button to compact cards too */}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="absolute top-2 right-2 rounded-full bg-white/80 hover:bg-white"
+                onClick={handleWishlistToggle}
+              >
+                <Heart 
+                  className={`h-4 w-4 ${inWishlist ? 'fill-red-500 text-red-500' : ''}`} 
+                />
+              </Button>
+            </motion.div>
           </div>
           
           <CardContent className="p-3 flex-grow">

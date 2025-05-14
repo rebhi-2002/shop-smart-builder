@@ -1,198 +1,173 @@
 
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 
-// Define user types
 export interface User {
   id: string;
   name?: string;
   email: string;
   role: 'user' | 'admin';
+  avatar?: string;
 }
 
-// Define auth context
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  register: (name: string, email: string, password: string) => boolean;
-  isLoading: boolean;
-  requireAuth: (role?: 'user' | 'admin') => boolean;
+  isLoading: boolean; // Added missing property
+  requireAuth: (role?: 'user' | 'admin') => boolean; // Added missing property
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-// Hardcoded admin credentials (in a real application, this would be in a secure database)
-const ADMIN_EMAIL = 'admin@example.com';
-const ADMIN_PASSWORD = 'admin123';
-
-// Mock user database (in a real app, this would be stored in a database)
-const MOCK_USERS: Record<string, { id: string, name: string, email: string, password: string, role: 'user' | 'admin' }> = {
-  'admin@example.com': {
-    id: 'admin-1',
-    name: 'Admin User',
-    email: ADMIN_EMAIL,
-    password: ADMIN_PASSWORD,
-    role: 'admin'
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
+  return context;
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Check for saved auth on mount
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
+
+  // Check for existing user session on load
   useEffect(() => {
-    const savedUser = localStorage.getItem('auth_user');
-    if (savedUser) {
+    const checkAuth = async () => {
       try {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
-        setIsAdmin(parsedUser.role === 'admin');
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
       } catch (error) {
-        console.error('Failed to parse saved user:', error);
-        localStorage.removeItem('auth_user');
+        console.error('Auth initialization error:', error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-  }, []);
-  
-  // Login function
-  const login = (email: string, password: string): boolean => {
-    setIsLoading(true);
+    };
     
+    checkAuth();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      // Check if email exists in our mock database
-      const foundUser = MOCK_USERS[email];
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Special case for admin login
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      // Demo users
+      if (email === 'admin@example.com' && password === 'admin123') {
         const adminUser = {
           id: 'admin-1',
           name: 'Admin User',
-          email: ADMIN_EMAIL,
-          role: 'admin' as const
+          email: 'admin@example.com',
+          role: 'admin' as const,
+          avatar: 'https://i.pravatar.cc/150?u=admin',
         };
-        
         setUser(adminUser);
-        setIsAuthenticated(true);
-        setIsAdmin(true);
-        localStorage.setItem('auth_user', JSON.stringify(adminUser));
-        return true;
-      }
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        toast.success('Welcome back, Admin!');
+        navigate('/admin');
+        return;
+      } 
       
-      // For regular users
-      if (foundUser && foundUser.password === password) {
-        const authenticatedUser = {
-          id: foundUser.id,
-          name: foundUser.name,
-          email: foundUser.email,
-          role: foundUser.role
+      if (email === 'user@example.com' && password === 'user123') {
+        const regularUser = {
+          id: 'user-1',
+          name: 'John Doe',
+          email: 'user@example.com',
+          role: 'user' as const,
+          avatar: 'https://i.pravatar.cc/150?u=user',
         };
-        
-        setUser(authenticatedUser);
-        setIsAuthenticated(true);
-        setIsAdmin(foundUser.role === 'admin');
-        localStorage.setItem('auth_user', JSON.stringify(authenticatedUser));
-        return true;
+        setUser(regularUser);
+        localStorage.setItem('user', JSON.stringify(regularUser));
+        toast.success('Login successful!');
+        navigate('/');
+        return;
       }
       
-      return false;
+      throw new Error('Invalid credentials');
+    } catch (error) {
+      toast.error('Login failed. Please check your credentials.');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
   };
-  
-  // Register function
-  const register = (name: string, email: string, password: string): boolean => {
+
+  const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
-    
     try {
-      // Check if email already exists
-      if (MOCK_USERS[email]) {
-        return false;
-      }
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Create new user
-      const newUserId = `user-${Object.keys(MOCK_USERS).length + 1}`;
       const newUser = {
-        id: newUserId,
+        id: `user-${Date.now()}`,
         name,
         email,
-        password,
-        role: 'user' as const
+        role: 'user' as const,
+        avatar: `https://i.pravatar.cc/150?u=${email}`,
       };
       
-      // Add to mock database
-      MOCK_USERS[email] = newUser;
-      
-      // Auto-login after registration
-      setUser({
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role
-      });
-      setIsAuthenticated(true);
-      setIsAdmin(false);
-      
-      // Save to localStorage for persistence
-      localStorage.setItem('auth_user', JSON.stringify({
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role
-      }));
-      
-      return true;
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
+      toast.success('Account created successfully!');
+      navigate('/');
+    } catch (error) {
+      toast.error('Registration failed. Please try again.');
+      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }
   };
-  
-  // Logout function
+
   const logout = () => {
     setUser(null);
-    setIsAuthenticated(false);
-    setIsAdmin(false);
-    localStorage.removeItem('auth_user');
+    localStorage.removeItem('user');
+    toast.info('You have been logged out');
+    navigate('/');
   };
-  
-  // Auth check function
-  const requireAuth = (role?: 'user' | 'admin'): boolean => {
-    if (!isAuthenticated) return false;
-    if (role === 'admin' && !isAdmin) return false;
+
+  // Function to require authentication with optional role check
+  const requireAuth = (role?: 'user' | 'admin') => {
+    if (!user) {
+      toast.error('Please login to continue');
+      navigate('/login');
+      return false;
+    }
+    
+    if (role && user.role !== role) {
+      toast.error('You do not have permission to access this page');
+      navigate('/');
+      return false;
+    }
+    
     return true;
   };
-  
-  const value = {
-    user,
-    login,
-    logout,
-    isAuthenticated,
-    isAdmin,
-    register,
-    isLoading,
-    requireAuth
-  };
-  
+
+  const isAuthenticated = !!user;
+  const isAdmin = user?.role === 'admin';
+
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        login, 
+        register, 
+        logout, 
+        isAuthenticated, 
+        isAdmin,
+        isLoading,
+        requireAuth
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
-
-// Custom hook for using auth context
-export const useAuth = () => {
-  const context = React.useContext(AuthContext);
-  
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  
-  return context;
 };
