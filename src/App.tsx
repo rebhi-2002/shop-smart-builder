@@ -28,6 +28,7 @@ import Dashboard from '@/pages/admin/Dashboard';
 import Orders from '@/pages/admin/Orders';
 import ProductManagement from '@/pages/admin/ProductManagement';
 import Deals from '@/pages/Deals';
+import Careers from '@/pages/Careers';
 import { FramerMotionProvider } from '@/providers/FramerMotionProvider';
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ function App() {
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
             <Route path="/search" element={<Search />} />
             <Route path="/deals" element={<Deals />} />
+            <Route path="/careers" element={<Careers />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/account" element={<MyAccount />} />
@@ -65,6 +67,7 @@ function App() {
             <Route path="/admin" element={<Dashboard />} />
             <Route path="/admin/orders" element={<Orders />} />
             <Route path="/admin/products" element={<ProductManagement />} />
+            <Route path="/admin/users" element={<UserManagement />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -156,9 +156,6 @@ const ProductList = () => {
     setSelectedCategories([]);
   };
   
-  // Fix for the wishlist heart hover issue: 
-  // We'll handle this through proper z-index and event propagation management
-  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page Header */}

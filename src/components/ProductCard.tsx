@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
-  const [showDeleteAlert, setShowDeleteAlert] = React.useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const wishlistBtnRef = useRef<HTMLButtonElement>(null);
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -115,7 +116,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
   if (variant === 'compact') {
     return (
       <>
-        <Card className="hover-card-animation overflow-hidden h-full">
+        <Card className="hover-card-animation overflow-hidden h-full relative">
           <Link to={`/products/${product.id}`} className="flex flex-col h-full">
             <div className="relative aspect-square overflow-hidden">
               <img 
@@ -160,26 +161,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
           </Link>
           
           {/* Wishlist button as separate div with higher z-index */}
-          <div 
-            className="absolute top-2 right-2 z-10"
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="absolute top-2 right-2 z-20"
             onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <Button 
+              ref={wishlistBtnRef}
+              variant="outline" 
+              size="icon" 
+              className="rounded-full bg-white/80 hover:bg-white"
+              onClick={handleWishlistToggle}
             >
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className="rounded-full bg-white/80 hover:bg-white"
-                onClick={handleWishlistToggle}
-              >
-                <Heart 
-                  className={`h-4 w-4 ${inWishlist ? 'fill-red-500 text-red-500' : ''}`} 
-                />
-              </Button>
-            </motion.div>
-          </div>
+              <Heart 
+                className={`h-4 w-4 ${inWishlist ? 'fill-red-500 text-red-500' : ''}`} 
+              />
+            </Button>
+          </motion.div>
         </Card>
         
         <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
@@ -204,7 +203,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
 
   return (
     <>
-      <Card className="hover-card-animation overflow-hidden flex flex-col h-full">
+      <Card className="hover-card-animation overflow-hidden flex flex-col h-full relative">
         <div className="flex flex-col h-full">
           <Link to={`/products/${product.id}`} className="block">
             <div className="relative aspect-square overflow-hidden">
@@ -228,27 +227,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default' 
             </div>
           </Link>
           
-          {/* Wishlist button as separate div with higher z-index */}
-          <div 
-            className="absolute top-2 right-2 z-10"
+          {/* Wishlist button with higher z-index */}
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="absolute top-2 right-2 z-20"
             onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <Button 
+              ref={wishlistBtnRef}
+              variant="outline" 
+              size="icon" 
+              className="rounded-full bg-white hover:bg-white/90"
+              onClick={handleWishlistToggle}
             >
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className="rounded-full bg-white hover:bg-white/90"
-                onClick={handleWishlistToggle}
-              >
-                <Heart 
-                  className={`h-4 w-4 ${inWishlist ? 'fill-red-500 text-red-500' : ''}`} 
-                />
-              </Button>
-            </motion.div>
-          </div>
+              <Heart 
+                className={`h-4 w-4 ${inWishlist ? 'fill-red-500 text-red-500' : ''}`} 
+              />
+            </Button>
+          </motion.div>
           
           <CardContent className="pt-4 flex-grow">
             <Link to={`/products/${product.id}`}>

@@ -44,7 +44,7 @@ const Wishlist = () => {
   const handleAddToCart = (productId: string) => {
     const product = wishlistItems.find(item => item.id === productId);
     if (product) {
-      // Create animation effect (similar to ProductCard)
+      // Create animation effect
       const buttons = document.querySelectorAll(`[data-product-id="${productId}"]`);
       if (buttons.length > 0) {
         const button = buttons[0];
@@ -100,6 +100,11 @@ const Wishlist = () => {
     }
   };
   
+  // Remove duplicate wishlist items by ID
+  const uniqueWishlistItems = Array.from(
+    new Map(wishlistItems.map(item => [item.id, item])).values()
+  );
+  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page Header */}
@@ -112,7 +117,7 @@ const Wishlist = () => {
         </div>
       </div>
       
-      {wishlistItems.length === 0 ? (
+      {uniqueWishlistItems.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -134,12 +139,22 @@ const Wishlist = () => {
       ) : (
         <div>
           <div className="mb-4 flex justify-between items-center">
-            <p className="text-muted-foreground">{wishlistItems.length} item(s)</p>
+            <p className="text-muted-foreground">{uniqueWishlistItems.length} item(s)</p>
+            {uniqueWishlistItems.length > 0 && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                onClick={() => openDeleteDialog('all', 'all items')}
+              >
+                <Trash className="h-4 w-4 mr-2" /> Clear All
+              </Button>
+            )}
           </div>
           
           <AnimatePresence>
             <div className="grid gap-6">
-              {wishlistItems.map(item => (
+              {uniqueWishlistItems.map(item => (
                 <motion.div 
                   key={item.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -219,14 +234,30 @@ const Wishlist = () => {
       <AlertDialog open={!!itemToDelete} onOpenChange={closeDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove from Wishlist</AlertDialogTitle>
+            <AlertDialogTitle>
+              {itemToDelete === 'all' ? 'Clear Wishlist?' : 'Remove from Wishlist?'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove "{itemNameToDelete}" from your wishlist?
+              {itemToDelete === 'all' 
+                ? 'Are you sure you want to remove all items from your wishlist?'
+                : `Are you sure you want to remove "${itemNameToDelete}" from your wishlist?`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRemove} className="bg-red-500 hover:bg-red-600">
+            <AlertDialogAction onClick={() => {
+              if (itemToDelete === 'all') {
+                // Clear all wishlist items
+                wishlistItems.forEach(item => removeFromWishlist(item.id));
+                toast("Wishlist cleared", {
+                  description: "All items have been removed from your wishlist.",
+                  icon: <Heart className="h-4 w-4 text-gray-500" />
+                });
+              } else {
+                confirmRemove();
+              }
+              closeDeleteDialog();
+            }} className="bg-red-500 hover:bg-red-600">
               Remove
             </AlertDialogAction>
           </AlertDialogFooter>
