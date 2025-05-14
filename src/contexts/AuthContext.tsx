@@ -17,6 +17,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   register: (name: string, email: string, password: string) => boolean;
+  isLoading: boolean;
+  requireAuth: (role?: 'user' | 'admin') => boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Check for saved auth on mount
   useEffect(() => {
@@ -59,83 +62,95 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   // Login function
   const login = (email: string, password: string): boolean => {
-    // Check if email exists in our mock database
-    const foundUser = MOCK_USERS[email];
+    setIsLoading(true);
     
-    // Special case for admin login
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      const adminUser = {
-        id: 'admin-1',
-        name: 'Admin User',
-        email: ADMIN_EMAIL,
-        role: 'admin' as const
-      };
+    try {
+      // Check if email exists in our mock database
+      const foundUser = MOCK_USERS[email];
       
-      setUser(adminUser);
-      setIsAuthenticated(true);
-      setIsAdmin(true);
-      localStorage.setItem('auth_user', JSON.stringify(adminUser));
-      return true;
-    }
-    
-    // For regular users
-    if (foundUser && foundUser.password === password) {
-      const authenticatedUser = {
-        id: foundUser.id,
-        name: foundUser.name,
-        email: foundUser.email,
-        role: foundUser.role
-      };
+      // Special case for admin login
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        const adminUser = {
+          id: 'admin-1',
+          name: 'Admin User',
+          email: ADMIN_EMAIL,
+          role: 'admin' as const
+        };
+        
+        setUser(adminUser);
+        setIsAuthenticated(true);
+        setIsAdmin(true);
+        localStorage.setItem('auth_user', JSON.stringify(adminUser));
+        return true;
+      }
       
-      setUser(authenticatedUser);
-      setIsAuthenticated(true);
-      setIsAdmin(foundUser.role === 'admin');
-      localStorage.setItem('auth_user', JSON.stringify(authenticatedUser));
-      return true;
+      // For regular users
+      if (foundUser && foundUser.password === password) {
+        const authenticatedUser = {
+          id: foundUser.id,
+          name: foundUser.name,
+          email: foundUser.email,
+          role: foundUser.role
+        };
+        
+        setUser(authenticatedUser);
+        setIsAuthenticated(true);
+        setIsAdmin(foundUser.role === 'admin');
+        localStorage.setItem('auth_user', JSON.stringify(authenticatedUser));
+        return true;
+      }
+      
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-    
-    return false;
   };
   
   // Register function
   const register = (name: string, email: string, password: string): boolean => {
-    // Check if email already exists
-    if (MOCK_USERS[email]) {
-      return false;
+    setIsLoading(true);
+    
+    try {
+      // Check if email already exists
+      if (MOCK_USERS[email]) {
+        return false;
+      }
+      
+      // Create new user
+      const newUserId = `user-${Object.keys(MOCK_USERS).length + 1}`;
+      const newUser = {
+        id: newUserId,
+        name,
+        email,
+        password,
+        role: 'user' as const
+      };
+      
+      // Add to mock database
+      MOCK_USERS[email] = newUser;
+      
+      // Auto-login after registration
+      setUser({
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role
+      });
+      setIsAuthenticated(true);
+      setIsAdmin(false);
+      
+      // Save to localStorage for persistence
+      localStorage.setItem('auth_user', JSON.stringify({
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role
+      }));
+      
+      return true;
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Create new user
-    const newUserId = `user-${Object.keys(MOCK_USERS).length + 1}`;
-    const newUser = {
-      id: newUserId,
-      name,
-      email,
-      password,
-      role: 'user' as const
-    };
-    
-    // Add to mock database
-    MOCK_USERS[email] = newUser;
-    
-    // Auto-login after registration
-    setUser({
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role
-    });
-    setIsAuthenticated(true);
-    setIsAdmin(false);
-    
-    // Save to localStorage for persistence
-    localStorage.setItem('auth_user', JSON.stringify({
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role
-    }));
-    
-    return true;
   };
   
   // Logout function
@@ -146,13 +161,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('auth_user');
   };
   
+  // Auth check function
+  const requireAuth = (role?: 'user' | 'admin'): boolean => {
+    if (!isAuthenticated) return false;
+    if (role === 'admin' && !isAdmin) return false;
+    return true;
+  };
+  
   const value = {
     user,
     login,
     logout,
     isAuthenticated,
     isAdmin,
-    register
+    register,
+    isLoading,
+    requireAuth
   };
   
   return (
