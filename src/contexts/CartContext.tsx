@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect } from 'react';
 
 export interface Product {
@@ -45,6 +46,13 @@ interface CartContextType {
   saveForLater: (productId: string) => void;
   moveToCart: (productId: string) => void;
   addToRecentlyViewed: (product: Product) => void;
+  // Add missing properties
+  getTotalItems: () => number;
+  updateQuantity: (productId: string, quantity: number) => void;
+  getTotalPrice: () => number;
+  applyPromoCode: (code: string) => boolean;
+  promoDiscount: number;
+  activePromoCode: string | null;
 }
 
 // Create the context
@@ -62,6 +70,13 @@ export const CartContext = createContext<CartContextType>({
   saveForLater: () => {},
   moveToCart: () => {},
   addToRecentlyViewed: () => {},
+  // Add missing properties with default values
+  getTotalItems: () => 0,
+  updateQuantity: () => {},
+  getTotalPrice: () => 0,
+  applyPromoCode: () => false,
+  promoDiscount: 0,
+  activePromoCode: null,
 });
 
 // Create a provider component
@@ -94,6 +109,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
   
+  // Add new state for promo code functionality
+  const [promoDiscount, setPromoDiscount] = useState<number>(0);
+  const [activePromoCode, setActivePromoCode] = useState<string | null>(null);
+  
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
@@ -124,6 +143,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
     setCartItems(updatedCartItems);
   };
+  
+  // Alias for updateCartItemQuantity for code consistency
+  const updateQuantity = updateCartItemQuantity;
 
   const removeFromCart = (productId: string) => {
     const updatedCartItems = cartItems.filter(item => item.id !== productId);
@@ -185,6 +207,44 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
   };
+  
+  // New functions to implement the missing functionality
+  
+  // Calculate total number of items in cart
+  const getTotalItems = () => {
+    return cartItems
+      .filter(item => !item.savedForLater)
+      .reduce((total, item) => total + item.quantity, 0);
+  };
+  
+  // Calculate total price of items in cart
+  const getTotalPrice = () => {
+    const subtotal = cartItems
+      .filter(item => !item.savedForLater)
+      .reduce((total, item) => total + item.price * item.quantity, 0);
+    
+    return subtotal * (1 - promoDiscount);
+  };
+  
+  // Apply a promo code
+  const applyPromoCode = (code: string) => {
+    // Simple promo code validation
+    const validPromoCodes: Record<string, number> = {
+      'WELCOME10': 0.1,    // 10% off
+      'SUMMER20': 0.2,     // 20% off
+      'SALE25': 0.25,      // 25% off
+      'DISCOUNT30': 0.3,   // 30% off
+      'SPECIAL50': 0.5     // 50% off
+    };
+    
+    const upperCaseCode = code.toUpperCase();
+    if (validPromoCodes[upperCaseCode]) {
+      setPromoDiscount(validPromoCodes[upperCaseCode]);
+      setActivePromoCode(upperCaseCode);
+      return true;
+    }
+    return false;
+  };
 
   return (
     <CartContext.Provider value={{
@@ -200,7 +260,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isInWishlist,
       saveForLater,
       moveToCart,
-      addToRecentlyViewed
+      addToRecentlyViewed,
+      // Add the new functions to the context value
+      getTotalItems,
+      updateQuantity,
+      getTotalPrice,
+      applyPromoCode,
+      promoDiscount,
+      activePromoCode
     }}>
       {children}
     </CartContext.Provider>
