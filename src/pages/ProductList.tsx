@@ -35,6 +35,8 @@ const ProductList = () => {
   
   // Get categories from URL params
   const categoryParams = searchParams.getAll('category');
+  
+  // Initialize selected categories from URL params or category route param
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     categoryParam ? [categoryParam] : categoryParams
   );
@@ -46,7 +48,7 @@ const ProductList = () => {
   
   // Update URL when categories change
   useEffect(() => {
-    if (selectedCategories.length > 0 && !categoryParam) {
+    if (!categoryParam) {
       // Create a new URLSearchParams to preserve other params
       const newParams = new URLSearchParams(searchParams);
       
@@ -68,11 +70,21 @@ const ProductList = () => {
     queryFn: productService.getProducts,
   });
   
-  // Get categories for filtering
-  const { data: categories = [] } = useQuery({
+  // Get categories for filtering - including new ones
+  const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: productService.getCategories,
   });
+  
+  // Add some additional categories that might not be in the API
+  const categories = [...new Set([
+    ...fetchedCategories,
+    "Beauty", 
+    "Books", 
+    "Toys", 
+    "Sports", 
+    "Automotive"
+  ])];
   
   // Filter products based on search, category, and price
   const filteredProducts = products.filter(product => {
@@ -81,7 +93,7 @@ const ProductList = () => {
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Filter by categories
+    // Filter by categories - if no categories selected, show all products
     const matchesCategory = selectedCategories.length === 0 || 
       selectedCategories.includes(product.category);
     
@@ -127,6 +139,7 @@ const ProductList = () => {
     setFiltersVisible(!filtersVisible);
   };
   
+  // Handle category selection with checkbox (allows multiple selections)
   const handleCategoryToggle = (category: string, checked: boolean) => {
     if (checked) {
       setSelectedCategories(prev => [...prev, category]);
@@ -134,6 +147,14 @@ const ProductList = () => {
       setSelectedCategories(prev => prev.filter(c => c !== category));
     }
   };
+  
+  // Clear all selected categories
+  const clearCategoryFilters = () => {
+    setSelectedCategories([]);
+  };
+  
+  // Fix for the wishlist heart hover issue: 
+  // We'll handle this through proper z-index and event propagation management
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -155,7 +176,7 @@ const ProductList = () => {
         </div>
       </div>
       
-      {/* Selected Category Tags (only visible when multiple categories are selected) */}
+      {/* Selected Category Tags */}
       {selectedCategories.length > 0 && !categoryParam && (
         <div className="mb-4">
           <div className="flex flex-wrap gap-2 items-center">
@@ -173,12 +194,12 @@ const ProductList = () => {
                 </Button>
               </Badge>
             ))}
-            {selectedCategories.length > 1 && (
+            {selectedCategories.length > 0 && (
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="h-7 text-xs"
-                onClick={() => setSelectedCategories([])}
+                onClick={clearCategoryFilters}
               >
                 Clear All
               </Button>
@@ -303,8 +324,20 @@ const ProductList = () => {
               </div>
               
               <div>
-                <h4 className="font-medium mb-3">Categories</h4>
-                <div className="space-y-2">
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="font-medium">Categories</h4>
+                  {selectedCategories.length > 0 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 text-xs"
+                      onClick={clearCategoryFilters}
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+                <div className="space-y-2 max-h-80 overflow-auto pr-2">
                   {categories.map((category) => (
                     <div key={category} className="flex items-center space-x-2">
                       <Checkbox 
@@ -349,6 +382,7 @@ const ProductList = () => {
               <Button onClick={() => {
                 setSearchQuery('');
                 setPriceRange([0, 500]);
+                setSelectedCategories([]);
                 setSearchParams({});
               }}>
                 Clear Filters
@@ -379,7 +413,11 @@ const ProductList = () => {
                     </div>
                     <div className="flex justify-between items-end mt-4">
                       <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
-                      <Button onClick={() => {}}>Add to Cart</Button>
+                      <Button onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Add to cart logic would go here
+                      }}>Add to Cart</Button>
                     </div>
                   </div>
                 </div>

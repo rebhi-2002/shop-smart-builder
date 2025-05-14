@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
@@ -15,9 +15,13 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import RecentlyViewed from '@/components/RecentlyViewed';
+import NewArrivals from '@/components/NewArrivals';
+import TrendingProducts from '@/components/TrendingProducts';
+import FeaturedProducts from '@/components/FeaturedProducts';
 import useEmblaCarousel from 'embla-carousel-react';
 
 const Index = () => {
+  // ... keep existing code (emblaRef, autoplayInterval, useState declarations)
   const [featuredCategory, setFeaturedCategory] = useState<string>('Electronics');
   const [autoplayInterval, setAutoplayInterval] = useState<NodeJS.Timeout | null>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -128,6 +132,7 @@ const Index = () => {
     <div>
       {/* Hero Carousel Section */}
       <section className="mb-8 relative">
+        {/* ... keep existing code (hero carousel) */}
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {heroSlides.map((slide, index) => (
@@ -201,6 +206,7 @@ const Index = () => {
       
       {/* Categories Quick Links */}
       <section className="container mx-auto px-4 mb-12">
+        {/* ... keep existing code (categories quick links) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {categories.slice(0, 6).map((category) => (
             <Link 
@@ -221,8 +227,19 @@ const Index = () => {
         </div>
       </section>
       
+      {/* NEW: Featured Products Section with Modern Design */}
+      <FeaturedProducts 
+        title="Featured Collection" 
+        subtitle="Handpicked products from our latest collection"
+        limit={10}
+        variant="modern"
+        filter={(product) => product.rating && product.rating >= 4.5}
+        sortBy={(a, b) => (b.rating || 0) - (a.rating || 0)}
+      />
+      
       {/* Deals Section */}
       <section className="container mx-auto px-4 mb-12">
+        {/* ... keep existing code (deals section) */}
         <div className="bg-gradient-to-r from-shop-900 to-shop-700 rounded-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -270,43 +287,22 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Featured Products Carousel */}
-      <section className="container mx-auto px-4 mb-12">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Featured Products</h2>
-          <Button asChild variant="ghost">
-            <Link to="/products" className="flex items-center">
-              View All 
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </Button>
+      {/* NEW: Two-column layout with Trending and New Arrivals */}
+      <div className="container mx-auto px-4 mb-12">
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="md:col-span-2">
+            <NewArrivals variant="modern" />
+          </div>
+          <div className="space-y-8">
+            <TrendingProducts variant="compact" className="mb-6" />
+            <RecentlyViewed variant="floating" className="mb-6" />
+          </div>
         </div>
-        
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full"
-        >
-          <CarouselContent>
-            {featuredProducts.map((product) => (
-              <CarouselItem key={product.id} className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-                <Card>
-                  <CardContent className="p-0">
-                    <ProductCard product={product} variant="compact" />
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
-      </section>
+      </div>
       
       {/* Category Products Section */}
       <section className="container mx-auto px-4 py-10 bg-muted/50 rounded-lg mb-12">
+        {/* ... keep existing code (category products section) */}
         <h2 className="text-2xl font-bold mb-6">Shop by Category</h2>
         
         <Tabs defaultValue={featuredCategory} onValueChange={setFeaturedCategory}>
@@ -341,6 +337,7 @@ const Index = () => {
       
       {/* Banner Section */}
       <section className="container mx-auto px-4 mb-12">
+        {/* ... keep existing code (banner section) */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="relative rounded-lg overflow-hidden h-80">
             <img 
@@ -376,6 +373,7 @@ const Index = () => {
       
       {/* Features Section */}
       <section className="container mx-auto px-4 mb-12">
+        {/* ... keep existing code (features section) */}
         <div className="grid md:grid-cols-4 gap-6">
           <div className="flex flex-col items-center text-center p-6 border rounded-lg">
             <Truck className="h-10 w-10 text-primary mb-4" />
@@ -403,32 +401,21 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Best Sellers */}
-      <section className="container mx-auto px-4 mb-12">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Best Sellers</h2>
-          <Button asChild variant="ghost">
-            <Link to="/products?sort=popular" className="flex items-center">
-              View All <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-        
-        <div className="product-grid">
-          {allProducts
-            .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-            .slice(0, 4)
-            .map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-        </div>
-      </section>
+      {/* Best Sellers as FeaturedProducts component */}
+      <FeaturedProducts
+        title="Best Sellers"
+        viewAllLink="/products?sort=popular"
+        filter={(product) => product.rating && product.rating >= 4}
+        sortBy={(a, b) => (b.rating || 0) - (a.rating || 0)}
+        variant="grid"
+      />
       
       {/* Recently Viewed Products */}
       <RecentlyViewed />
       
       {/* Newsletter Section */}
       <section className="py-16 bg-primary text-white">
+        {/* ... keep existing code (newsletter section) */}
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Join Our Newsletter</h2>
           <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
