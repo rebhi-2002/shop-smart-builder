@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -57,9 +56,11 @@ const Categories: React.FC = () => {
     if (selectedCategories.length === 0) {
       navigate('/products');
     } else if (selectedCategories.length === 1) {
-      navigate(`/categories/${selectedCategories[0]}`);
+      navigate(`/categories/${encodeURIComponent(selectedCategories[0])}`);
     } else {
-      const queryString = selectedCategories.map(c => `category=${encodeURIComponent(c)}`).join('&');
+      const queryString = selectedCategories
+        .map(c => `category=${encodeURIComponent(c)}`)
+        .join('&');
       navigate(`/products?${queryString}`);
     }
   };
@@ -72,7 +73,7 @@ const Categories: React.FC = () => {
     "Toys", 
     "Sports", 
     "Automotive"
-  ])];
+  ])].sort();
   
   return (
     <div className="container mx-auto px-4 py-8">

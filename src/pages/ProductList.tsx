@@ -19,7 +19,7 @@ import {
 import { Filter, Search, ChevronDown, ChevronRight, LayoutGrid, LayoutList, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 
 const ProductList = () => {
   const location = useLocation();
@@ -38,7 +38,7 @@ const ProductList = () => {
   
   // Initialize selected categories from URL params or category route param
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    categoryParam ? [categoryParam] : categoryParams
+    categoryParam ? [decodeURIComponent(categoryParam)] : categoryParams.map(param => decodeURIComponent(param))
   );
 
   // Prevent page reload when changing filters - using React Router instead of form submission
@@ -77,6 +77,13 @@ const ProductList = () => {
       updateFiltersWithoutReload({ categories: selectedCategories });
     }
   }, [selectedCategories, categoryParam, updateFiltersWithoutReload]);
+  
+  // Update selectedCategories when categoryParam changes
+  useEffect(() => {
+    if (categoryParam) {
+      setSelectedCategories([decodeURIComponent(categoryParam)]);
+    }
+  }, [categoryParam]);
   
   // Get all products
   const { data: products = [], isLoading } = useQuery({
@@ -119,6 +126,8 @@ const ProductList = () => {
     
     return matchesSearch && matchesCategory && matchesPrice;
   });
+  
+  
   
   // Sort the filtered products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -244,6 +253,8 @@ const ProductList = () => {
           </div>
         </div>
       )}
+      
+      
       
       {/* Search and Filters Bar */}
       <div className="bg-card rounded-lg shadow-sm border p-4 mb-8">
@@ -406,7 +417,7 @@ const ProductList = () => {
                         htmlFor={`desktop-category-${category}`}
                         className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        {category} {categories.length}
+                        {category}
                       </label>
                     </div>
                   ))}

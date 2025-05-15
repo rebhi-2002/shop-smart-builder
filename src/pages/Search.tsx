@@ -147,7 +147,7 @@ const Search: React.FC = () => {
           </Button>
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="product-grid">
+        <div className="product-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {paginatedProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
