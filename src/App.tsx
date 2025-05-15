@@ -31,50 +31,53 @@ import Deals from '@/pages/Deals';
 import Careers from '@/pages/Careers';
 import { FramerMotionProvider } from '@/providers/FramerMotionProvider';
 import UserManagement from '@/pages/admin/UserManagement';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <FramerMotionProvider>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/products" element={<ProductList />} />
-            <Route path="/products/:id" element={<ProductDetails />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/categories/:category" element={<ProductList />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/order-confirmation" element={<OrderConfirmation />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/deals" element={<Deals />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/account" element={<MyAccount />} />
-            <Route path="/account/profile" element={<UserProfile />} />
-            <Route path="/account/orders" element={<MyOrders />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-conditions" element={<TermsConditions />} />
-            <Route path="/shipping-returns" element={<ShippingReturns />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<Dashboard />} />
-            <Route path="/admin/orders" element={<Orders />} />
-            <Route path="/admin/products" element={<ProductManagement />} />
-            <Route path="/admin/users" element={<UserManagement />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster />
-        </Layout>
-      </FramerMotionProvider>
+      <AuthProvider>
+        <FramerMotionProvider>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/products" element={<ProductList />} />
+              <Route path="/products/:id" element={<ProductDetails />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/categories/:category" element={<ProductList />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/order-confirmation" element={<OrderConfirmation />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/deals" element={<Deals />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/account" element={<MyAccount />} />
+              <Route path="/account/profile" element={<UserProfile />} />
+              <Route path="/account/orders" element={<MyOrders />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-conditions" element={<TermsConditions />} />
+              <Route path="/shipping-returns" element={<ShippingReturns />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<Dashboard />} />
+              <Route path="/admin/orders" element={<Orders />} />
+              <Route path="/admin/products" element={<ProductManagement />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+          </Layout>
+        </FramerMotionProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

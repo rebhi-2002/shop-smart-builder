@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useParams, Link } from 'react-router-dom';
@@ -113,7 +112,7 @@ const ProductList = () => {
     
     // Filter by categories - if no categories selected, show all products
     const matchesCategory = selectedCategories.length === 0 || 
-      selectedCategories.includes(product.category);
+      selectedCategories.some(cat => product.category === cat);
     
     // Filter by price range
     const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
@@ -157,14 +156,6 @@ const ProductList = () => {
       : selectedCategories.filter(c => c !== category);
       
     setSelectedCategories(newCategories);
-    
-    // This should NOT cause a page reload because we're using React Router's setSearchParams
-    if (!categoryParam) {
-      const params = new URLSearchParams(searchParams);
-      params.delete('category');
-      newCategories.forEach(cat => params.append('category', cat));
-      setSearchParams(params, { replace: true });
-    }
   };
   
   // Select all categories
@@ -176,12 +167,6 @@ const ProductList = () => {
   // Clear all selected categories
   const clearCategoryFilters = () => {
     setSelectedCategories([]);
-    // Update URL without reload
-    if (!categoryParam) {
-      const params = new URLSearchParams(searchParams);
-      params.delete('category');
-      setSearchParams(params, { replace: true });
-    }
     toast.success("Filters cleared");
   };
   
@@ -421,7 +406,7 @@ const ProductList = () => {
                         htmlFor={`desktop-category-${category}`}
                         className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        {category}
+                        {category} {categories.length}
                       </label>
                     </div>
                   ))}
@@ -494,9 +479,13 @@ const ProductList = () => {
                 <div key={product.id} className="flex flex-col sm:flex-row border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                   <div className="sm:w-48 h-48">
                     <img 
-                      src={product.image} 
+                      src={product.image || "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop"} 
                       alt={product.name} 
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop";
+                      }}
                     />
                   </div>
                   <div className="p-4 flex flex-col justify-between flex-grow">

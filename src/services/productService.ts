@@ -1,546 +1,429 @@
-import { Product } from '@/contexts/CartContext';
 
-// Mock product database with additional products for all categories
-const products: Product[] = [
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  rating: number;
+  stock?: number;
+  discount?: number;
+  isNew?: boolean;
+  isFeatured?: boolean;
+}
+
+const mockProducts: Product[] = [
   {
-    id: '1',
-    name: 'Gaming Laptop',
-    description: 'High-performance laptop for gaming enthusiasts.',
-    price: 1200,
-    image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1500',
-    category: 'Electronics',
-    discount: 10,
-    stock: 50,
+    id: "1",
+    name: "Wireless Headphones",
+    description: "High-quality wireless headphones with noise cancellation",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Electronics",
     rating: 4.5,
-    reviews: 25,
-    seller: 'TechStore',
-    tags: ['gaming', 'laptop', 'high-performance'],
-    specs: {
-      'Processor': 'Intel i9-12900K',
-      'Graphics': 'NVIDIA RTX 3080',
-      'RAM': '32GB DDR5',
-      'Storage': '1TB NVMe SSD',
-      'Display': '17.3" 4K 144Hz',
-      'Battery': '8 hours',
-      'Weight': '2.4kg'
-    }
+    stock: 100,
+    discount: 15,
+    isNew: false,
+    isFeatured: true
   },
   {
-    id: '2',
-    name: 'Running Shoes',
-    description: 'Comfortable and durable shoes for running.',
-    price: 80,
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1500',
-    category: 'Fashion',
-    discount: 15,
-    stock: 100,
+    id: "2",
+    name: "Smart Watch",
+    description: "Track your fitness and stay connected with this advanced smartwatch",
+    price: 299.99,
+    image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Electronics",
     rating: 4.2,
-    reviews: 30,
-    seller: 'FitLife',
-    tags: ['running', 'shoes', 'sports'],
-    specs: {
-      'Material': 'Breathable mesh, synthetic',
-      'Sole': 'Rubber with cushioning',
-      'Weight': '280g',
-      'Closure': 'Lace-up',
-      'Features': 'Shock absorption, arch support'
-    }
-  },
-  {
-    id: '3',
-    name: 'Coffee Maker',
-    description: 'Automatic coffee maker for home use.',
-    price: 50,
-    image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1500',
-    category: 'Home',
-    discount: 5,
     stock: 75,
+    discount: 0,
+    isNew: true,
+    isFeatured: true
+  },
+  {
+    id: "3",
+    name: "Designer Handbag",
+    description: "Elegant designer handbag with premium materials",
+    price: 499.99,
+    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Fashion",
+    rating: 4.8,
+    stock: 30,
+    discount: 0,
+    isNew: false,
+    isFeatured: true
+  },
+  {
+    id: "4",
+    name: "Coffee Maker",
+    description: "Premium coffee maker with multiple brewing options",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1522125123931-9304d91a42ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Home",
     rating: 4.0,
-    reviews: 20,
-    seller: 'HomeNeeds',
-    tags: ['coffee', 'maker', 'kitchen'],
-    specs: {
-      'Capacity': '12 cups',
-      'Functions': 'Brew strength control, timer',
-      'Material': 'Stainless steel, glass',
-      'Power': '1000W',
-      'Dimensions': '25cm x 18cm x 35cm'
-    }
-  },
-  {
-    id: '4',
-    name: 'Smart Watch',
-    description: 'Advanced smart watch with fitness tracking.',
-    price: 250,
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1500',
-    category: 'Electronics',
-    discount: 20,
-    stock: 40,
-    rating: 4.7,
-    reviews: 40,
-    seller: 'TechStore',
-    tags: ['smartwatch', 'fitness', 'wearable'],
-    specs: {
-      'Display': '1.4" AMOLED',
-      'Battery': '48 hours',
-      'Sensors': 'Heart rate, GPS, Accelerometer',
-      'Water Resistance': '50m',
-      'Compatibility': 'iOS, Android'
-    }
-  },
-  {
-    id: '5',
-    name: 'Denim Jeans',
-    description: 'Classic denim jeans for everyday wear.',
-    price: 60,
-    image: 'https://images.unsplash.com/photo-1582552938357-32b906df40cb?q=80&w=1500',
-    category: 'Fashion',
-    discount: 10,
-    stock: 90,
-    rating: 4.3,
-    reviews: 28,
-    seller: 'StyleHub',
-    tags: ['denim', 'jeans', 'casual'],
-    specs: {
-      'Material': '98% Cotton, 2% Elastane',
-      'Style': 'Straight leg',
-      'Rise': 'Mid-rise',
-      'Closure': 'Button and zipper fly',
-      'Care': 'Machine wash cold'
-    }
-  },
-  {
-    id: '6',
-    name: 'Blender',
-    description: 'High-speed blender for smoothies and shakes.',
-    price: 70,
-    image: 'https://images.unsplash.com/photo-1570222094114-d054a817e56b?q=80&w=1500',
-    category: 'Home',
-    discount: 15,
     stock: 60,
+    discount: 10,
+    isNew: false,
+    isFeatured: false
+  },
+  {
+    id: "5",
+    name: "Running Shoes",
+    description: "Comfortable and durable running shoes for all terrains",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Fashion",
+    rating: 4.3,
+    stock: 50,
+    discount: 0,
+    isNew: true,
+    isFeatured: false
+  },
+  {
+    id: "6",
+    name: "Smartphone",
+    description: "Latest model smartphone with advanced camera system",
+    price: 899.99,
+    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Electronics",
+    rating: 4.7,
+    stock: 85,
+    discount: 100,
+    isNew: true,
+    isFeatured: true
+  },
+  {
+    id: "7",
+    name: "Kitchen Mixer",
+    description: "Professional grade kitchen mixer for all your baking needs",
+    price: 349.99,
+    image: "https://images.unsplash.com/photo-1659681344894-91c657ef9898?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Home",
+    rating: 4.9,
+    stock: 25,
+    discount: 50,
+    isNew: false,
+    isFeatured: true
+  },
+  {
+    id: "8",
+    name: "Fitness Tracker",
+    description: "Track steps, heart rate, and sleep with this waterproof fitness band",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Electronics",
     rating: 4.1,
-    reviews: 15,
-    seller: 'KitchenPro',
-    tags: ['blender', 'smoothie', 'kitchen'],
-    specs: {
-      'Power': '800W',
-      'Speed Settings': '5 + Pulse',
-      'Capacity': '1.5L',
-      'Blades': 'Stainless steel',
-      'Functions': 'Blend, crush, puree'
-    }
-  },
-  {
-    id: '7',
-    name: 'Wireless Headphones',
-    description: 'Over-ear wireless headphones with noise cancellation.',
-    price: 180,
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1500',
-    category: 'Electronics',
-    discount: 5,
-    stock: 35,
-    rating: 4.6,
-    reviews: 35,
-    seller: 'AudioTech',
-    tags: ['headphones', 'wireless', 'audio'],
-    specs: {
-      'Type': 'Over-ear, Closed-back',
-      'Connectivity': 'Bluetooth 5.0, 3.5mm',
-      'Battery Life': 'Up to 30 hours',
-      'Features': 'Active Noise Cancellation',
-      'Microphone': 'Integrated'
-    }
-  },
-  {
-    id: '8',
-    name: 'Summer Dress',
-    description: 'Light and airy summer dress for women.',
-    price: 45,
-    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1500',
-    category: 'Fashion',
-    discount: 20,
-    stock: 80,
-    rating: 4.4,
-    reviews: 22,
-    seller: 'StyleHub',
-    tags: ['dress', 'summer', 'women'],
-    specs: {
-      'Material': '100% Cotton',
-      'Length': 'Knee-length',
-      'Style': 'A-line',
-      'Closure': 'Back zip',
-      'Care': 'Machine wash cold'
-    }
-  },
-  {
-    id: '9',
-    name: 'Toaster Oven',
-    description: 'Compact toaster oven for small kitchens.',
-    price: 65,
-    image: 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?q=80&w=1500',
-    category: 'Home',
-    discount: 10,
-    stock: 55,
-    rating: 3.9,
-    reviews: 18,
-    seller: 'HomeNeeds',
-    tags: ['toaster', 'oven', 'kitchen'],
-    specs: {
-      'Capacity': '12L',
-      'Power': '1200W',
-      'Functions': 'Toast, bake, broil',
-      'Timer': '30 minutes',
-      'Dimensions': '40cm x 30cm x 25cm'
-    }
-  },
-  {
-    id: '10',
-    name: 'Bluetooth Speaker',
-    description: 'Portable Bluetooth speaker with loud sound.',
-    price: 90,
-    image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=1500',
-    category: 'Electronics',
-    discount: 15,
-    stock: 45,
-    rating: 4.8,
-    reviews: 45,
-    seller: 'AudioTech',
-    tags: ['speaker', 'bluetooth', 'portable'],
-    specs: {
-      'Power': '20W',
-      'Battery Life': '12 hours',
-      'Connectivity': 'Bluetooth 5.0, Aux',
-      'Water Resistance': 'IPX7',
-      'Features': 'Built-in mic, voice assistant'
-    }
-  },
-  {
-    id: '11',
-    name: 'Digital Camera',
-    description: 'Professional digital camera with 4K video recording.',
-    price: 899,
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1500',
-    category: 'Electronics',
-    discount: 12,
-    stock: 20,
-    rating: 4.9,
-    reviews: 38,
-    seller: 'PhotoTech',
-    tags: ['camera', 'photography', '4k'],
-    specs: {
-      'Sensor': '24.2MP APS-C CMOS',
-      'ISO Range': '100-25600',
-      'Video': '4K UHD',
-      'Lens Mount': 'Standard',
-      'Stabilization': '5-axis'
-    }
-  },
-  {
-    id: '12',
-    name: 'Leather Backpack',
-    description: 'Stylish leather backpack for everyday use.',
-    price: 120,
-    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1500',
-    category: 'Fashion',
-    discount: 8,
-    stock: 60,
-    rating: 4.3,
-    reviews: 27,
-    seller: 'BagWorld',
-    tags: ['backpack', 'leather', 'accessories'],
-    specs: {
-      'Material': 'Genuine leather',
-      'Capacity': '18L',
-      'Compartments': 'Laptop sleeve, 3 pockets',
-      'Dimensions': '30cm x 45cm x 15cm',
-      'Features': 'Water resistant, padded straps'
-    }
-  },
-  
-  // Adding products for Beauty category
-  {
-    id: '13',
-    name: 'Luxury Skincare Set',
-    description: 'Premium skincare routine with cleanser, toner, and moisturizer.',
-    price: 85,
-    image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=1500',
-    category: 'Beauty',
-    discount: 10,
-    stock: 45,
-    rating: 4.7,
-    reviews: 32,
-    seller: 'GlowUp',
-    tags: ['skincare', 'beauty', 'premium'],
-    specs: {
-      'Contents': '3 products',
-      'Skin Type': 'All skin types',
-      'Volume': '50ml each',
-      'Features': 'Vegan, Cruelty-free',
-      'Usage': 'Morning and evening application'
-    }
-  },
-  {
-    id: '14',
-    name: 'Professional Makeup Brush Set',
-    description: 'Complete set of makeup brushes for professional application.',
-    price: 65,
-    image: 'https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?q=80&w=1500',
-    category: 'Beauty',
-    discount: 15,
-    stock: 60,
-    rating: 4.5,
-    reviews: 28,
-    seller: 'MakeupPro',
-    tags: ['makeup', 'brushes', 'beauty'],
-    specs: {
-      'Brushes': '12 pieces',
-      'Material': 'Synthetic bristles, wooden handles',
-      'Case': 'Travel pouch included',
-      'Maintenance': 'Hand wash with mild soap'
-    }
-  },
-  
-  // Adding products for Books category
-  {
-    id: '15',
-    name: 'Bestselling Novel',
-    description: 'Award-winning fiction novel from acclaimed author.',
-    price: 24,
-    image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1500',
-    category: 'Books',
-    discount: 5,
-    stock: 100,
-    rating: 4.8,
-    reviews: 45,
-    seller: 'BookHaven',
-    tags: ['fiction', 'novel', 'bestseller'],
-    specs: {
-      'Pages': '384',
-      'Format': 'Hardcover',
-      'Language': 'English',
-      'Publication Date': '2023',
-      'Publisher': 'Literary Press'
-    }
-  },
-  {
-    id: '16',
-    name: 'Cooking Encyclopedia',
-    description: 'Comprehensive cookbook with recipes from around the world.',
-    price: 42,
-    image: 'https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=1500',
-    category: 'Books',
-    discount: 10,
-    stock: 50,
-    rating: 4.6,
-    reviews: 38,
-    seller: 'CulinaryBooks',
-    tags: ['cookbook', 'recipes', 'cooking'],
-    specs: {
-      'Pages': '520',
-      'Format': 'Hardcover, illustrated',
-      'Recipes': '200+',
-      'Features': 'Step-by-step guides, photographs',
-      'Cuisine Types': 'International'
-    }
-  },
-  
-  // Adding products for Toys category
-  {
-    id: '17',
-    name: 'Educational Building Blocks',
-    description: 'Creative learning blocks for children ages 3-8.',
-    price: 35,
-    image: 'https://images.unsplash.com/photo-1516981879613-9f5da904015f?q=80&w=1500',
-    category: 'Toys',
+    stock: 120,
     discount: 0,
-    stock: 80,
-    rating: 4.9,
-    reviews: 50,
-    seller: 'KidZone',
-    tags: ['toy', 'educational', 'blocks'],
-    specs: {
-      'Pieces': '100 blocks',
-      'Material': 'Non-toxic plastic',
-      'Age': '3-8 years',
-      'Educational Focus': 'Spatial awareness, creativity'
-    }
+    isNew: false,
+    isFeatured: false
   },
   {
-    id: '18',
-    name: 'Remote Control Car',
-    description: 'Fast RC race car with precision controls.',
-    price: 75,
-    image: 'https://images.unsplash.com/photo-1595588073112-39358076aa22?q=80&w=1500',
-    category: 'Toys',
-    discount: 20,
+    id: "9",
+    name: "Portable Speaker",
+    description: "Waterproof portable speaker with 24-hour battery life",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Electronics",
+    rating: 4.4,
+    stock: 90,
+    discount: 0,
+    isNew: true,
+    isFeatured: false
+  },
+  {
+    id: "10",
+    name: "Premium Blender",
+    description: "High-speed blender for smoothies and food preparation",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1570222094714-d504fbe46a36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Home",
+    rating: 4.6,
     stock: 40,
-    rating: 4.3,
-    reviews: 35,
-    seller: 'RaceMasters',
-    tags: ['rc car', 'toys', 'racing'],
-    specs: {
-      'Scale': '1:16',
-      'Control Range': '100m',
-      'Speed': 'Up to 25km/h',
-      'Battery': 'Rechargeable Li-ion',
-      'Run Time': '25 minutes'
-    }
+    discount: 25,
+    isNew: false,
+    isFeatured: false
   },
-  
-  // Adding products for Sports category
+  // Adding products for all categories
   {
-    id: '19',
-    name: 'Yoga Mat',
-    description: 'Non-slip exercise mat for yoga and fitness.',
-    price: 30,
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1500',
-    category: 'Sports',
-    discount: 10,
-    stock: 70,
-    rating: 4.5,
-    reviews: 42,
-    seller: 'FitLife',
-    tags: ['yoga', 'fitness', 'exercise'],
-    specs: {
-      'Material': 'TPE eco-friendly foam',
-      'Thickness': '6mm',
-      'Dimensions': '183cm x 61cm',
-      'Features': 'Non-slip, waterproof, carry strap'
-    }
-  },
-  {
-    id: '20',
-    name: 'Basketball',
-    description: 'Official size and weight indoor/outdoor basketball.',
-    price: 45,
-    image: 'https://images.unsplash.com/photo-1579338559194-a162d19bf842?q=80&w=1500',
-    category: 'Sports',
-    discount: 0,
-    stock: 55,
+    id: "11",
+    name: "Luxury Face Cream",
+    description: "Premium anti-aging face cream with natural ingredients",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+    category: "Beauty",
     rating: 4.7,
-    reviews: 30,
-    seller: 'SportsGear',
-    tags: ['basketball', 'sports', 'outdoor'],
-    specs: {
-      'Size': 'Official size 7 (29.5")',
-      'Material': 'Composite leather',
-      'Use': 'Indoor/Outdoor',
-      'Inflation': 'Comes inflated'
-    }
-  },
-  
-  // Adding products for Automotive category
-  {
-    id: '21',
-    name: 'Car Dashboard Camera',
-    description: 'HD dash cam with night vision and loop recording.',
-    price: 120,
-    image: 'https://images.unsplash.com/photo-1621839673705-6617adf9e890?q=80&w=1500',
-    category: 'Automotive',
-    discount: 15,
     stock: 35,
-    rating: 4.4,
-    reviews: 27,
-    seller: 'AutoTech',
-    tags: ['dashcam', 'car', 'electronics'],
-    specs: {
-      'Resolution': '1080p Full HD',
-      'Viewing Angle': '170 degrees',
-      'Storage': 'MicroSD up to 128GB',
-      'Features': 'Night vision, motion detection, loop recording'
-    }
+    discount: 0,
+    isNew: true,
+    isFeatured: true
   },
   {
-    id: '22',
-    name: 'Car Cleaning Kit',
-    description: 'Complete kit for interior and exterior car cleaning.',
-    price: 55,
-    image: 'https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?q=80&w=1500',
-    category: 'Automotive',
-    discount: 5,
-    stock: 50,
+    id: "12",
+    name: "Organic Shampoo",
+    description: "Chemical-free shampoo for all hair types",
+    price: 24.99,
+    image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+    category: "Beauty",
+    rating: 4.3,
+    stock: 80,
+    discount: 10,
+    isNew: false,
+    isFeatured: false
+  },
+  {
+    id: "13",
+    name: "Premium Makeup Kit",
+    description: "Complete makeup kit with brushes and palette",
+    price: 149.99,
+    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1000&q=80",
+    category: "Beauty",
+    rating: 4.8,
+    stock: 25,
+    discount: 15,
+    isNew: true,
+    isFeatured: true
+  },
+  {
+    id: "14",
+    name: "Best-selling Novel",
+    description: "Award-winning fiction novel by renowned author",
+    price: 19.99,
+    image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=1000&q=80",
+    category: "Books",
+    rating: 4.9,
+    stock: 100,
+    discount: 0,
+    isNew: false,
+    isFeatured: true
+  },
+  {
+    id: "15",
+    name: "Cookbook Collection",
+    description: "Set of gourmet cookbooks featuring international cuisine",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1589998059171-988d887df646?auto=format&fit=crop&w=1000&q=80",
+    category: "Books",
+    rating: 4.5,
+    stock: 40,
+    discount: 20,
+    isNew: false,
+    isFeatured: false
+  },
+  {
+    id: "16",
+    name: "Children's Book Set",
+    description: "Illustrated children's books for early readers",
+    price: 34.99,
+    image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1000&q=80",
+    category: "Books",
+    rating: 4.7,
+    stock: 60,
+    discount: 0,
+    isNew: true,
+    isFeatured: false
+  },
+  {
+    id: "17",
+    name: "Remote Control Car",
+    description: "High-speed remote control car with off-road capabilities",
+    price: 75.00,
+    image: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=1000&q=80",
+    category: "Toys",
+    rating: 4.3,
+    stock: 45,
+    discount: 20,
+    isNew: false,
+    isFeatured: true
+  },
+  {
+    id: "18",
+    name: "Educational Building Blocks",
+    description: "Creative building blocks for children's development",
+    price: 39.99,
+    image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1000&q=80",
+    category: "Toys",
     rating: 4.6,
-    reviews: 33,
-    seller: 'AutoCare',
-    tags: ['car care', 'cleaning', 'automotive'],
-    specs: {
-      'Contents': '10 pieces',
-      'Includes': 'Wash mitt, microfiber cloths, detailing brush, wax',
-      'Use': 'Interior and exterior',
-      'Storage': 'Organizer bucket included'
-    }
+    stock: 70,
+    discount: 0,
+    isNew: true,
+    isFeatured: false
+  },
+  {
+    id: "19",
+    name: "Interactive Robot Toy",
+    description: "Programmable robot toy for learning coding basics",
+    price: 99.99,
+    image: "https://images.unsplash.com/photo-1535378917042-10a22c95931a?auto=format&fit=crop&w=1000&q=80",
+    category: "Toys",
+    rating: 4.8,
+    stock: 30,
+    discount: 10,
+    isNew: true,
+    isFeatured: true
+  },
+  {
+    id: "20",
+    name: "Professional Basketball",
+    description: "Official size and weight basketball for indoor/outdoor use",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1000&q=80",
+    category: "Sports",
+    rating: 4.5,
+    stock: 85,
+    discount: 0,
+    isNew: false,
+    isFeatured: false
+  },
+  {
+    id: "21",
+    name: "Yoga Mat Set",
+    description: "Premium yoga mat with blocks and strap",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1000&q=80",
+    category: "Sports",
+    rating: 4.6,
+    stock: 50,
+    discount: 15,
+    isNew: true,
+    isFeatured: true
+  },
+  {
+    id: "22",
+    name: "Mountain Bike",
+    description: "All-terrain mountain bike with 21 speeds",
+    price: 499.99,
+    image: "https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?auto=format&fit=crop&w=1000&q=80",
+    category: "Sports",
+    rating: 4.7,
+    stock: 20,
+    discount: 50,
+    isNew: false,
+    isFeatured: true
+  },
+  {
+    id: "23",
+    name: "Car Audio System",
+    description: "High-performance car stereo system with Bluetooth",
+    price: 349.99,
+    image: "https://images.unsplash.com/photo-1632098953531-4f7486abe6f9?auto=format&fit=crop&w=1000&q=80",
+    category: "Automotive",
+    rating: 4.4,
+    stock: 25,
+    discount: 0,
+    isNew: true,
+    isFeatured: false
+  },
+  {
+    id: "24",
+    name: "Luxury Car Seat Covers",
+    description: "Premium leather seat covers for sedans and SUVs",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1566985724615-a71321aed8be?auto=format&fit=crop&w=1000&q=80",
+    category: "Automotive",
+    rating: 4.3,
+    stock: 40,
+    discount: 10,
+    isNew: false,
+    isFeatured: true
+  },
+  {
+    id: "25",
+    name: "Car Dash Camera",
+    description: "4K resolution dashboard camera with night vision",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1617470702892-e01504693bd7?auto=format&fit=crop&w=1000&q=80",
+    category: "Automotive",
+    rating: 4.5,
+    stock: 60,
+    discount: 15,
+    isNew: true,
+    isFeatured: false
   }
 ];
 
 export const productService = {
-  // Get all products
   getProducts: async (): Promise<Product[]> => {
-    return products;
-  },
-
-  // Get a single product by ID
-  getProduct: async (id: string): Promise<Product | undefined> => {
-    return products.find(product => product.id === id);
+    // Simulate API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(mockProducts);
+      }, 500);
+    });
   },
   
-  // Alias for getProduct to maintain compatibility with existing code
   getProductById: async (id: string): Promise<Product | undefined> => {
-    return products.find(product => product.id === id);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const product = mockProducts.find(p => p.id === id);
+        resolve(product);
+      }, 300);
+    });
   },
   
-  // Get product categories
   getCategories: async (): Promise<string[]> => {
-    return [...new Set(products.map(product => product.category))];
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const categories = [...new Set(mockProducts.map(p => p.category))];
+        resolve(categories);
+      }, 200);
+    });
   },
   
-  // Get discounted products
-  getDiscountedProducts: async (): Promise<Product[]> => {
-    return products.filter(product => product.discount && product.discount > 0);
+  getFeaturedProducts: async (): Promise<Product[]> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const featured = mockProducts.filter(p => p.isFeatured);
+        resolve(featured);
+      }, 300);
+    });
   },
   
-  // Create a new product
-  createProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
-    const newProduct: Product = {
-      id: String(products.length + 1),
-      ...product,
-    };
-    products.push(newProduct);
-    return newProduct;
+  getNewArrivals: async (): Promise<Product[]> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newArrivals = mockProducts.filter(p => p.isNew);
+        resolve(newArrivals);
+      }, 300);
+    });
+  },
+  
+  getRelatedProducts: async (productId: string, limit = 4): Promise<Product[]> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const product = mockProducts.find(p => p.id === productId);
+        if (!product) {
+          resolve([]);
+          return;
+        }
+        
+        const related = mockProducts
+          .filter(p => p.id !== productId && p.category === product.category)
+          .slice(0, limit);
+          
+        resolve(related);
+      }, 300);
+    });
+  },
+  
+  searchProducts: async (query: string): Promise<Product[]> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const results = mockProducts.filter(p => 
+          p.name.toLowerCase().includes(query.toLowerCase()) || 
+          p.description.toLowerCase().includes(query.toLowerCase())
+        );
+        resolve(results);
+      }, 300);
+    });
   },
 
-  // Update an existing product
-  updateProduct: async (updatedProduct: Product): Promise<Product> => {
-    const index = products.findIndex(product => product.id === updatedProduct.id);
-    if (index !== -1) {
-      products[index] = updatedProduct;
-      return updatedProduct;
-    } else {
-      throw new Error(`Product with id ${updatedProduct.id} not found`);
-    }
-  },
-
-  // Delete a product
-  deleteProduct: async (id: string): Promise<void> => {
-    const index = products.findIndex(product => product.id === id);
-    if (index !== -1) {
-      products.splice(index, 1);
-    } else {
-      throw new Error(`Product with id ${id} not found`);
-    }
-  },
-  
-  // Get related products based on category
-  getRelatedProducts: async (productId: string): Promise<Product[]> => {
-    // Find the current product
-    const product = products.find(p => p.id === productId);
-    
-    if (!product) {
-      return [];
-    }
-    
-    // Find products in the same category, excluding the current product
-    return products
-      .filter(p => p.category === product.category && p.id !== productId)
-      .slice(0, 4); // Return up to 4 related products
+  getProductsByCategory: async (category: string): Promise<Product[]> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const results = mockProducts.filter(p => p.category === category);
+        resolve(results);
+      }, 300);
+    });
   }
 };
