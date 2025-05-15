@@ -9,8 +9,8 @@ export interface User {
   email: string;
   role: 'user' | 'admin' | 'customer';
   avatar?: string;
-  phone?: string; // Added phone property
-  bio?: string;   // Added bio property
+  phone?: string;
+  bio?: string;
   address?: {
     street?: string;
     city?: string;
@@ -18,6 +18,10 @@ export interface User {
     zip?: string;
     country?: string;
   };
+  createdAt?: string;
+  lastLogin?: string;
+  status?: 'active' | 'inactive' | 'suspended';
+  orders?: number;
 }
 
 export interface AuthContextType {
@@ -25,7 +29,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
-  updateUser: (updatedUser: User) => Promise<void>; // Added updateUser method
+  updateUser: (updatedUser: User) => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
@@ -42,10 +46,85 @@ export const useAuth = () => {
   return context;
 };
 
+// Mock users database
+const mockUsers: User[] = [
+  {
+    id: 'admin-1',
+    name: 'Admin User',
+    email: 'admin@example.com',
+    role: 'admin',
+    avatar: 'https://i.pravatar.cc/150?u=admin',
+    phone: '123-456-7890',
+    bio: 'System administrator with full access rights',
+    createdAt: '2023-01-15',
+    lastLogin: '2025-05-12',
+    status: 'active',
+    orders: 0
+  },
+  {
+    id: 'user-1',
+    name: 'John Doe',
+    email: 'user@example.com',
+    role: 'user',
+    avatar: 'https://i.pravatar.cc/150?u=user',
+    phone: '987-654-3210',
+    bio: 'Regular customer',
+    createdAt: '2023-02-20',
+    lastLogin: '2025-05-10',
+    status: 'active',
+    orders: 5
+  },
+  {
+    id: 'user-2',
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    role: 'user',
+    avatar: 'https://i.pravatar.cc/150?u=jane',
+    phone: '555-123-4567',
+    bio: 'Frequent shopper',
+    createdAt: '2023-03-10',
+    lastLogin: '2025-05-05',
+    status: 'active',
+    orders: 12
+  },
+  {
+    id: 'user-3',
+    name: 'Bob Johnson',
+    email: 'bob@example.com',
+    role: 'user',
+    avatar: 'https://i.pravatar.cc/150?u=bob',
+    phone: '444-333-2222',
+    bio: 'New customer',
+    createdAt: '2024-01-05',
+    lastLogin: '2025-04-28',
+    status: 'active',
+    orders: 1
+  },
+  {
+    id: 'customer-1',
+    name: 'Sarah Williams',
+    email: 'sarah@example.com',
+    role: 'customer',
+    avatar: 'https://i.pravatar.cc/150?u=sarah',
+    phone: '222-555-8888',
+    bio: 'VIP customer',
+    createdAt: '2023-05-18',
+    lastLogin: '2025-05-01',
+    status: 'active',
+    orders: 25
+  }
+];
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  
+  // Make mockUsers available through window for admin functions
+  useEffect(() => {
+    // @ts-ignore
+    window.mockUsers = mockUsers;
+  }, []);
 
   // Check for existing user session on load
   useEffect(() => {
@@ -71,9 +150,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // In a real app, this would call an API to update user data
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      toast.success("Profile updated successfully");
       return Promise.resolve();
     } catch (error) {
       console.error('Failed to update user:', error);
+      toast.error("Failed to update profile");
       return Promise.reject(error);
     }
   };
@@ -84,17 +165,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Demo users
+      // Check existing users
+      const foundUser = mockUsers.find(u => u.email === email);
+      
       if (email === 'admin@example.com' && password === 'admin123') {
-        const adminUser = {
-          id: 'admin-1',
-          name: 'Admin User',
-          email: 'admin@example.com',
-          role: 'admin' as const,
-          avatar: 'https://i.pravatar.cc/150?u=admin',
-          phone: '123-456-7890',
-          bio: 'System administrator with full access rights'
-        };
+        const adminUser = mockUsers.find(u => u.id === 'admin-1')!;
         setUser(adminUser);
         localStorage.setItem('user', JSON.stringify(adminUser));
         toast.success('Welcome back, Admin!');
@@ -103,15 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } 
       
       if (email === 'user@example.com' && password === 'user123') {
-        const regularUser = {
-          id: 'user-1',
-          name: 'John Doe',
-          email: 'user@example.com',
-          role: 'user' as const,
-          avatar: 'https://i.pravatar.cc/150?u=user',
-          phone: '987-654-3210',
-          bio: 'Regular customer'
-        };
+        const regularUser = mockUsers.find(u => u.id === 'user-1')!;
         setUser(regularUser);
         localStorage.setItem('user', JSON.stringify(regularUser));
         toast.success('Login successful!');
@@ -134,13 +201,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const newUser = {
+      // Check if email already exists
+      if (mockUsers.some(user => user.email === email)) {
+        toast.error('Email already registered');
+        setIsLoading(false);
+        return;
+      }
+      
+      const newUser: User = {
         id: `user-${Date.now()}`,
         name,
         email,
-        role: 'user' as const,
+        role: 'user',
         avatar: `https://i.pravatar.cc/150?u=${email}`,
+        createdAt: new Date().toISOString().split('T')[0],
+        lastLogin: new Date().toISOString().split('T')[0],
+        status: 'active',
+        orders: 0
       };
+      
+      // Add user to mock database
+      mockUsers.push(newUser);
       
       setUser(newUser);
       localStorage.setItem('user', JSON.stringify(newUser));

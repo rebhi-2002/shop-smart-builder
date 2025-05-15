@@ -42,7 +42,7 @@ const ProductList = () => {
     categoryParam ? [categoryParam] : categoryParams
   );
 
-  // Prevent page reload when changing filters
+  // Prevent page reload when changing filters - using React Router instead of form submission
   const updateFiltersWithoutReload = useCallback((newFilters: Record<string, any>) => {
     const newParams = new URLSearchParams(searchParams);
     
@@ -143,7 +143,6 @@ const ProductList = () => {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Update URL with search query without page reload
     updateFiltersWithoutReload({ q: searchQuery });
   };
   
@@ -151,12 +150,20 @@ const ProductList = () => {
     setFiltersVisible(!filtersVisible);
   };
   
-  // Handle category selection with checkbox (allows multiple selections)
+  // Handle category selection with checkbox (allows multiple selections) - fixed to prevent reload
   const handleCategoryToggle = (category: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories(prev => [...prev, category]);
-    } else {
-      setSelectedCategories(prev => prev.filter(c => c !== category));
+    const newCategories = checked
+      ? [...selectedCategories, category]
+      : selectedCategories.filter(c => c !== category);
+      
+    setSelectedCategories(newCategories);
+    
+    // This should NOT cause a page reload because we're using React Router's setSearchParams
+    if (!categoryParam) {
+      const params = new URLSearchParams(searchParams);
+      params.delete('category');
+      newCategories.forEach(cat => params.append('category', cat));
+      setSearchParams(params, { replace: true });
     }
   };
   
@@ -169,6 +176,12 @@ const ProductList = () => {
   // Clear all selected categories
   const clearCategoryFilters = () => {
     setSelectedCategories([]);
+    // Update URL without reload
+    if (!categoryParam) {
+      const params = new URLSearchParams(searchParams);
+      params.delete('category');
+      setSearchParams(params, { replace: true });
+    }
     toast.success("Filters cleared");
   };
   

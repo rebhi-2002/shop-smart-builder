@@ -1,7 +1,6 @@
-
 import { Product } from '@/contexts/CartContext';
 
-// Mock product database
+// Mock product database with additional products for all categories
 const products: Product[] = [
   {
     id: '1',
@@ -257,6 +256,220 @@ const products: Product[] = [
       'Features': 'Water resistant, padded straps'
     }
   },
+  
+  // Adding products for Beauty category
+  {
+    id: '13',
+    name: 'Luxury Skincare Set',
+    description: 'Premium skincare routine with cleanser, toner, and moisturizer.',
+    price: 85,
+    image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=1500',
+    category: 'Beauty',
+    discount: 10,
+    stock: 45,
+    rating: 4.7,
+    reviews: 32,
+    seller: 'GlowUp',
+    tags: ['skincare', 'beauty', 'premium'],
+    specs: {
+      'Contents': '3 products',
+      'Skin Type': 'All skin types',
+      'Volume': '50ml each',
+      'Features': 'Vegan, Cruelty-free',
+      'Usage': 'Morning and evening application'
+    }
+  },
+  {
+    id: '14',
+    name: 'Professional Makeup Brush Set',
+    description: 'Complete set of makeup brushes for professional application.',
+    price: 65,
+    image: 'https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?q=80&w=1500',
+    category: 'Beauty',
+    discount: 15,
+    stock: 60,
+    rating: 4.5,
+    reviews: 28,
+    seller: 'MakeupPro',
+    tags: ['makeup', 'brushes', 'beauty'],
+    specs: {
+      'Brushes': '12 pieces',
+      'Material': 'Synthetic bristles, wooden handles',
+      'Case': 'Travel pouch included',
+      'Maintenance': 'Hand wash with mild soap'
+    }
+  },
+  
+  // Adding products for Books category
+  {
+    id: '15',
+    name: 'Bestselling Novel',
+    description: 'Award-winning fiction novel from acclaimed author.',
+    price: 24,
+    image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1500',
+    category: 'Books',
+    discount: 5,
+    stock: 100,
+    rating: 4.8,
+    reviews: 45,
+    seller: 'BookHaven',
+    tags: ['fiction', 'novel', 'bestseller'],
+    specs: {
+      'Pages': '384',
+      'Format': 'Hardcover',
+      'Language': 'English',
+      'Publication Date': '2023',
+      'Publisher': 'Literary Press'
+    }
+  },
+  {
+    id: '16',
+    name: 'Cooking Encyclopedia',
+    description: 'Comprehensive cookbook with recipes from around the world.',
+    price: 42,
+    image: 'https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=1500',
+    category: 'Books',
+    discount: 10,
+    stock: 50,
+    rating: 4.6,
+    reviews: 38,
+    seller: 'CulinaryBooks',
+    tags: ['cookbook', 'recipes', 'cooking'],
+    specs: {
+      'Pages': '520',
+      'Format': 'Hardcover, illustrated',
+      'Recipes': '200+',
+      'Features': 'Step-by-step guides, photographs',
+      'Cuisine Types': 'International'
+    }
+  },
+  
+  // Adding products for Toys category
+  {
+    id: '17',
+    name: 'Educational Building Blocks',
+    description: 'Creative learning blocks for children ages 3-8.',
+    price: 35,
+    image: 'https://images.unsplash.com/photo-1516981879613-9f5da904015f?q=80&w=1500',
+    category: 'Toys',
+    discount: 0,
+    stock: 80,
+    rating: 4.9,
+    reviews: 50,
+    seller: 'KidZone',
+    tags: ['toy', 'educational', 'blocks'],
+    specs: {
+      'Pieces': '100 blocks',
+      'Material': 'Non-toxic plastic',
+      'Age': '3-8 years',
+      'Educational Focus': 'Spatial awareness, creativity'
+    }
+  },
+  {
+    id: '18',
+    name: 'Remote Control Car',
+    description: 'Fast RC race car with precision controls.',
+    price: 75,
+    image: 'https://images.unsplash.com/photo-1595588073112-39358076aa22?q=80&w=1500',
+    category: 'Toys',
+    discount: 20,
+    stock: 40,
+    rating: 4.3,
+    reviews: 35,
+    seller: 'RaceMasters',
+    tags: ['rc car', 'toys', 'racing'],
+    specs: {
+      'Scale': '1:16',
+      'Control Range': '100m',
+      'Speed': 'Up to 25km/h',
+      'Battery': 'Rechargeable Li-ion',
+      'Run Time': '25 minutes'
+    }
+  },
+  
+  // Adding products for Sports category
+  {
+    id: '19',
+    name: 'Yoga Mat',
+    description: 'Non-slip exercise mat for yoga and fitness.',
+    price: 30,
+    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1500',
+    category: 'Sports',
+    discount: 10,
+    stock: 70,
+    rating: 4.5,
+    reviews: 42,
+    seller: 'FitLife',
+    tags: ['yoga', 'fitness', 'exercise'],
+    specs: {
+      'Material': 'TPE eco-friendly foam',
+      'Thickness': '6mm',
+      'Dimensions': '183cm x 61cm',
+      'Features': 'Non-slip, waterproof, carry strap'
+    }
+  },
+  {
+    id: '20',
+    name: 'Basketball',
+    description: 'Official size and weight indoor/outdoor basketball.',
+    price: 45,
+    image: 'https://images.unsplash.com/photo-1579338559194-a162d19bf842?q=80&w=1500',
+    category: 'Sports',
+    discount: 0,
+    stock: 55,
+    rating: 4.7,
+    reviews: 30,
+    seller: 'SportsGear',
+    tags: ['basketball', 'sports', 'outdoor'],
+    specs: {
+      'Size': 'Official size 7 (29.5")',
+      'Material': 'Composite leather',
+      'Use': 'Indoor/Outdoor',
+      'Inflation': 'Comes inflated'
+    }
+  },
+  
+  // Adding products for Automotive category
+  {
+    id: '21',
+    name: 'Car Dashboard Camera',
+    description: 'HD dash cam with night vision and loop recording.',
+    price: 120,
+    image: 'https://images.unsplash.com/photo-1621839673705-6617adf9e890?q=80&w=1500',
+    category: 'Automotive',
+    discount: 15,
+    stock: 35,
+    rating: 4.4,
+    reviews: 27,
+    seller: 'AutoTech',
+    tags: ['dashcam', 'car', 'electronics'],
+    specs: {
+      'Resolution': '1080p Full HD',
+      'Viewing Angle': '170 degrees',
+      'Storage': 'MicroSD up to 128GB',
+      'Features': 'Night vision, motion detection, loop recording'
+    }
+  },
+  {
+    id: '22',
+    name: 'Car Cleaning Kit',
+    description: 'Complete kit for interior and exterior car cleaning.',
+    price: 55,
+    image: 'https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?q=80&w=1500',
+    category: 'Automotive',
+    discount: 5,
+    stock: 50,
+    rating: 4.6,
+    reviews: 33,
+    seller: 'AutoCare',
+    tags: ['car care', 'cleaning', 'automotive'],
+    specs: {
+      'Contents': '10 pieces',
+      'Includes': 'Wash mitt, microfiber cloths, detailing brush, wax',
+      'Use': 'Interior and exterior',
+      'Storage': 'Organizer bucket included'
+    }
+  }
 ];
 
 export const productService = {
