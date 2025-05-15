@@ -1,289 +1,674 @@
-
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, User, Search, Heart, Menu, X } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useCart } from '@/hooks/useCart';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import {
+  Search,
+  ShoppingCart,
+  Menu,
+  User,
+  Heart,
+  ChevronDown,
+  LogOut,
+  Settings,
+  Package,
+  Home,
+  Info,
+  Phone,
+  HelpCircle,
+  FileText,
+  Truck,
+  ShoppingBag,
+  Grid,
+  ChevronRight,
+  X,
+} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useCart } from '@/hooks/useCart';
+import { useMobile } from '@/hooks/use-mobile';
+
+interface NavigationMenuProps extends React.ComponentPropsWithoutRef<typeof NavigationMenu> {}
+
+const NavigationMenuDemo = React.forwardRef<
+  React.ElementRef<typeof NavigationMenu>,
+  NavigationMenuProps
+>(({ className, ...props }, ref) => (
+  <NavigationMenu ref={ref} className={cn("relative z-10", className)} {...props}>
+    <NavigationMenuList>
+      <NavigationMenuItem>
+        <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <ul className="grid gap-3 p-6 md:w-[400px] md:grid-cols-2 lg:w-[500px]">
+            <li className="row-span-3">
+              <NavigationMenuLink asChild>
+                <a
+                  className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                  href="/"
+                >
+                  <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
+                  <p className="text-sm leading-tight text-muted-foreground">
+                    Beautifully designed components that you can copy and paste into your apps.
+                    Accessible. Customizable. Open Source.
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+            <li>
+              <NavigationMenuLink asChild>
+                <a
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                  href="/"
+                >
+                  <div className="text-sm font-medium leading-none">Installation</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    How to install dependencies and structure your app.
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+            <li>
+              <NavigationMenuLink asChild>
+                <a
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                  href="/"
+                >
+                  <div className="text-sm font-medium leading-none">Re-using components</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    Import components and re-use them in your app.
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+            <li>
+              <NavigationMenuLink asChild>
+                <a
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                  href="/"
+                >
+                  <div className="text-sm font-medium leading-none">Building components</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    Create new components using Radix Primitives.
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+      <NavigationMenuItem>
+        <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+            <li className="row-span-3">
+              <NavigationMenuLink asChild>
+                <a
+                  className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                  href="/"
+                >
+                  <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
+                  <p className="text-sm leading-tight text-muted-foreground">
+                    Beautifully designed components that you can copy and paste into your apps.
+                    Accessible. Customizable. Open Source.
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+            <li>
+              <NavigationMenuLink asChild>
+                <a
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                  href="/"
+                >
+                  <div className="text-sm font-medium leading-none">Installation</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    How to install dependencies and structure your app.
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+            <li>
+              <NavigationMenuLink asChild>
+                <a
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                  href="/"
+                >
+                  <div className="text-sm font-medium leading-none">Re-using components</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    Import components and re-use them in your app.
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+            <li>
+              <NavigationMenuLink asChild>
+                <a
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                  href="/"
+                >
+                  <div className="text-sm font-medium leading-none">Building components</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    Create new components using Radix Primitives.
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+      <NavigationMenuItem>
+        <NavigationMenuLink href="#">Pricing</NavigationMenuLink>
+      </NavigationMenuItem>
+    </NavigationMenuList>
+  </NavigationMenu>
+))
+NavigationMenuDemo.displayName = "NavigationMenuDemo"
 
 const Header = () => {
+  const { user, logout } = useAuth();
+  const { cartItems } = useCart();
+  const location = useLocation();
+  const isMobile = useMobile();
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const location = useLocation();
-  const { getTotalItems } = useCart();
-  const cartCount = getTotalItems();
-  const { user, logout } = useAuth();
-  
-  // Add scroll listener
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
+  // Effect for scroll detection
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 50);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
     }
   };
-  
-  const handleLogout = () => {
-    logout();
+
+  const handleMobileSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+      setIsMobileSearchOpen(false);
+    }
   };
 
-  const navItems = [
-    { path: '/', label: 'Home' },
-    { path: '/products', label: 'Products' },
-    { path: '/categories', label: 'Categories' },
-    { path: '/deals', label: 'Deals' },
-    { path: '/about', label: 'About Us' },
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/shop', label: 'Shop', hasMenu: true },
+    { href: '/deals', label: 'Deals' },
+    { href: '/about', label: 'About Us' },
+    { href: '/contact', label: 'Contact' },
   ];
-  
+
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname === '/') return true;
+    if (path !== '/' && location.pathname.startsWith(path)) return true;
+    return false;
+  };
+
   return (
-    <header 
-      className={`sticky top-0 z-50 w-full transition-all duration-200 ${
-        isScrolled ? 'bg-white/80 backdrop-blur-md shadow-sm' : 'bg-white'
-      }`}
+    <header
+      className={cn(
+        'sticky top-0 z-50 transition-all duration-200 bg-background',
+        isScrolled ? 'shadow-md py-2' : 'py-4'
+      )}
     >
-      {/* Promo Banner */}
-      <div className="bg-gradient-to-r from-primary/90 to-accent/90 text-white py-2">
-        <div className="container mx-auto px-4 text-center text-sm">
-          <span className="font-medium">FREE SHIPPING</span> on orders over $50 | Use code <span className="font-bold">WELCOME10</span> for 10% off your first order!
-        </div>
-      </div>
-      
       {/* Top Bar */}
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <span className="font-bold text-2xl">ShopHub</span>
-        </Link>
-        
-        {/* Search - Hidden on mobile */}
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-4">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              type="search"
-              placeholder="Search products..." 
-              className="pl-10 w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </form>
-        
-        {/* Quick Actions */}
-        <div className="flex items-center gap-2">
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="hidden md:flex gap-2 items-center">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>{user.name?.substring(0, 2).toUpperCase() || 'U'}</AvatarFallback>
-                  </Avatar>
-                  <span className="hidden lg:inline-block">
-                    {user.name?.split(' ')[0] || 'User'}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/account/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/account/orders">My Orders</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/wishlist">Wishlist</Link>
-                </DropdownMenuItem>
-                
-                {user.role === 'admin' && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Admin</DropdownMenuLabel>
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin">Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin/products">Products</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin/orders">Orders</Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button asChild variant="ghost" size="icon" className="hidden md:flex">
-              <Link to="/login">
-                <User className="h-5 w-5" />
-              </Link>
-            </Button>
-          )}
-          
-          <Button asChild variant="ghost" size="icon" className="hidden md:flex">
-            <Link to="/wishlist">
-              <Heart className="h-5 w-5" />
-            </Link>
-          </Button>
-          
-          <Button asChild variant="ghost" size="icon" className="relative cart-icon">
-            <Link to="/cart">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="cart-badge cart-badge-pulse">{cartCount}</span>
-              )}
-            </Link>
-          </Button>
-          
-          {/* Mobile Menu Trigger */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between gap-4">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <ShoppingBag className="h-8 w-8 text-primary mr-2" />
+            <span className="font-bold text-xl">ShopApp</span>
+          </Link>
+
+          {/* Desktop Search */}
+          <div className="hidden md:flex flex-1 max-w-xl mx-4">
+            <form onSubmit={handleSearch} className="w-full flex">
+              <Input
+                type="search"
+                placeholder="Search for products..."
+                className="rounded-r-none w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Button type="submit" className="rounded-l-none">
+                <Search className="h-4 w-4" />
               </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <div className="flex flex-col h-full mt-6">
-                <div className="space-y-3">
-                  <form onSubmit={handleSearch} className="flex w-full mb-6">
-                    <div className="relative w-full">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        type="search"
-                        placeholder="Search products..." 
-                        className="pl-10 w-full"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                    </div>
-                  </form>
-                  
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className="block py-2 text-lg"
-                    >
-                      {item.label}
+            </form>
+          </div>
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center space-x-1">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {navLinks.map((link) =>
+                  link.hasMenu ? (
+                    <NavigationMenuItem key={link.href}>
+                      <NavigationMenuTrigger
+                        className={isActive(link.href) ? 'bg-accent text-accent-foreground' : ''}
+                      >
+                        {link.label}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                          <li className="row-span-3">
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to="/shop"
+                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                              >
+                                <div className="mb-2 mt-4 text-lg font-medium">
+                                  Browse All Products
+                                </div>
+                                <p className="text-sm leading-tight text-muted-foreground">
+                                  Explore our complete catalog of quality products at great prices.
+                                </p>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                          <li>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to="/shop"
+                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                              >
+                                <div className="text-sm font-medium leading-none">Categories</div>
+                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                  Shop by product categories
+                                </p>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                          <li>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to="/deals"
+                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                              >
+                                <div className="text-sm font-medium leading-none">Deals & Offers</div>
+                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                  Special discounts and limited-time offers
+                                </p>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                          <li>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to="/shop?sort=new"
+                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                              >
+                                <div className="text-sm font-medium leading-none">New Arrivals</div>
+                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                  The latest products added to our inventory
+                                </p>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  ) : (
+                    <NavigationMenuItem key={link.href}>
+                      <Link to={link.href}>
+                        <NavigationMenuLink
+                          className={cn(
+                            navigationMenuTriggerStyle(),
+                            isActive(link.href) ? 'bg-accent text-accent-foreground' : ''
+                          )}
+                        >
+                          {link.label}
+                        </NavigationMenuLink>
+                      </Link>
+                    </NavigationMenuItem>
+                  )
+                )}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
+
+          {/* Desktop Action Buttons */}
+          <div className="hidden md:flex items-center space-x-2">
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" title="Wishlist">
+                <Heart className="h-5 w-5" />
+              </Button>
+            </Link>
+
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative" title="Cart">
+                <ShoppingCart className="h-5 w-5" />
+                {cartItems.length > 0 && (
+                  <Badge
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    variant="destructive"
+                  >
+                    {cartItems.length}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
+
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="gap-2 flex items-center">
+                    <User className="h-5 w-5" />
+                    <span className="max-w-[100px] truncate">{user.firstName}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/account" className="cursor-pointer flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      My Account
                     </Link>
-                  ))}
-                  
-                  <div className="pt-4 border-t my-4">
-                    <Link to="/wishlist" className="flex items-center py-2">
-                      <Heart className="h-5 w-5 mr-2" />
-                      Wishlist
-                    </Link>
-                    <Link to="/account/orders" className="flex items-center py-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2">
-                        <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path>
-                      </svg>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/orders" className="cursor-pointer flex items-center">
+                      <Package className="h-4 w-4 mr-2" />
                       My Orders
                     </Link>
-                  </div>
-                  
-                  {user ? (
-                    <div className="pt-4 border-t mt-4">
-                      <div className="flex items-center mb-4">
-                        <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={user.avatar} alt={user.name} />
-                          <AvatarFallback>{user.name?.substring(0, 2).toUpperCase() || 'U'}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-bold">{user.name}</div>
-                          <div className="text-sm text-muted-foreground">{user.email}</div>
-                        </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/profile" className="cursor-pointer flex items-center">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={logout}
+                    className="cursor-pointer flex items-center text-red-500"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button asChild variant="default">
+                <Link to="/login">Login</Link>
+              </Button>
+            )}
+          </div>
+
+          {/* Mobile Icons */}
+          <div className="flex items-center md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileSearchOpen(true)}
+              title="Search"
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" title="Wishlist">
+                <Heart className="h-5 w-5" />
+              </Button>
+            </Link>
+
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative" title="Cart">
+                <ShoppingCart className="h-5 w-5" />
+                {cartItems.length > 0 && (
+                  <Badge
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    variant="destructive"
+                  >
+                    {cartItems.length}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
+
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" title="Menu">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-full sm:w-80">
+                <div className="flex flex-col h-full">
+                  <div className="mb-6">
+                    {user ? (
+                      <div className="flex flex-col">
+                        <h2 className="font-semibold text-lg mb-1">Hello, {user.firstName}</h2>
+                        <p className="text-muted-foreground text-sm">{user.email}</p>
                       </div>
-                      
-                      <Link to="/account/profile" className="flex items-center py-2">
-                        <User className="h-5 w-5 mr-2" />
-                        My Profile
-                      </Link>
-                      
-                      {user.role === 'admin' && (
-                        <Link to="/admin" className="flex items-center py-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="3" y1="9" x2="21" y2="9"></line>
-                            <line x1="9" y1="21" x2="9" y2="9"></line>
-                          </svg>
-                          Admin Dashboard
-                        </Link>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Button asChild className="flex-1">
+                          <Link to="/login">Login</Link>
+                        </Button>
+                        <Button asChild variant="outline" className="flex-1">
+                          <Link to="/register">Register</Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  <nav className="flex-1">
+                    <ul className="space-y-2">
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <Home className="h-5 w-5 mr-3" />
+                            Home
+                          </Link>
+                        </SheetClose>
+                      </li>
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/shop"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <Grid className="h-5 w-5 mr-3" />
+                            Shop
+                          </Link>
+                        </SheetClose>
+                      </li>
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/deals"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <ShoppingBag className="h-5 w-5 mr-3" />
+                            Deals
+                          </Link>
+                        </SheetClose>
+                      </li>
+                      {user && (
+                        <>
+                          <li>
+                            <SheetClose asChild>
+                              <Link
+                                to="/account"
+                                className="flex items-center py-2 hover:text-primary"
+                              >
+                                <User className="h-5 w-5 mr-3" />
+                                My Account
+                              </Link>
+                            </SheetClose>
+                          </li>
+                          <li>
+                            <SheetClose asChild>
+                              <Link
+                                to="/account/orders"
+                                className="flex items-center py-2 hover:text-primary"
+                              >
+                                <Package className="h-5 w-5 mr-3" />
+                                My Orders
+                              </Link>
+                            </SheetClose>
+                          </li>
+                        </>
                       )}
-                      
-                      <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2">
-                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                          <polyline points="16 17 21 12 16 7"></polyline>
-                          <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/about"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <Info className="h-5 w-5 mr-3" />
+                            About Us
+                          </Link>
+                        </SheetClose>
+                      </li>
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/contact"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <Phone className="h-5 w-5 mr-3" />
+                            Contact
+                          </Link>
+                        </SheetClose>
+                      </li>
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/faq"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <HelpCircle className="h-5 w-5 mr-3" />
+                            FAQ
+                          </Link>
+                        </SheetClose>
+                      </li>
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/shipping-returns"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <Truck className="h-5 w-5 mr-3" />
+                            Shipping & Returns
+                          </Link>
+                        </SheetClose>
+                      </li>
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/terms-conditions"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <FileText className="h-5 w-5 mr-3" />
+                            Terms & Conditions
+                          </Link>
+                        </SheetClose>
+                      </li>
+                    </ul>
+                  </nav>
+
+                  {user && (
+                    <div className="mt-auto pt-4 border-t">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/10"
+                        onClick={() => {
+                          logout();
+                        }}
+                      >
+                        <LogOut className="h-5 w-5 mr-3" />
                         Logout
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="pt-4 border-t mt-4">
-                      <Button asChild className="w-full mb-2">
-                        <Link to="/login">Sign In</Link>
-                      </Button>
-                      <Button asChild variant="outline" className="w-full">
-                        <Link to="/register">Create Account</Link>
                       </Button>
                     </div>
                   )}
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
-      
-      {/* Navigation */}
-      <nav className="border-t border-b hidden md:block">
-        <div className="container mx-auto px-4">
-          <ul className="flex justify-center space-x-8">
-            {navItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) => 
-                    `py-3 inline-block font-medium hover:text-primary transition-colors ${
-                      isActive ? 'text-primary border-b-2 border-primary' : ''
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+
+      {/* Mobile Search Overlay */}
+      {isMobileSearchOpen && (
+        <div className="fixed inset-0 bg-background z-50 flex flex-col p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-lg">Search Products</h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileSearchOpen(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+          <form onSubmit={handleMobileSearch} className="flex w-full mb-4">
+            <Input
+              type="search"
+              placeholder="Search for products..."
+              className="rounded-r-none w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+            <Button type="submit" className="rounded-l-none">
+              <Search className="h-4 w-4" />
+            </Button>
+          </form>
+          <div className="overflow-auto">
+            <div className="text-sm text-muted-foreground mb-2">Popular Searches:</div>
+            <div className="flex flex-wrap gap-2">
+              {['Electronics', 'Clothing', 'Home & Kitchen', 'Beauty', 'Accessories'].map(
+                (term) => (
+                  <Button
+                    key={term}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearchQuery(term);
+                      handleMobileSearch(new Event('submit') as any);
+                    }}
+                  >
+                    {term}
+                  </Button>
+                )
+              )}
+            </div>
+          </div>
         </div>
-      </nav>
+      )}
     </header>
   );
 };

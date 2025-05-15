@@ -21,7 +21,6 @@ import FeaturedProducts from '@/components/FeaturedProducts';
 import useEmblaCarousel from 'embla-carousel-react';
 
 const Index = () => {
-  // ... keep existing code (emblaRef, autoplayInterval, useState declarations)
   const [featuredCategory, setFeaturedCategory] = useState<string>('Electronics');
   const [autoplayInterval, setAutoplayInterval] = useState<NodeJS.Timeout | null>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -59,7 +58,7 @@ const Index = () => {
       title: "Summer Collection",
       description: "Discover the latest trends for summer 2025",
       buttonText: "Shop Now",
-      buttonLink: "/products?category=Fashion",
+      buttonLink: "/shop?category=Clothing",
       color: "from-blue-900 to-blue-700"
     },
     {
@@ -75,11 +74,11 @@ const Index = () => {
       title: "Home & Living",
       description: "Transform your space with our collection",
       buttonText: "Explore",
-      buttonLink: "/products?category=Home",
+      buttonLink: "/shop?category=Home+%26+Kitchen",
       color: "from-green-900 to-green-700"
     }
   ];
-
+  
   // Set up autoplay for hero carousel
   useEffect(() => {
     if (emblaApi) {
@@ -119,9 +118,9 @@ const Index = () => {
     switch(category) {
       case 'Electronics':
         return "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?q=80&w=500&auto=format&fit=crop";
-      case 'Fashion':
+      case 'Clothing':
         return "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=500&auto=format&fit=crop";
-      case 'Home':
+      case 'Home & Kitchen':
         return "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=500&auto=format&fit=crop";
       default:
         return `https://source.unsplash.com/random/100x100?${category.toLowerCase()}`;
@@ -132,7 +131,6 @@ const Index = () => {
     <div>
       {/* Hero Carousel Section */}
       <section className="mb-8 relative">
-        {/* ... keep existing code (hero carousel) */}
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {heroSlides.map((slide, index) => (
@@ -206,12 +204,11 @@ const Index = () => {
       
       {/* Categories Quick Links */}
       <section className="container mx-auto px-4 mb-12">
-        {/* ... keep existing code (categories quick links) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {categories.slice(0, 6).map((category) => (
             <Link 
               key={category} 
-              to={`/categories/${category}`} 
+              to={`/shop?category=${encodeURIComponent(category)}`} 
               className="flex flex-col items-center p-4 rounded-lg hover:bg-muted transition-colors text-center"
             >
               <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-3 overflow-hidden">
@@ -239,7 +236,6 @@ const Index = () => {
       
       {/* Deals Section */}
       <section className="container mx-auto px-4 mb-12">
-        {/* ... keep existing code (deals section) */}
         <div className="bg-gradient-to-r from-shop-900 to-shop-700 rounded-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -302,7 +298,6 @@ const Index = () => {
       
       {/* Category Products Section */}
       <section className="container mx-auto px-4 py-10 bg-muted/50 rounded-lg mb-12">
-        {/* ... keep existing code (category products section) */}
         <h2 className="text-2xl font-bold mb-6">Shop by Category</h2>
         
         <Tabs defaultValue={featuredCategory} onValueChange={setFeaturedCategory}>
@@ -325,7 +320,7 @@ const Index = () => {
               
               <div className="mt-8 text-center">
                 <Button asChild variant="outline">
-                  <Link to={`/categories/${category}`} className="flex items-center">
+                  <Link to={`/shop?category=${encodeURIComponent(category)}`} className="flex items-center">
                     View All {category} <ChevronRight className="ml-1 h-4 w-4" />
                   </Link>
                 </Button>
@@ -337,7 +332,6 @@ const Index = () => {
       
       {/* Banner Section */}
       <section className="container mx-auto px-4 mb-12">
-        {/* ... keep existing code (banner section) */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="relative rounded-lg overflow-hidden h-80">
             <img 
@@ -349,7 +343,7 @@ const Index = () => {
               <h3 className="text-white text-3xl font-bold mb-2">Electronics Sale</h3>
               <p className="text-white mb-4">Up to 30% off on selected items</p>
               <Button asChild className="w-fit">
-                <Link to="/products?category=Electronics">Shop Now</Link>
+                <Link to="/shop?category=Electronics">Shop Now</Link>
               </Button>
             </div>
           </div>
@@ -364,7 +358,7 @@ const Index = () => {
               <h3 className="text-white text-3xl font-bold mb-2">New Fashion</h3>
               <p className="text-white mb-4">Check out our latest collection</p>
               <Button asChild className="w-fit">
-                <Link to="/products?category=Fashion">Discover</Link>
+                <Link to="/shop?category=Clothing">Discover</Link>
               </Button>
             </div>
           </div>
@@ -373,7 +367,6 @@ const Index = () => {
       
       {/* Features Section */}
       <section className="container mx-auto px-4 mb-12">
-        {/* ... keep existing code (features section) */}
         <div className="grid md:grid-cols-4 gap-6">
           <div className="flex flex-col items-center text-center p-6 border rounded-lg">
             <Truck className="h-10 w-10 text-primary mb-4" />
@@ -404,7 +397,7 @@ const Index = () => {
       {/* Best Sellers as FeaturedProducts component */}
       <FeaturedProducts
         title="Best Sellers"
-        viewAllLink="/products?sort=popular"
+        viewAllLink="/shop?sort=popular"
         filter={(product) => product.rating && product.rating >= 4}
         sortBy={(a, b) => (b.rating || 0) - (a.rating || 0)}
         variant="grid"
@@ -415,7 +408,6 @@ const Index = () => {
       
       {/* Newsletter Section */}
       <section className="py-16 bg-primary text-white">
-        {/* ... keep existing code (newsletter section) */}
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Join Our Newsletter</h2>
           <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
