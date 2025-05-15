@@ -30,6 +30,7 @@ import ProductManagement from '@/pages/admin/ProductManagement';
 import Deals from '@/pages/Deals';
 import Careers from '@/pages/Careers';
 import { FramerMotionProvider } from '@/providers/FramerMotionProvider';
+import UserManagement from '@/pages/admin/UserManagement';
 
 const queryClient = new QueryClient();
 
