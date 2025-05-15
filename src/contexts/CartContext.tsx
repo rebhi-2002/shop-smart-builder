@@ -8,9 +8,11 @@ export interface Product {
   price: number;
   image: string;
   category: string;
-  discount?: number;
+  rating: number;
   stock?: number;
-  rating?: number;
+  discount?: number;
+  isNew?: boolean;
+  isFeatured?: boolean;
   reviews?: number;
   savedForLater?: boolean;
   quantity?: number;
@@ -18,7 +20,6 @@ export interface Product {
   selectedSize?: string | null;
   seller?: string;
   tags?: string[];
-  // Add missing properties used in ProductDetails
   colors?: string[];
   sizes?: string[];
   additionalImages?: string[];

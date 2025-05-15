@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   name: string;
@@ -11,6 +10,14 @@ export interface Product {
   discount?: number;
   isNew?: boolean;
   isFeatured?: boolean;
+  reviews?: number;
+  seller?: string;
+  tags?: string[];
+  colors?: string[];
+  sizes?: string[];
+  additionalImages?: string[];
+  longDescription?: string;
+  specifications?: Record<string, string | number>;
 }
 
 const mockProducts: Product[] = [
@@ -423,6 +430,48 @@ export const productService = {
       setTimeout(() => {
         const results = mockProducts.filter(p => p.category === category);
         resolve(results);
+      }, 300);
+    });
+  },
+  
+  getDiscountedProducts: async (): Promise<Product[]> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const discounted = mockProducts.filter(p => p.discount && p.discount > 0);
+        resolve(discounted);
+      }, 300);
+    });
+  },
+  
+  deleteProduct: async (productId: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // In a real app, this would actually delete from the database
+        // For now we'll just pretend it succeeded
+        resolve(true);
+      }, 300);
+    });
+  },
+  
+  updateProduct: async (product: Product): Promise<Product> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // In a real app, this would actually update the database
+        resolve(product);
+      }, 300);
+    });
+  },
+  
+  createProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // In a real app, this would actually insert into the database
+        // For now we'll just pretend and assign a random ID
+        const newProduct = {
+          ...product,
+          id: Math.random().toString(36).substring(2, 11) // Generate random ID
+        };
+        resolve(newProduct as Product);
       }, 300);
     });
   }
