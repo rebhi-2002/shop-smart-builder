@@ -6,18 +6,19 @@ import { toast } from "sonner";
 export interface User {
   id: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   role: 'user' | 'admin' | 'customer';
   avatar?: string;
   phone?: string;
   bio?: string;
-  address?: {
-    street?: string;
-    city?: string;
-    state?: string;
-    zip?: string;
-    country?: string;
-  };
+  street?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+  profilePicture?: string;
   createdAt?: string;
   lastLogin?: string;
   status?: 'active' | 'inactive' | 'suspended';
@@ -30,6 +31,7 @@ export interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUser: (updatedUser: User) => Promise<void>;
+  updateUserProfile: (userData: Partial<User>) => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
@@ -50,12 +52,20 @@ export const useAuth = () => {
 const mockUsers: User[] = [
   {
     id: 'admin-1',
+    firstName: 'Admin',
+    lastName: 'User',
     name: 'Admin User',
     email: 'admin@example.com',
     role: 'admin',
     avatar: 'https://i.pravatar.cc/150?u=admin',
     phone: '123-456-7890',
     bio: 'System administrator with full access rights',
+    street: '123 Admin St',
+    city: 'Adminville',
+    state: 'California',
+    zip: '90210',
+    country: 'United States',
+    profilePicture: 'https://i.pravatar.cc/150?u=admin',
     createdAt: '2023-01-15',
     lastLogin: '2025-05-12',
     status: 'active',
@@ -63,12 +73,20 @@ const mockUsers: User[] = [
   },
   {
     id: 'user-1',
+    firstName: 'John',
+    lastName: 'Doe',
     name: 'John Doe',
     email: 'user@example.com',
     role: 'user',
     avatar: 'https://i.pravatar.cc/150?u=user',
     phone: '987-654-3210',
     bio: 'Regular customer',
+    street: '456 User Ave',
+    city: 'Usertown',
+    state: 'New York',
+    zip: '10001',
+    country: 'United States',
+    profilePicture: 'https://i.pravatar.cc/150?u=user',
     createdAt: '2023-02-20',
     lastLogin: '2025-05-10',
     status: 'active',
@@ -154,6 +172,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return Promise.resolve();
     } catch (error) {
       console.error('Failed to update user:', error);
+      toast.error("Failed to update profile");
+      return Promise.reject(error);
+    }
+  };
+
+  // Add updateUserProfile method
+  const updateUserProfile = async (userData: Partial<User>): Promise<void> => {
+    try {
+      if (!user) {
+        throw new Error('No user logged in');
+      }
+      
+      const updatedUser = {
+        ...user,
+        ...userData
+      };
+      
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      toast.success("Profile updated successfully");
+      return Promise.resolve();
+    } catch (error) {
+      console.error('Failed to update user profile:', error);
       toast.error("Failed to update profile");
       return Promise.reject(error);
     }
@@ -270,6 +311,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register, 
         logout,
         updateUser,
+        updateUserProfile,
         isAuthenticated, 
         isAdmin,
         isLoading,
