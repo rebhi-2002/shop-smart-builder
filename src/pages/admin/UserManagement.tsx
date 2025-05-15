@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Search, UserPlus, Edit, Trash2, UserCog } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 
 interface User {
   id: string;
@@ -19,11 +22,11 @@ interface User {
 }
 
 const mockUsers: User[] = [
-  { id: '1', name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active', joinDate: '2025-01-15' },
-  { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'customer', status: 'active', joinDate: '2025-02-20' },
-  { id: '3', name: 'Mike Johnson', email: 'mike@example.com', role: 'customer', status: 'inactive', joinDate: '2025-03-10' },
-  { id: '4', name: 'Sarah Williams', email: 'sarah@example.com', role: 'customer', status: 'active', joinDate: '2025-03-15' },
-  { id: '5', name: 'Alex Brown', email: 'alex@example.com', role: 'admin', status: 'active', joinDate: '2025-04-01' },
+  { id: '1', name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active', joinDate: '2025-01-15', phone: '123-456-7890', bio: 'System Administrator' },
+  { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'customer', status: 'active', joinDate: '2025-02-20', phone: '234-567-8901', bio: 'Regular customer' },
+  { id: '3', name: 'Mike Johnson', email: 'mike@example.com', role: 'customer', status: 'inactive', joinDate: '2025-03-10', phone: '345-678-9012', bio: 'Occasional buyer' },
+  { id: '4', name: 'Sarah Williams', email: 'sarah@example.com', role: 'customer', status: 'active', joinDate: '2025-03-15', phone: '456-789-0123', bio: 'Frequent shopper' },
+  { id: '5', name: 'Alex Brown', email: 'alex@example.com', role: 'admin', status: 'active', joinDate: '2025-04-01', phone: '567-890-1234', bio: 'Content Manager' },
 ];
 
 const UserManagement = () => {
@@ -31,6 +34,20 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'customer'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isPermissionsDialogOpen, setIsPermissionsDialogOpen] = useState(false);
+  
+  // Form state
+  const [formData, setFormData] = useState<Partial<User>>({});
+  const [permissionsData, setPermissionsData] = useState({
+    viewDashboard: false,
+    manageProducts: false,
+    manageOrders: false,
+    manageUsers: false,
+    viewReports: false,
+  });
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -45,7 +62,102 @@ const UserManagement = () => {
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       setUsers(users.filter(user => user.id !== id));
+      toast.success('User deleted successfully');
     }
+  };
+  
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setFormData({...user});
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleAddUser = () => {
+    setFormData({
+      role: 'customer',
+      status: 'active',
+      joinDate: new Date().toISOString().split('T')[0]
+    });
+    setIsAddDialogOpen(true);
+  };
+  
+  const handleManagePermissions = (user: User) => {
+    setSelectedUser(user);
+    setPermissionsData({
+      viewDashboard: user.role === 'admin',
+      manageProducts: user.role === 'admin',
+      manageOrders: user.role === 'admin',
+      manageUsers: user.role === 'admin',
+      viewReports: user.role === 'admin',
+    });
+    setIsPermissionsDialogOpen(true);
+  };
+  
+  const handleSaveEdit = () => {
+    if (!formData.name || !formData.email) {
+      toast.error('Name and email are required');
+      return;
+    }
+    
+    setUsers(prevUsers => prevUsers.map(user => 
+      user.id === selectedUser?.id ? { ...user, ...formData as User } : user
+    ));
+    
+    setIsEditDialogOpen(false);
+    toast.success('User updated successfully');
+  };
+  
+  const handleSaveNewUser = () => {
+    if (!formData.name || !formData.email) {
+      toast.error('Name and email are required');
+      return;
+    }
+    
+    const newUser: User = {
+      id: `user-${Date.now()}`,
+      name: formData.name || '',
+      email: formData.email || '',
+      role: formData.role as 'admin' | 'customer' || 'customer',
+      status: formData.status as 'active' | 'inactive' || 'active',
+      joinDate: formData.joinDate || new Date().toISOString().split('T')[0],
+      phone: formData.phone,
+      bio: formData.bio
+    };
+    
+    setUsers([...users, newUser]);
+    setIsAddDialogOpen(false);
+    toast.success('New user added successfully');
+  };
+  
+  const handleSavePermissions = () => {
+    if (!selectedUser) return;
+    
+    // In a real app, this would update permissions in the database
+    const hasAdminPermissions = Object.values(permissionsData).some(value => value);
+    
+    setUsers(prevUsers => prevUsers.map(user => 
+      user.id === selectedUser.id 
+        ? { ...user, role: hasAdminPermissions ? 'admin' : 'customer' } 
+        : user
+    ));
+    
+    setIsPermissionsDialogOpen(false);
+    toast.success('User permissions updated successfully');
+  };
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const toggleUserStatus = (id: string) => {
+    setUsers(prevUsers => prevUsers.map(user => 
+      user.id === id 
+        ? { ...user, status: user.status === 'active' ? 'inactive' : 'active' } 
+        : user
+    ));
+    
+    toast.success('User status updated');
   };
 
   return (
@@ -55,7 +167,7 @@ const UserManagement = () => {
           <h1 className="text-3xl font-bold">User Management</h1>
           <p className="text-gray-500">Manage all users and their permissions</p>
         </div>
-        <Button>
+        <Button onClick={handleAddUser}>
           <UserPlus className="mr-2 h-4 w-4" />
           Add New User
         </Button>
@@ -122,16 +234,20 @@ const UserManagement = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={user.status === 'active' ? 'default' : 'outline'}>
+                      <Badge 
+                        variant={user.status === 'active' ? 'default' : 'outline'}
+                        className="cursor-pointer"
+                        onClick={() => toggleUserStatus(user.id)}
+                      >
                         {user.status}
                       </Badge>
                     </TableCell>
                     <TableCell>{user.joinDate}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(user)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleManagePermissions(user)}>
                         <UserCog className="h-4 w-4" />
                       </Button>
                       <Button 
@@ -156,6 +272,242 @@ const UserManagement = () => {
           </Table>
         </div>
       </div>
+
+      {/* Edit User Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>
+              Make changes to the user account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right">Name</label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name || ''}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="email" className="text-right">Email</label>
+              <Input
+                id="email"
+                name="email"
+                value={formData.email || ''}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="phone" className="text-right">Phone</label>
+              <Input
+                id="phone"
+                name="phone"
+                value={formData.phone || ''}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="role" className="text-right">Role</label>
+              <select 
+                id="role" 
+                name="role"
+                value={formData.role || 'customer'} 
+                onChange={handleInputChange}
+                className="col-span-3 px-3 py-2 rounded-md border border-gray-200"
+              >
+                <option value="admin">Admin</option>
+                <option value="customer">Customer</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="status" className="text-right">Status</label>
+              <select 
+                id="status" 
+                name="status"
+                value={formData.status || 'active'} 
+                onChange={handleInputChange}
+                className="col-span-3 px-3 py-2 rounded-md border border-gray-200"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="bio" className="text-right">Bio</label>
+              <Input
+                id="bio"
+                name="bio"
+                value={formData.bio || ''}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveEdit}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add User Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+            <DialogDescription>
+              Create a new user account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right">Name</label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name || ''}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="email" className="text-right">Email</label>
+              <Input
+                id="email"
+                name="email"
+                value={formData.email || ''}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="phone" className="text-right">Phone</label>
+              <Input
+                id="phone"
+                name="phone"
+                value={formData.phone || ''}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="role" className="text-right">Role</label>
+              <select 
+                id="role" 
+                name="role"
+                value={formData.role || 'customer'} 
+                onChange={handleInputChange}
+                className="col-span-3 px-3 py-2 rounded-md border border-gray-200"
+              >
+                <option value="admin">Admin</option>
+                <option value="customer">Customer</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="status" className="text-right">Status</label>
+              <select 
+                id="status" 
+                name="status"
+                value={formData.status || 'active'} 
+                onChange={handleInputChange}
+                className="col-span-3 px-3 py-2 rounded-md border border-gray-200"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="bio" className="text-right">Bio</label>
+              <Input
+                id="bio"
+                name="bio"
+                value={formData.bio || ''}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveNewUser}>Create User</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Permissions Dialog */}
+      <Dialog open={isPermissionsDialogOpen} onOpenChange={setIsPermissionsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Manage Permissions</DialogTitle>
+            <DialogDescription>
+              Set permissions for {selectedUser?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="viewDashboard" 
+                checked={permissionsData.viewDashboard} 
+                onCheckedChange={(checked) => 
+                  setPermissionsData({...permissionsData, viewDashboard: !!checked})
+                }
+              />
+              <label htmlFor="viewDashboard">Access Dashboard</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="manageProducts" 
+                checked={permissionsData.manageProducts} 
+                onCheckedChange={(checked) => 
+                  setPermissionsData({...permissionsData, manageProducts: !!checked})
+                }
+              />
+              <label htmlFor="manageProducts">Manage Products</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="manageOrders" 
+                checked={permissionsData.manageOrders} 
+                onCheckedChange={(checked) => 
+                  setPermissionsData({...permissionsData, manageOrders: !!checked})
+                }
+              />
+              <label htmlFor="manageOrders">Manage Orders</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="manageUsers" 
+                checked={permissionsData.manageUsers} 
+                onCheckedChange={(checked) => 
+                  setPermissionsData({...permissionsData, manageUsers: !!checked})
+                }
+              />
+              <label htmlFor="manageUsers">Manage Users</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="viewReports" 
+                checked={permissionsData.viewReports} 
+                onCheckedChange={(checked) => 
+                  setPermissionsData({...permissionsData, viewReports: !!checked})
+                }
+              />
+              <label htmlFor="viewReports">View Reports</label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPermissionsDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSavePermissions}>Save Permissions</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow p-6">

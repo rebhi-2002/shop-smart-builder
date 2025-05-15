@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useParams, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
 import { Filter, Search, ChevronDown, ChevronRight, LayoutGrid, LayoutList, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
+import { toast } from "sonner";
 
 const ProductList = () => {
   const location = useLocation();
@@ -40,29 +41,43 @@ const ProductList = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     categoryParam ? [categoryParam] : categoryParams
   );
+
+  // Prevent page reload when changing filters
+  const updateFiltersWithoutReload = useCallback((newFilters: Record<string, any>) => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    // Handle special case for categories
+    if ('categories' in newFilters) {
+      newParams.delete('category');
+      newFilters.categories.forEach((cat: string) => {
+        newParams.append('category', cat);
+      });
+      delete newFilters.categories;
+    }
+    
+    // Handle other filter parameters
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === '') {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value.toString());
+      }
+    });
+    
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, setSearchParams]);
   
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, priceRange, selectedCategories]);
   
-  // Update URL when categories change
+  // Update URL when categories change without causing page reload
   useEffect(() => {
     if (!categoryParam) {
-      // Create a new URLSearchParams to preserve other params
-      const newParams = new URLSearchParams(searchParams);
-      
-      // Remove all existing category params
-      newParams.delete('category');
-      
-      // Add each selected category
-      selectedCategories.forEach(category => {
-        newParams.append('category', category);
-      });
-      
-      setSearchParams(newParams, { replace: true }); // Use replace: true to prevent adding to history
+      updateFiltersWithoutReload({ categories: selectedCategories });
     }
-  }, [selectedCategories, categoryParam, searchParams, setSearchParams]);
+  }, [selectedCategories, categoryParam, updateFiltersWithoutReload]);
   
   // Get all products
   const { data: products = [], isLoading } = useQuery({
@@ -87,7 +102,7 @@ const ProductList = () => {
     "Toys", 
     "Sports", 
     "Automotive"
-  ])];
+  ])].sort();
   
   // Filter products based on search, category, and price
   const filteredProducts = products.filter(product => {
@@ -128,14 +143,8 @@ const ProductList = () => {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Update URL with search query
-    const newParams = new URLSearchParams(searchParams);
-    if (searchQuery) {
-      newParams.set('q', searchQuery);
-    } else {
-      newParams.delete('q');
-    }
-    setSearchParams(newParams, { replace: true });
+    // Update URL with search query without page reload
+    updateFiltersWithoutReload({ q: searchQuery });
   };
   
   const toggleFilters = () => {
@@ -151,11 +160,41 @@ const ProductList = () => {
     }
   };
   
+  // Select all categories
+  const selectAllCategories = () => {
+    setSelectedCategories(categories);
+    toast.success("All categories selected");
+  };
+  
   // Clear all selected categories
   const clearCategoryFilters = () => {
     setSelectedCategories([]);
+    toast.success("Filters cleared");
   };
   
+  // Handle page change without reload
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  // Handle adding product to cart
+  const handleAddToCart = (productId: string) => {
+    // In a real app, this would add the product to the cart
+    toast.success("Product added to cart");
+  };
+  
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setPriceRange([0, 500]);
+    setSelectedCategories([]);
+    setSortBy('featured');
+    setSearchParams({}, { replace: true });
+    toast.success("All filters cleared");
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page Header */}
@@ -279,17 +318,27 @@ const ProductList = () => {
             </div>
             
             <div>
-              <h3 className="font-medium mb-2">Categories</h3>
-              <div className="space-y-2">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-medium">Categories</h3>
+                <div className="flex space-x-2">
+                  <Button variant="ghost" size="sm" className="text-xs" onClick={selectAllCategories}>
+                    Select All
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-xs" onClick={clearCategoryFilters}>
+                    Clear
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
                 {categories.map((category) => (
                   <div key={category} className="flex items-center space-x-2">
                     <Checkbox 
-                      id={`category-${category}`}
+                      id={`category-mobile-${category}`}
                       checked={selectedCategories.includes(category)}
                       onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
                     />
                     <label 
-                      htmlFor={`category-${category}`}
+                      htmlFor={`category-mobile-${category}`}
                       className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
                       {category}
@@ -326,16 +375,26 @@ const ProductList = () => {
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <h4 className="font-medium">Categories</h4>
-                  {selectedCategories.length > 0 && (
+                  <div className="flex space-x-2">
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       className="h-7 text-xs"
-                      onClick={clearCategoryFilters}
+                      onClick={selectAllCategories}
                     >
-                      Clear
+                      Select All
                     </Button>
-                  )}
+                    {selectedCategories.length > 0 && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-xs"
+                        onClick={clearCategoryFilters}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2 max-h-80 overflow-auto pr-2">
                   {categories.map((category) => (
@@ -355,12 +414,39 @@ const ProductList = () => {
                   ))}
                 </div>
               </div>
+              
+              {/* Clear All Filters Button */}
+              <Button 
+                variant="outline" 
+                className="w-full mt-6" 
+                onClick={clearAllFilters}
+              >
+                Clear All Filters
+              </Button>
             </div>
           </div>
         </div>
         
         {/* Products Grid */}
         <div className={`md:col-span-3 lg:col-span-4 ${viewMode === 'list' ? 'space-y-4' : ''}`}>
+          {/* Product Count */}
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-sm text-muted-foreground">
+              Showing {sortedProducts.length > 0 ? indexOfFirstProduct + 1 : 0}-
+              {Math.min(indexOfLastProduct, sortedProducts.length)} of {sortedProducts.length} products
+            </p>
+            
+            {/* Mobile Clear All Button */}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={clearAllFilters}
+              className="md:hidden"
+            >
+              Clear All Filters
+            </Button>
+          </div>
+          
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {Array(6).fill(0).map((_, i) => (
@@ -379,12 +465,7 @@ const ProductList = () => {
               <p className="text-muted-foreground mb-4">
                 Try adjusting your search or filters to find what you're looking for.
               </p>
-              <Button onClick={() => {
-                setSearchQuery('');
-                setPriceRange([0, 500]);
-                setSelectedCategories([]);
-                setSearchParams({}, { replace: true });
-              }}>
+              <Button onClick={clearAllFilters}>
                 Clear Filters
               </Button>
             </div>
@@ -413,11 +494,7 @@ const ProductList = () => {
                     </div>
                     <div className="flex justify-between items-end mt-4">
                       <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
-                      <Button onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        // Add to cart logic would go here
-                      }}>Add to Cart</Button>
+                      <Button onClick={() => handleAddToCart(product.id)}>Add to Cart</Button>
                     </div>
                   </div>
                 </div>
@@ -432,7 +509,7 @@ const ProductList = () => {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                      onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
                       aria-disabled={currentPage === 1}
                       className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                     />
@@ -454,7 +531,7 @@ const ProductList = () => {
                     return (
                       <PaginationItem key={i}>
                         <PaginationLink
-                          onClick={() => setCurrentPage(pageNumber)}
+                          onClick={() => handlePageChange(pageNumber)}
                           isActive={currentPage === pageNumber}
                         >
                           {pageNumber}
@@ -465,7 +542,7 @@ const ProductList = () => {
                   
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                      onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
                       aria-disabled={currentPage === totalPages}
                       className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
                     />

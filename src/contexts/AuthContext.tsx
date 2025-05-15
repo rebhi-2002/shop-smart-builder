@@ -7,8 +7,17 @@ export interface User {
   id: string;
   name?: string;
   email: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'customer';
   avatar?: string;
+  phone?: string; // Added phone property
+  bio?: string;   // Added bio property
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+  };
 }
 
 export interface AuthContextType {
@@ -16,10 +25,11 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (updatedUser: User) => Promise<void>; // Added updateUser method
   isAuthenticated: boolean;
   isAdmin: boolean;
-  isLoading: boolean; // Added missing property
-  requireAuth: (role?: 'user' | 'admin') => boolean; // Added missing property
+  isLoading: boolean;
+  requireAuth: (role?: 'user' | 'admin' | 'customer') => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -55,6 +65,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
 
+  // Add updateUser method
+  const updateUser = async (updatedUser: User): Promise<void> => {
+    try {
+      // In a real app, this would call an API to update user data
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      return Promise.resolve();
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      return Promise.reject(error);
+    }
+  };
+
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -69,6 +92,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: 'admin@example.com',
           role: 'admin' as const,
           avatar: 'https://i.pravatar.cc/150?u=admin',
+          phone: '123-456-7890',
+          bio: 'System administrator with full access rights'
         };
         setUser(adminUser);
         localStorage.setItem('user', JSON.stringify(adminUser));
@@ -84,6 +109,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: 'user@example.com',
           role: 'user' as const,
           avatar: 'https://i.pravatar.cc/150?u=user',
+          phone: '987-654-3210',
+          bio: 'Regular customer'
         };
         setUser(regularUser);
         localStorage.setItem('user', JSON.stringify(regularUser));
@@ -135,7 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Function to require authentication with optional role check
-  const requireAuth = (role?: 'user' | 'admin') => {
+  const requireAuth = (role?: 'user' | 'admin' | 'customer') => {
     if (!user) {
       toast.error('Please login to continue');
       navigate('/login');
@@ -160,7 +187,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user, 
         login, 
         register, 
-        logout, 
+        logout,
+        updateUser,
         isAuthenticated, 
         isAdmin,
         isLoading,
