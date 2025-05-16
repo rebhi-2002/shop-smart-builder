@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useParams, Link, useNavigate } from 'react-router-dom';
@@ -53,6 +52,88 @@ const categoryImages: Record<string, string> = {
   "Home": "https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=2080&auto=format&fit=crop"
 };
 
+// Sample products for categories with no products
+const sampleProducts: Record<string, Product[]> = {
+  "Clothing": [
+    { 
+      id: "c1", 
+      name: "Classic White T-Shirt", 
+      price: 19.99, 
+      description: "Essential white t-shirt made from premium cotton", 
+      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop", 
+      category: "Clothing"
+    },
+    { 
+      id: "c2", 
+      name: "Slim Fit Jeans", 
+      price: 59.99, 
+      description: "Comfortable slim fit jeans for everyday wear", 
+      image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&auto=format&fit=crop", 
+      category: "Clothing" 
+    },
+    { 
+      id: "c3", 
+      name: "Summer Dress", 
+      price: 39.99, 
+      description: "Light summer dress with floral pattern", 
+      image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=500&auto=format&fit=crop", 
+      category: "Clothing" 
+    }
+  ],
+  "Accessories": [
+    { 
+      id: "a1", 
+      name: "Leather Watch", 
+      price: 89.99, 
+      description: "Classic leather watch with minimalist design", 
+      image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=500&auto=format&fit=crop", 
+      category: "Accessories" 
+    },
+    { 
+      id: "a2", 
+      name: "Sunglasses", 
+      price: 29.99, 
+      description: "UV protection sunglasses with stylish frame", 
+      image: "https://images.unsplash.com/photo-1577803645773-f96470509666?w=500&auto=format&fit=crop", 
+      category: "Accessories" 
+    },
+    { 
+      id: "a3", 
+      name: "Leather Wallet", 
+      price: 49.99, 
+      description: "Genuine leather wallet with multiple card slots", 
+      image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&auto=format&fit=crop", 
+      category: "Accessories" 
+    }
+  ],
+  "Home & Kitchen": [
+    { 
+      id: "hk1", 
+      name: "Coffee Maker", 
+      price: 79.99, 
+      description: "Programmable coffee maker with thermal carafe", 
+      image: "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=500&auto=format&fit=crop", 
+      category: "Home & Kitchen" 
+    },
+    { 
+      id: "hk2", 
+      name: "Non-stick Pan Set", 
+      price: 59.99, 
+      description: "Set of 3 non-stick pans for everyday cooking", 
+      image: "https://images.unsplash.com/photo-1584990347449-5ca269388e26?w=500&auto=format&fit=crop", 
+      category: "Home & Kitchen" 
+    },
+    { 
+      id: "hk3", 
+      name: "Knife Block Set", 
+      price: 99.99, 
+      description: "Professional knife set with wooden block", 
+      image: "https://images.unsplash.com/photo-1566454825481-9c31a09a6bc3?w=500&auto=format&fit=crop", 
+      category: "Home & Kitchen" 
+    }
+  ]
+};
+
 // Promotional deals data
 const promotionalDeals = [
   { name: "Summer Sale", discount: "20% OFF", code: "SUMMER20", color: "bg-gradient-to-r from-orange-500 to-amber-500" },
@@ -80,7 +161,6 @@ const Shop = () => {
   
   // Initialize selected categories from URL params or category route param
   const categoryParams = searchParams.getAll('category');
-  // Removed the duplicate line: const { category: categoryParam } = useParams();
   
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     categoryParam ? [decodeURIComponent(categoryParam)] : 
@@ -114,9 +194,24 @@ const Shop = () => {
     "Automotive"
   ])].sort();
   
-  // Count products per category
+  // Combine API products with sample products for empty categories
+  const enrichedProducts = React.useMemo(() => {
+    const allEnrichedProducts = [...allProducts];
+    
+    // Add sample products for empty categories
+    Object.keys(sampleProducts).forEach(category => {
+      const categoryHasProducts = allProducts.some(product => product.category === category);
+      if (!categoryHasProducts) {
+        allEnrichedProducts.push(...sampleProducts[category]);
+      }
+    });
+    
+    return allEnrichedProducts;
+  }, [allProducts]);
+  
+  // Count products per category using enriched products list
   const categoryCount = allCategories.reduce((acc, category) => {
-    acc[category] = allProducts.filter(product => product.category === category).length;
+    acc[category] = enrichedProducts.filter(product => product.category === category).length;
     return acc;
   }, {} as Record<string, number>);
   
@@ -182,7 +277,7 @@ const Shop = () => {
   }, [location.pathname, selectedCategories]);
   
   // Filter products based on selected categories, search, and price range
-  const filteredProducts = allProducts.filter(product => {
+  const filteredProducts = enrichedProducts.filter(product => {
     // Filter by search query
     const matchesSearch = !searchQuery || 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -237,11 +332,16 @@ const Shop = () => {
     }
   };
   
-  // Apply selected categories filter - Modified to prevent reload
+  // Apply selected categories filter - Fix for the reload issue
   const handleApplyFilter = () => {
     setActiveTab('products');
     // Update the search params without navigating
     updateFiltersWithoutReload({ categories: selectedCategories });
+    
+    // The key fix for preventing page reload: use React Router's navigate instead of changing window.location
+    if (location.pathname !== '/shop') {
+      navigate('/shop', { replace: true });
+    }
   };
   
   // Select all categories
@@ -278,40 +378,22 @@ const Shop = () => {
     navigator.clipboard.writeText(code);
     toast.success(`Promo code ${code} copied to clipboard!`);
   };
+
+  // This function fixes the category selection issue by using React Router navigation
+  const handleCategoryClick = (category: string) => {
+    const isSelected = selectedCategories.includes(category);
+    
+    if (isSelected) {
+      setSelectedCategories(prev => prev.filter(c => c !== category));
+    } else {
+      setSelectedCategories(prev => [...prev, category]);
+    }
+    
+    // No page reload here, just state updates
+  };
   
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Featured Deal Banner - Enhanced version */}
-      <div className={`${promotionalDeals[activePromotion].color} mb-8 rounded-lg overflow-hidden shadow-lg`}>
-        <div className="flex flex-col md:flex-row items-center justify-between p-6 text-white">
-          <div className="flex items-center mb-4 md:mb-0">
-            <div className="mr-4 p-3 bg-white/20 rounded-full">
-              <Percent className="h-8 w-8" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold">{promotionalDeals[activePromotion].name}</h3>
-              <p className="text-sm opacity-90">Limited time offer - Don't miss out!</p>
-            </div>
-          </div>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="text-3xl font-bold">{promotionalDeals[activePromotion].discount}</div>
-            <div className="flex items-center gap-2">
-              <div className="bg-white/20 px-3 py-1 rounded font-mono">{promotionalDeals[activePromotion].code}</div>
-              <Button 
-                variant="secondary" 
-                onClick={() => copyPromoCode(promotionalDeals[activePromotion].code)}
-                className="whitespace-nowrap"
-              >
-                Copy Code
-              </Button>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white/10 px-6 py-2 text-sm text-center text-white/90">
-          Use code at checkout • Free shipping on orders over $50 • Valid until end of month
-        </div>
-      </div>
-
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">
@@ -398,7 +480,7 @@ const Shop = () => {
                 className={`hover:opacity-95 transition-opacity cursor-pointer ${
                   selectedCategories.includes(category) ? 'ring-2 ring-primary rounded-lg' : ''
                 }`}
-                onClick={() => toggleCategory(category, !selectedCategories.includes(category))}
+                onClick={() => handleCategoryClick(category)}
               >
                 <Card className="overflow-hidden hover-card-animation relative h-full">
                   {selectedCategories.includes(category) && (

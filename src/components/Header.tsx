@@ -196,7 +196,6 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true);
 
   // Effect for scroll detection
   useEffect(() => {
@@ -226,6 +225,7 @@ const Header = () => {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/shop', label: 'Shop', hasMenu: true },
+    { href: '/categories', label: 'Categories' },
     { href: '/deals', label: 'Deals' },
     { href: '/about', label: 'About Us' },
     { href: '/contact', label: 'Contact' },
@@ -244,24 +244,6 @@ const Header = () => {
         isScrolled ? 'shadow-md py-2' : 'py-4'
       )}
     >
-      {/* Announcement Bar */}
-      {isAnnouncementVisible && (
-        <div className="bg-primary text-white py-2 px-4">
-          <div className="container mx-auto flex items-center justify-between">
-            <div className="flex-1 text-center text-sm">
-              <span className="font-bold">SPECIAL OFFER:</span> Get 20% OFF on all products with code <span className="font-bold">SUMMER20</span>
-            </div>
-            <button 
-              onClick={() => setIsAnnouncementVisible(false)} 
-              className="text-white hover:text-white/80"
-              aria-label="Close announcement"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      )}
-      
       {/* Top Bar */}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between gap-4">
@@ -319,7 +301,7 @@ const Header = () => {
                           <li>
                             <NavigationMenuLink asChild>
                               <Link
-                                to="/shop"
+                                to="/categories"
                                 className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                               >
                                 <div className="text-sm font-medium leading-none">Categories</div>
@@ -522,6 +504,17 @@ const Header = () => {
                           >
                             <Grid className="h-5 w-5 mr-3" />
                             Shop
+                          </Link>
+                        </SheetClose>
+                      </li>
+                      <li>
+                        <SheetClose asChild>
+                          <Link
+                            to="/categories"
+                            className="flex items-center py-2 hover:text-primary"
+                          >
+                            <GridIcon className="h-5 w-5 mr-3" />
+                            Categories
                           </Link>
                         </SheetClose>
                       </li>
