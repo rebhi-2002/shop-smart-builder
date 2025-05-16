@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useParams, Link, useNavigate } from 'react-router-dom';
@@ -216,14 +215,11 @@ const Shop = () => {
     }
   };
   
-  // Apply selected categories filter
+  // Apply selected categories filter - Modified to prevent reload
   const handleApplyFilter = () => {
     setActiveTab('products');
-    if (selectedCategories.length === 0) {
-      navigate('/shop');
-    } else {
-      navigate(`/shop?${selectedCategories.map(c => `category=${encodeURIComponent(c)}`).join('&')}`);
-    }
+    // Update the search params without navigating
+    updateFiltersWithoutReload({ categories: selectedCategories });
   };
   
   // Select all categories

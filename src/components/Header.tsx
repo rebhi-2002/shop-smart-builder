@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -195,6 +196,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true);
 
   // Effect for scroll detection
   useEffect(() => {
@@ -242,6 +244,24 @@ const Header = () => {
         isScrolled ? 'shadow-md py-2' : 'py-4'
       )}
     >
+      {/* Announcement Bar */}
+      {isAnnouncementVisible && (
+        <div className="bg-primary text-white py-2 px-4">
+          <div className="container mx-auto flex items-center justify-between">
+            <div className="flex-1 text-center text-sm">
+              <span className="font-bold">SPECIAL OFFER:</span> Get 20% OFF on all products with code <span className="font-bold">SUMMER20</span>
+            </div>
+            <button 
+              onClick={() => setIsAnnouncementVisible(false)} 
+              className="text-white hover:text-white/80"
+              aria-label="Close announcement"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Top Bar */}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between gap-4">
