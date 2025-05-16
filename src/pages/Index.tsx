@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -130,11 +129,6 @@ const Index = () => {
 
   return (
     <div>
-      {/* Promotional Banner - Top of homepage only */}
-      <div className="bg-primary text-white p-2 text-center">
-        <p className="text-sm font-medium">FREE SHIPPING on orders over $50! Use code FREE50 at checkout</p>
-      </div>
-      
       {/* Hero Carousel Section */}
       <section className="mb-8 relative">
         <div className="overflow-hidden" ref={emblaRef}>

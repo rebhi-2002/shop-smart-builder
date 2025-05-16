@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useParams, Link, useNavigate } from 'react-router-dom';
@@ -27,14 +26,13 @@ import {
   LayoutList, 
   X, 
   Check,
-  Grid2x2,
+  GridIcon,
   LayoutIcon
 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
 import { toast } from "@/components/ui/sonner";
 import { Product } from '@/contexts/CartContext';
-import { useCart } from '@/hooks/useCart';
 
 const PAGE_SIZE = 8;
 
@@ -56,7 +54,6 @@ const Shop = () => {
   const { category: categoryParam } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
   
   // Tab state
   const [activeTab, setActiveTab] = useState<'categories' | 'products'>('categories');
@@ -218,13 +215,9 @@ const Shop = () => {
     }
   };
   
-  // Apply selected categories filter - Preventing reload
-  const handleApplyFilter = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
+  // Apply selected categories filter - Modified to prevent reload
+  const handleApplyFilter = () => {
     setActiveTab('products');
-    
     // Update the search params without navigating
     updateFiltersWithoutReload({ categories: selectedCategories });
   };
@@ -258,13 +251,6 @@ const Shop = () => {
     toast.success("All filters cleared");
   };
   
-  // Handle adding product to cart - Now redirects to cart
-  const handleAddToCart = (product: Product) => {
-    addToCart(product);
-    toast.success(`${product.name} added to cart`);
-    navigate('/cart'); // Navigate to cart after adding product
-  };
-  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page Header */}
@@ -289,7 +275,7 @@ const Shop = () => {
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'categories' | 'products')} className="mb-8">
         <TabsList className="w-full grid grid-cols-2">
           <TabsTrigger value="categories" className="flex items-center">
-            <Grid2x2 className="h-4 w-4 mr-2" /> Shop by Category
+            <GridIcon className="h-4 w-4 mr-2" /> Shop by Category
           </TabsTrigger>
           <TabsTrigger value="products" className="flex items-center">
             <LayoutIcon className="h-4 w-4 mr-2" /> Browse All Products
@@ -608,7 +594,7 @@ const Shop = () => {
               ) : viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {currentProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} onAddToCart={() => handleAddToCart(product)} />
+                    <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               ) : (
@@ -636,7 +622,7 @@ const Shop = () => {
                         </div>
                         <div className="flex justify-between items-end mt-4">
                           <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
-                          <Button onClick={() => handleAddToCart(product)}>Add to Cart</Button>
+                          <Button>Add to Cart</Button>
                         </div>
                       </div>
                     </div>
