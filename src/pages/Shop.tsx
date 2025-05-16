@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useParams, Link, useNavigate } from 'react-router-dom';
@@ -27,7 +28,8 @@ import {
   X, 
   Check,
   GridIcon,
-  LayoutIcon
+  LayoutIcon,
+  Percent
 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
@@ -41,13 +43,22 @@ const categoryImages: Record<string, string> = {
   "Clothing": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop",
   "Accessories": "https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?q=80&w=2012&auto=format&fit=crop",
   "Home & Kitchen": "https://images.unsplash.com/photo-1583845112203-29329902332e?q=80&w=1974&auto=format&fit=crop",
+  "Fashion": "https://images.unsplash.com/photo-1540221652346-e5dd6b50f3e7?q=80&w=2069&auto=format&fit=crop",
   "Fitness": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070&auto=format&fit=crop",
   "Beauty": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2080&auto=format&fit=crop",
   "Books": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop",
   "Toys": "https://images.unsplash.com/photo-1618842676088-c4d48a6a7c9d?q=80&w=2070&auto=format&fit=crop",
   "Sports": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=1935&auto=format&fit=crop",
-  "Automotive": "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=2070&auto=format&fit=crop"
+  "Automotive": "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=2070&auto=format&fit=crop",
+  "Home": "https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=2080&auto=format&fit=crop"
 };
+
+// Promotional deals data
+const promotionalDeals = [
+  { name: "Summer Sale", discount: "20% OFF", code: "SUMMER20", color: "bg-gradient-to-r from-orange-500 to-amber-500" },
+  { name: "New Customer", discount: "15% OFF", code: "WELCOME15", color: "bg-gradient-to-r from-blue-500 to-cyan-500" },
+  { name: "Weekend Special", discount: "10% OFF", code: "WEEKEND10", color: "bg-gradient-to-r from-purple-500 to-pink-500" }
+];
 
 const Shop = () => {
   const location = useLocation();
@@ -65,11 +76,12 @@ const Shop = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [sortBy, setSortBy] = useState('featured');
   const [currentPage, setCurrentPage] = useState(1);
-  
-  // Get categories from URL params
-  const categoryParams = searchParams.getAll('category');
+  const [activePromotion, setActivePromotion] = useState(0);
   
   // Initialize selected categories from URL params or category route param
+  const categoryParams = searchParams.getAll('category');
+  const { category: categoryParam } = useParams();
+  
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     categoryParam ? [decodeURIComponent(categoryParam)] : 
     categoryParams.map(param => decodeURIComponent(param))
@@ -91,8 +103,10 @@ const Shop = () => {
     ...fetchedCategories,
     "Electronics",
     "Clothing",
+    "Fashion",
     "Accessories",
     "Home & Kitchen",
+    "Home",
     "Beauty", 
     "Books", 
     "Toys", 
@@ -105,6 +119,14 @@ const Shop = () => {
     acc[category] = allProducts.filter(product => product.category === category).length;
     return acc;
   }, {} as Record<string, number>);
+  
+  // Rotate through promotions
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActivePromotion((prev) => (prev + 1) % promotionalDeals.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
   
   // Prevent page reload when changing filters - using React Router instead of form submission
   const updateFiltersWithoutReload = useCallback((newFilters: Record<string, any>) => {
@@ -251,8 +273,45 @@ const Shop = () => {
     toast.success("All filters cleared");
   };
   
+  // Copy promo code to clipboard
+  const copyPromoCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast.success(`Promo code ${code} copied to clipboard!`);
+  };
+  
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Featured Deal Banner - Enhanced version */}
+      <div className={`${promotionalDeals[activePromotion].color} mb-8 rounded-lg overflow-hidden shadow-lg`}>
+        <div className="flex flex-col md:flex-row items-center justify-between p-6 text-white">
+          <div className="flex items-center mb-4 md:mb-0">
+            <div className="mr-4 p-3 bg-white/20 rounded-full">
+              <Percent className="h-8 w-8" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold">{promotionalDeals[activePromotion].name}</h3>
+              <p className="text-sm opacity-90">Limited time offer - Don't miss out!</p>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="text-3xl font-bold">{promotionalDeals[activePromotion].discount}</div>
+            <div className="flex items-center gap-2">
+              <div className="bg-white/20 px-3 py-1 rounded font-mono">{promotionalDeals[activePromotion].code}</div>
+              <Button 
+                variant="secondary" 
+                onClick={() => copyPromoCode(promotionalDeals[activePromotion].code)}
+                className="whitespace-nowrap"
+              >
+                Copy Code
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white/10 px-6 py-2 text-sm text-center text-white/90">
+          Use code at checkout • Free shipping on orders over $50 • Valid until end of month
+        </div>
+      </div>
+
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">
