@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Category, Grid, Home, Store, TagIcon, HeartIcon, HelpCircle, User } from 'lucide-react';
+import { LayoutGrid, Home, Store, Tag, Heart, HelpCircle, User, Grid2x2 } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -22,15 +22,15 @@ import {
 const navItems = [
   { icon: Home, label: 'Home', path: '/' },
   { icon: Store, label: 'Shop', path: '/shop' },
-  { icon: Category, label: 'Categories', path: '/categories' },
-  { icon: TagIcon, label: 'Deals', path: '/deals' },
-  { icon: HeartIcon, label: 'Wishlist', path: '/wishlist' },
+  { icon: Grid2x2, label: 'Categories', path: '/categories' },
+  { icon: Tag, label: 'Deals', path: '/deals' },
+  { icon: Heart, label: 'Wishlist', path: '/wishlist' },
   { icon: HelpCircle, label: 'Help', path: '/faq' },
 ];
 
 const userNavItems = [
   { icon: User, label: 'My Account', path: '/account' },
-  { icon: Grid, label: 'My Orders', path: '/account/orders' },
+  { icon: LayoutGrid, label: 'My Orders', path: '/account/orders' },
 ];
 
 export function AppSidebar() {
@@ -57,7 +57,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup defaultOpen>
+        <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -79,7 +79,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup defaultOpen>
+        <SidebarGroup>
           <SidebarGroupLabel>Account</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

@@ -72,7 +72,7 @@ const Index = () => {
         <p className="text-lg text-muted-foreground mb-8">Discover amazing products at great prices</p>
       </section>
 
-      <FeaturedProducts />
+      <FeaturedProducts title="Featured Products" />
       <TrendingProducts />
       <NewArrivals />
       <RecentlyViewed />
