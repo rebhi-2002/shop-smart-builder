@@ -80,7 +80,7 @@ const Shop = () => {
   
   // Initialize selected categories from URL params or category route param
   const categoryParams = searchParams.getAll('category');
-  const { category: categoryParam } = useParams();
+  // Removed the duplicate line: const { category: categoryParam } = useParams();
   
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     categoryParam ? [decodeURIComponent(categoryParam)] : 
