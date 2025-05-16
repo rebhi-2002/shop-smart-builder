@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
@@ -8,7 +9,7 @@ import Cart from '@/pages/Cart';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import NotFound from '@/pages/NotFound';
-import Shop from '@/pages/Shop';
+import Categories from '@/pages/Categories';
 import ProductList from '@/pages/ProductList';
 import Wishlist from '@/pages/Wishlist';
 import AboutUs from '@/pages/AboutUs';
@@ -42,19 +43,10 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/" element={<Index />} />
-              
-              {/* New unified Shop route that replaces both products and categories */}
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/shop/:category" element={<Shop />} />
-              
-              {/* Keep product details route */}
+              <Route path="/products" element={<ProductList />} />
               <Route path="/products/:id" element={<ProductDetails />} />
-              
-              {/* Legacy routes that redirect to Shop */}
-              <Route path="/products" element={<Shop />} />
-              <Route path="/categories" element={<Shop />} />
-              <Route path="/categories/:category" element={<Shop />} />
-              
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/categories/:category" element={<ProductList />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/checkout" element={<Checkout />} />
