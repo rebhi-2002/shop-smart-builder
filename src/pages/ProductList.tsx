@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation, useSearchParams, useParams, Link } from 'react-router-dom';
+import { useLocation, useSearchParams, useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { 
   Pagination, 
   PaginationContent, 
@@ -19,7 +21,43 @@ import {
 import { Filter, Search, ChevronDown, ChevronRight, LayoutGrid, LayoutList, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
+import { useCart } from '@/hooks/useCart';
+import { motion } from 'framer-motion';
+
+// Promotional deals data
+const promotionalDeals = [
+  {
+    name: "Summer Sale",
+    discount: "20% OFF",
+    code: "SUMMER20",
+    color: "bg-gradient-to-r from-orange-500 to-amber-500"
+  },
+  {
+    name: "New Customer",
+    discount: "15% OFF",
+    code: "WELCOME15",
+    color: "bg-gradient-to-r from-blue-500 to-cyan-500"
+  },
+  {
+    name: "Weekend Special",
+    discount: "10% OFF",
+    code: "WEEKEND10",
+    color: "bg-gradient-to-r from-purple-500 to-pink-500"
+  },
+  {
+    name: "Flash Sale",
+    discount: "25% OFF",
+    code: "FLASH25",
+    color: "bg-gradient-to-r from-green-500 to-emerald-500"
+  },
+  {
+    name: "Loyalty Reward",
+    discount: "Free Shipping",
+    code: "LOYALTY",
+    color: "bg-gradient-to-r from-red-500 to-pink-400"
+  }
+];
 
 const ProductList = () => {
   const location = useLocation();
@@ -31,7 +69,10 @@ const ProductList = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [sortBy, setSortBy] = useState('featured');
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const [currentDealIndex, setCurrentDealIndex] = useState(0);
+  const productsPerPage = 9;
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   
   // Get categories from URL params
   const categoryParams = searchParams.getAll('category');
@@ -40,6 +81,15 @@ const ProductList = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     categoryParam ? [decodeURIComponent(categoryParam)] : categoryParams.map(param => decodeURIComponent(param))
   );
+
+  // Rotate through promotional deals
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDealIndex((prevIndex) => (prevIndex + 1) % promotionalDeals.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Prevent page reload when changing filters - using React Router instead of form submission
   const updateFiltersWithoutReload = useCallback((newFilters: Record<string, any>) => {
@@ -127,8 +177,6 @@ const ProductList = () => {
     return matchesSearch && matchesCategory && matchesPrice;
   });
   
-  
-  
   // Sort the filtered products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
@@ -188,8 +236,18 @@ const ProductList = () => {
   
   // Handle adding product to cart
   const handleAddToCart = (productId: string) => {
-    // In a real app, this would add the product to the cart
-    toast.success("Product added to cart");
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      addToCart(product);
+      toast.success(`${product.name} added to cart`);
+      navigate('/cart');
+    }
+  };
+  
+  // Copy promo code to clipboard
+  const copyPromoCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast.success(`Promo code ${code} copied to clipboard!`);
   };
   
   // Clear all filters
@@ -219,6 +277,33 @@ const ProductList = () => {
               <span className="font-medium">{decodeURIComponent(categoryParam)}</span>
             </>
           )}
+        </div>
+      </div>
+      
+      {/* Promotional Deals Carousel */}
+      <div className="mb-8 overflow-hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+          {promotionalDeals.map((deal, index) => (
+            <motion.div
+              key={deal.code}
+              className={`${deal.color} rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all cursor-pointer`}
+              onClick={() => copyPromoCode(deal.code)}
+              initial={{ opacity: 0.7, scale: 0.95 }}
+              animate={{ 
+                opacity: index === currentDealIndex ? 1 : 0.7,
+                scale: index === currentDealIndex ? 1 : 0.95,
+                y: index === currentDealIndex ? -5 : 0
+              }}
+              transition={{ duration: 0.5 }}
+            >
+              <p className="text-sm font-medium uppercase tracking-wider">{deal.name}</p>
+              <h3 className="text-2xl font-bold mt-1">{deal.discount}</h3>
+              <div className="mt-3 flex items-center">
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">CODE: {deal.code}</span>
+                <span className="ml-2 text-xs">Click to copy</span>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
       
@@ -253,8 +338,6 @@ const ProductList = () => {
           </div>
         </div>
       )}
-      
-      
       
       {/* Search and Filters Bar */}
       <div className="bg-card rounded-lg shadow-sm border p-4 mb-8">
@@ -457,7 +540,7 @@ const ProductList = () => {
           </div>
           
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array(6).fill(0).map((_, i) => (
                 <div key={i} className="animate-pulse">
                   <div className="aspect-square bg-muted rounded-md"></div>
@@ -479,9 +562,13 @@ const ProductList = () => {
               </Button>
             </div>
           ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 product-grid">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 product-grid">
               {currentProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  onAddToCart={() => handleAddToCart(product.id)}
+                />
               ))}
             </div>
           ) : (

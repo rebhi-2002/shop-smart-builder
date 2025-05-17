@@ -53,6 +53,8 @@ const Header = () => {
     { path: '/categories', label: 'Categories' },
     { path: '/deals', label: 'Deals' },
     { path: '/about', label: 'About Us' },
+    { path: '/contact', label: 'Contact' },
+    { path: '/faq', label: 'FAQ' },
   ];
   
   return (
@@ -72,7 +74,7 @@ const Header = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <span className="font-bold text-2xl">ShopHub</span>
+          <span className="font-bold text-2xl">StyleMart</span>
         </Link>
         
         {/* Search - Hidden on mobile */}
