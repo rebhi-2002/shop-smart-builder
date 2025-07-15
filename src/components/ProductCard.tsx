@@ -17,10 +17,11 @@ export interface ProductCardProps {
     rating?: number;
     discount?: number;
   };
+  variant?: 'default' | 'compact';
   onAddToCart?: () => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default', onAddToCart }) => {
   const { id, name, price, description, image, category, rating, discount } = product;
   
   const renderRating = (rating?: number) => {
@@ -54,10 +55,59 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
       </div>
     );
   };
+
+  // Compact variant for carousels and smaller displays
+  if (variant === 'compact') {
+    return (
+      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+        <Link to={`/products/${id}`} className="block overflow-hidden aspect-square relative">
+          <img
+            src={image || "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop"}
+            alt={name}
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop";
+            }}
+          />
+          
+          {discount && discount > 0 && (
+            <Badge className="absolute top-2 right-2 bg-red-500 hover:bg-red-600">-{discount}%</Badge>
+          )}
+        </Link>
+        
+        <CardContent className="p-3 flex-grow">
+          <div className="text-xs text-muted-foreground">{category}</div>
+          <Link to={`/products/${id}`} className="block">
+            <h3 className="font-semibold text-sm mt-1 hover:text-primary transition-colors line-clamp-2">{name}</h3>
+          </Link>
+          
+          <div className="mt-2">
+            {renderRating(rating)}
+          </div>
+        </CardContent>
+        
+        <CardFooter className="flex justify-between items-center p-3 pt-0">
+          <div>
+            {discount && discount > 0 ? (
+              <div className="flex items-center gap-1">
+                <span className="font-bold text-sm">${(price * (1 - discount/100)).toFixed(2)}</span>
+                <span className="text-xs text-muted-foreground line-through">${price.toFixed(2)}</span>
+              </div>
+            ) : (
+              <span className="font-bold text-sm">${price.toFixed(2)}</span>
+            )}
+          </div>
+          <Button onClick={onAddToCart} size="sm" className="text-xs px-2">Add</Button>
+        </CardFooter>
+      </Card>
+    );
+  }
   
+  // Default variant
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
-      <Link to={`/products/${id}`} className="block overflow-hidden aspect-square">
+      <Link to={`/products/${id}`} className="block overflow-hidden aspect-square relative">
         <img
           src={image || "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop"}
           alt={name}
