@@ -8,6 +8,7 @@ import ProductDetails from '@/pages/ProductDetails';
 import Cart from '@/pages/Cart';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
+import ResetPassword from '@/pages/ResetPassword';
 import NotFound from '@/pages/NotFound';
 import Categories from '@/pages/Categories';
 import ProductList from '@/pages/ProductList';
@@ -32,6 +33,7 @@ import Careers from '@/pages/Careers';
 import { FramerMotionProvider } from '@/providers/FramerMotionProvider';
 import UserManagement from '@/pages/admin/UserManagement';
 import { AuthProvider } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const queryClient = new QueryClient();
 
