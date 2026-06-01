@@ -58,22 +58,23 @@ function App() {
               <Route path="/careers" element={<Careers />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/account" element={<MyAccount />} />
-              <Route path="/account/profile" element={<UserProfile />} />
-              <Route path="/account/orders" element={<MyOrders />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/account" element={<ProtectedRoute><MyAccount /></ProtectedRoute>} />
+              <Route path="/account/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+              <Route path="/account/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-conditions" element={<TermsConditions />} />
               <Route path="/shipping-returns" element={<ShippingReturns />} />
-              
-              {/* Admin Routes */}
-              <Route path="/admin" element={<Dashboard />} />
-              <Route path="/admin/orders" element={<Orders />} />
-              <Route path="/admin/products" element={<ProductManagement />} />
-              <Route path="/admin/users" element={<UserManagement />} />
-              
+
+              {/* Admin Routes — protected */}
+              <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
+              <Route path="/admin/orders" element={<ProtectedRoute requireAdmin><Orders /></ProtectedRoute>} />
+              <Route path="/admin/products" element={<ProtectedRoute requireAdmin><ProductManagement /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UserManagement /></ProtectedRoute>} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
