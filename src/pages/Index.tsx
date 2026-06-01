@@ -23,7 +23,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 const Index = () => {
   // ... keep existing code (emblaRef, autoplayInterval, useState declarations)
   const [featuredCategory, setFeaturedCategory] = useState<string>('Electronics');
-  const [autoplayInterval, setAutoplayInterval] = useState<NodeJS.Timeout | null>(null);
+  const [autoplayInterval, setAutoplayInterval] = useState<ReturnType<typeof setInterval> | null>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
 
   // Get product categories

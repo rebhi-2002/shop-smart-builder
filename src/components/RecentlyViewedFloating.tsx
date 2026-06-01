@@ -23,7 +23,7 @@ const RecentlyViewedFloating = () => {
   const { toast } = useToast();
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
-  const [autoOpenTimer, setAutoOpenTimer] = useState<NodeJS.Timeout | null>(null);
+  const [autoOpenTimer, setAutoOpenTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
   
   // Auto open the component after 30 seconds if there are viewed products
   useEffect(() => {
