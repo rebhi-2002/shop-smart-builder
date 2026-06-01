@@ -27,26 +27,19 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register: registerUser, isLoading } = useAuth();
-  
+  const { register: registerUser } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    }
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' }
   });
-  
+
   const onSubmit = async (data: RegisterFormValues) => {
-    try {
-      await registerUser(data.name, data.email, data.password);
-      // The AuthContext will handle redirect and toast on success
-    } catch (error) {
-      toast.error("Registration failed. Please try again.");
-      console.error(error);
-    }
+    setIsLoading(true);
+    const ok = await registerUser(data.name, data.email, data.password);
+    setIsLoading(false);
+    if (ok) navigate('/');
   };
 
   return (
