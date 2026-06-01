@@ -55,7 +55,7 @@ const fetchOrders = async (): Promise<Order[]> => {
       status: 'shipped',
       items: [
         { id: '7', name: 'Yoga Mat', quantity: 1, price: 49.99, image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1820' },
-        { id: '8', name: 'Ceramic Coffee Mug', quantity: 2, price: 24.99, image: 'https://images.unsplash.com/photo-1577937927133-3bbfa3dfd628?q=80&w=1974' }
+        { id: '8', name: 'Ceramic Coffee Mug', quantity: 2, price: 24.99, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1974' }
       ],
       address: '456 Elm St, Los Angeles, CA 90001',
       tracking: 'TRK87654321',
