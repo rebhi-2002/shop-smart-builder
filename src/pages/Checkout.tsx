@@ -20,6 +20,7 @@ import { useCart } from '@/hooks/useCart';
 import { toast } from '@/components/ui/sonner';
 import { CreditCard, Truck, Check, Shield, CreditCard as CreditCardIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -75,21 +76,67 @@ const Checkout: React.FC = () => {
   });
   
   const onSubmit = async (data: FormData) => {
-    // Simulate payment processing
     setIsProcessing(true);
-    
+
     try {
-      // Simulate API call for payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Generate a random order number
-      const generatedOrderNumber = 'ORD-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+      // Simulate payment processing latency
+      await new Promise(resolve => setTimeout(resolve, 1200));
+
+      const shippingAddress = {
+        full_name: data.name,
+        email: data.email,
+        street: data.address,
+        city: data.city,
+        state: data.state,
+        zip: data.zipCode,
+        country: 'US',
+      };
+
+      let generatedOrderNumber = 'ORD-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+      // Insert order into Supabase if user is signed in
+      if (user?.id) {
+        const { data: orderRow, error: orderError } = await supabase
+          .from('orders')
+          .insert({
+            user_id: user.id,
+            guest_email: data.email,
+            status: 'pending',
+            subtotal,
+            discount: discountAmount,
+            shipping,
+            tax,
+            total: finalTotal,
+            promo_code: activePromoCode,
+            shipping_address: shippingAddress,
+            notes: data.notes,
+          })
+          .select('id, order_number')
+          .single();
+
+        if (orderError) throw orderError;
+        generatedOrderNumber = orderRow.order_number;
+
+        const itemsPayload = cartItems.map(item => ({
+          order_id: orderRow.id,
+          product_id: item.id,
+          product_name: item.name,
+          product_image: item.image,
+          unit_price: item.price,
+          quantity: item.quantity,
+          selected_color: item.selectedColor ?? null,
+          selected_size: item.selectedSize ?? null,
+        }));
+
+        const { error: itemsError } = await supabase
+          .from('order_items')
+          .insert(itemsPayload);
+        if (itemsError) throw itemsError;
+      }
+
       setOrderNumber(generatedOrderNumber);
-      
-      // Show success message
       toast.success('Payment successful! Your order is being processed.');
-      
-      // Save order to localStorage (in a real app, this would go to a database)
+
       const orderData = {
         id: generatedOrderNumber,
         customer: {
@@ -110,28 +157,21 @@ const Checkout: React.FC = () => {
         date: new Date().toISOString(),
         notes: data.notes,
       };
-      
-      // Store in localStorage (user-specific)
+
+      // Keep a localStorage fallback for guests / offline view
       const userId = user?.id || 'guest';
       const existingOrders = JSON.parse(localStorage.getItem(`orders_${userId}`) || '[]');
       localStorage.setItem(`orders_${userId}`, JSON.stringify([...existingOrders, orderData]));
-      
-      // Set order completed flag to prevent cart emptying immediately
+
       setOrderCompleted(true);
-      
-      // Clear cart after successful payment
       clearCart();
-      
-      // Navigate to confirmation page
-      navigate('/order-confirmation', { 
-        state: { 
-          orderNumber: generatedOrderNumber,
-          orderData
-        } 
+
+      navigate('/order-confirmation', {
+        state: { orderNumber: generatedOrderNumber, orderData },
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment processing error:', error);
-      toast.error('There was an error processing your payment. Please try again.');
+      toast.error(error?.message || 'There was an error processing your payment. Please try again.');
     } finally {
       setIsProcessing(false);
     }

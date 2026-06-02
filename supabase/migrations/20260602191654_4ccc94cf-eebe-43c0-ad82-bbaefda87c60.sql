@@ -1,0 +1,1 @@
+UPDATE public.categories SET image_url='https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=1200&auto=format&fit=crop' WHERE name='Toys';
