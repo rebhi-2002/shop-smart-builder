@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Order {
   id: string;
@@ -28,52 +29,33 @@ interface Order {
   paymentMethod?: string;
 }
 
-// This would be replaced by a real API call
-const fetchOrders = async (): Promise<Order[]> => {
-  // Simulate API request
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  
-  return [
-    {
-      id: 'ORD-1234',
-      date: '2025-05-10',
-      total: 329.97,
-      status: 'delivered',
-      items: [
-        { id: '1', name: 'Wireless Headphones', quantity: 1, price: 249.99, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070' },
-        { id: '3', name: 'Organic Cotton T-Shirt', quantity: 1, price: 29.99, image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=1964' },
-        { id: '5', name: 'Stainless Steel Water Bottle', quantity: 1, price: 34.99, image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=1974' }
-      ],
-      address: '123 Main St, New York, NY 10001',
-      tracking: 'TRK12345678',
-      paymentMethod: 'Credit Card'
-    },
-    {
-      id: 'ORD-5678',
-      date: '2025-05-01',
-      total: 139.97,
-      status: 'shipped',
-      items: [
-        { id: '7', name: 'Yoga Mat', quantity: 1, price: 49.99, image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1820' },
-        { id: '8', name: 'Ceramic Coffee Mug', quantity: 2, price: 24.99, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1974' }
-      ],
-      address: '456 Elm St, Los Angeles, CA 90001',
-      tracking: 'TRK87654321',
-      paymentMethod: 'PayPal'
-    },
-    {
-      id: 'ORD-9012',
-      date: '2025-04-15',
-      total: 199.99,
-      status: 'delivered',
-      items: [
-        { id: '2', name: 'Smart Watch', quantity: 1, price: 199.99, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999' }
-      ],
-      address: '789 Oak St, Chicago, IL 60007',
-      tracking: 'TRK11223344',
-      paymentMethod: 'Credit Card'
-    }
-  ];
+const fetchOrders = async (userId: string): Promise<Order[]> => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('id, order_number, created_at, total, status, shipping_address, order_items(id, product_id, product_name, product_image, unit_price, quantity)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data || []).map((o: any) => {
+    const addr = o.shipping_address || {};
+    const addressString = [addr.street, addr.city, addr.state, addr.zip].filter(Boolean).join(', ');
+    return {
+      id: o.order_number,
+      date: o.created_at,
+      total: Number(o.total),
+      status: o.status,
+      items: (o.order_items || []).map((it: any) => ({
+        id: it.product_id || it.id,
+        name: it.product_name,
+        quantity: it.quantity,
+        price: Number(it.unit_price),
+        image: it.product_image || undefined,
+      })),
+      address: addressString || undefined,
+    };
+  });
 };
 
 const getStatusColor = (status: Order['status']) => {
@@ -117,9 +99,9 @@ const MyOrders: React.FC = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ['orders'],
-    queryFn: fetchOrders,
-    enabled: !!user
+    queryKey: ['orders', user?.id],
+    queryFn: () => fetchOrders(user!.id),
+    enabled: !!user?.id,
   });
 
   React.useEffect(() => {
