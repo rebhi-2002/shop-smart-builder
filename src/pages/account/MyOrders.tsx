@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Order {
   id: string;
