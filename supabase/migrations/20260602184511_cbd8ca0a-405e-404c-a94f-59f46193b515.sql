@@ -1,0 +1,1 @@
+UPDATE public.categories SET image_url='https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200&auto=format&fit=crop' WHERE slug='beauty';
