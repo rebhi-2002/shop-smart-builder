@@ -20,6 +20,7 @@ import { useCart } from '@/hooks/useCart';
 import { toast } from '@/components/ui/sonner';
 import { CreditCard, Truck, Check, Shield, CreditCard as CreditCardIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
