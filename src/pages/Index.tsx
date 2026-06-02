@@ -115,18 +115,19 @@ const Index = () => {
   };
 
   // Get category images for the circles
-  const getCategoryImage = (category: string) => {
-    switch(category) {
-      case 'Electronics':
-        return "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?q=80&w=500&auto=format&fit=crop";
-      case 'Fashion':
-        return "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=500&auto=format&fit=crop";
-      case 'Home':
-        return "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=500&auto=format&fit=crop";
-      default:
-        return `https://source.unsplash.com/random/100x100?${category.toLowerCase()}`;
-    }
+  const categoryImageMap: Record<string, string> = {
+    Electronics: "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?q=80&w=500&auto=format&fit=crop",
+    Fashion: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=500&auto=format&fit=crop",
+    Home: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=500&auto=format&fit=crop",
+    Beauty: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=500&auto=format&fit=crop",
+    Books: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=500&auto=format&fit=crop",
+    Toys: "https://images.unsplash.com/photo-1558877385-8c1c30a30d4d?q=80&w=500&auto=format&fit=crop",
+    Sports: "https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=500&auto=format&fit=crop",
+    Automotive: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=500&auto=format&fit=crop",
   };
+  const getCategoryImage = (category: string) =>
+    categoryImageMap[category] ||
+    "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=500&auto=format&fit=crop";
 
   return (
     <div>
