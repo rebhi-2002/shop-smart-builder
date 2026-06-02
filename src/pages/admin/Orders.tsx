@@ -100,35 +100,69 @@ const OrdersPage: React.FC = () => {
       navigate('/login');
     }
   }, [isAdmin, navigate]);
-  
+
+  const loadOrders = async () => {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('id, order_number, created_at, total, status, notes, shipping_address, guest_email, order_items(id, product_id, product_name, unit_price, quantity)')
+      .order('created_at', { ascending: false });
+    if (error) {
+      toast({ title: 'Failed to load orders', description: error.message, variant: 'destructive' });
+      return;
+    }
+    const mapped: Order[] = (data || []).map((o: any) => {
+      const addr = o.shipping_address || {};
+      return {
+        id: o.order_number,
+        dbId: o.id,
+        customer: addr.full_name || 'Guest',
+        email: addr.email || o.guest_email || '',
+        date: o.created_at,
+        total: Number(o.total),
+        status: o.status,
+        items: (o.order_items || []).map((it: any) => ({
+          id: it.product_id || it.id,
+          name: it.product_name,
+          quantity: it.quantity,
+          price: Number(it.unit_price),
+        })),
+        address: [addr.street, addr.city, addr.state, addr.zip].filter(Boolean).join(', '),
+        notes: o.notes || '',
+      };
+    });
+    setOrders(mapped);
+  };
+
+  useEffect(() => {
+    if (isAdmin) loadOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin]);
+
   const ordersPerPage = 10;
-  
-  // Filter orders based on search
-  const filteredOrders = orders.filter(order => 
+
+  const filteredOrders = orders.filter(order =>
     order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
-  // Get current orders
+
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-  
-  // Calculate total pages
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
-  
-  const handleStatusChange = (orderId: string, newStatus: Order['status']) => {
-    const updatedOrders = orders.map(order => 
-      order.id === orderId ? { ...order, status: newStatus } : order
-    );
-    setOrders(updatedOrders);
-    toast({
-      title: "Order Status Updated",
-      description: `Order ${orderId} has been marked as ${newStatus}.`
-    });
+
+  const handleStatusChange = async (orderId: string, newStatus: Order['status']) => {
+    const target = orders.find(o => o.id === orderId);
+    if (!target) return;
+    const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', target.dbId);
+    if (error) {
+      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    toast({ title: 'Order Status Updated', description: `Order ${orderId} has been marked as ${newStatus}.` });
   };
-  
+
   const viewOrderDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsDetailsOpen(true);
@@ -142,17 +176,18 @@ const OrdersPage: React.FC = () => {
     }
   };
 
-  const confirmDeleteOrder = () => {
-    if (selectedOrder) {
-      const updatedOrders = orders.filter(order => order.id !== selectedOrder.id);
-      setOrders(updatedOrders);
-      setIsDeleteDialogOpen(false);
-      setSelectedOrder(null);
-      toast({
-        title: "Order Deleted",
-        description: `Order ${selectedOrder.id} has been deleted.`
-      });
+  const confirmDeleteOrder = async () => {
+    if (!selectedOrder) return;
+    // Mark as cancelled (deletes are not permitted by RLS)
+    const { error } = await supabase.from('orders').update({ status: 'cancelled' }).eq('id', selectedOrder.dbId);
+    if (error) {
+      toast({ title: 'Cancel failed', description: error.message, variant: 'destructive' });
+      return;
     }
+    setOrders(orders.map(o => o.id === selectedOrder.id ? { ...o, status: 'cancelled' } : o));
+    setIsDeleteDialogOpen(false);
+    setSelectedOrder(null);
+    toast({ title: 'Order Cancelled', description: `Order has been cancelled.` });
   };
 
   const handleEditOrder = (order: Order) => {
@@ -162,21 +197,23 @@ const OrdersPage: React.FC = () => {
     setIsEditDialogOpen(true);
   };
 
-  const saveOrderChanges = () => {
-    if (selectedOrder) {
-      const updatedOrders = orders.map(order => 
-        order.id === selectedOrder.id 
-          ? { ...order, status: editedStatus, notes: editedNotes } 
-          : order
-      );
-      setOrders(updatedOrders);
-      setIsEditDialogOpen(false);
-      toast({
-        title: "Order Updated",
-        description: `Order ${selectedOrder.id} has been updated.`
-      });
+  const saveOrderChanges = async () => {
+    if (!selectedOrder) return;
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: editedStatus, notes: editedNotes })
+      .eq('id', selectedOrder.dbId);
+    if (error) {
+      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+      return;
     }
+    setOrders(orders.map(o =>
+      o.id === selectedOrder.id ? { ...o, status: editedStatus, notes: editedNotes } : o
+    ));
+    setIsEditDialogOpen(false);
+    toast({ title: 'Order Updated', description: `Order ${selectedOrder.id} has been updated.` });
   };
+
 
   const handleExportOrders = () => {
     toast({
