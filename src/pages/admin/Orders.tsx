@@ -44,7 +44,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 
 interface Order {
-  id: string;
+  id: string;            // order_number (display)
+  dbId: string;          // uuid for DB ops
   customer: string;
   email: string;
   date: string;
