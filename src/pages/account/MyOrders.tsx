@@ -99,9 +99,9 @@ const MyOrders: React.FC = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ['orders'],
-    queryFn: fetchOrders,
-    enabled: !!user
+    queryKey: ['orders', user?.id],
+    queryFn: () => fetchOrders(user!.id),
+    enabled: !!user?.id,
   });
 
   React.useEffect(() => {
