@@ -15,6 +15,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
 import Reviews from '@/components/Reviews';
 import { motion, AnimatePresence } from 'framer-motion';
+import SEO from '@/components/SEO';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -181,6 +182,34 @@ const ProductDetails = () => {
   
   return (
     <div className="container mx-auto px-4 py-8">
+      <SEO
+        title={product.name}
+        description={(product.description || product.name).slice(0, 155)}
+        image={product.image}
+        path={`/products/${product.id}`}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          image: [product.image, ...(product.additionalImages || [])],
+          description: product.description,
+          sku: product.id,
+          category: product.category,
+          aggregateRating: product.rating
+            ? { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviews || 1 }
+            : undefined,
+          offers: {
+            "@type": "Offer",
+            url: `https://shop-smart-builder.lovable.app/products/${product.id}`,
+            price: product.price,
+            priceCurrency: "USD",
+            availability: (product.stock ?? 0) > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+          },
+        }}
+      />
       {/* Breadcrumbs */}
       <div className="flex items-center text-sm mb-6">
         <a href="/" className="text-muted-foreground hover:text-foreground">Home</a>
