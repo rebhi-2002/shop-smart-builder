@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { productService } from '@/services/productService';
 import { ChevronRight, Check, X, Filter } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 const categoryImages: Record<string, string> = {
   "Electronics": "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2001&auto=format&fit=crop",
@@ -77,6 +78,7 @@ const Categories: React.FC = () => {
   
   return (
     <div className="container mx-auto px-4 py-8">
+      <SEO title="Shop by Category" description="Browse all StyleMart categories: electronics, fashion, home, beauty, books, toys and more." path="/categories" />
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Shop by Category</h1>

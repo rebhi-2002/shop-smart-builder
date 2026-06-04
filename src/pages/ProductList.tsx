@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
+import SEO from '@/components/SEO';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -262,6 +263,11 @@ const ProductList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <SEO
+        title={category ? `${category} Products` : "All Products"}
+        description={category ? `Shop ${category} on StyleMart with fast shipping and easy returns.` : "Browse all StyleMart products with filters, sorting and great deals."}
+        path={category ? `/categories/${category}` : "/products"}
+      />
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">

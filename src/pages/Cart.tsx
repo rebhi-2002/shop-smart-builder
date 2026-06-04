@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter, 
   AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { motion } from 'framer-motion';
+import SEO from '@/components/SEO';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice, applyPromoCode, promoDiscount, activePromoCode } = useCart();
@@ -83,6 +84,7 @@ const Cart = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <SEO title="Your Cart" description="Review items in your shopping cart and proceed to secure checkout." path="/cart" noindex />
       <h1 className="text-3xl font-bold mb-8">Your Shopping Cart</h1>
       
       <div className="grid lg:grid-cols-3 gap-8">
