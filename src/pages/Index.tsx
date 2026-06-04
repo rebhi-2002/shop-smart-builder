@@ -19,6 +19,7 @@ import NewArrivals from '@/components/NewArrivals';
 import TrendingProducts from '@/components/TrendingProducts';
 import FeaturedProducts from '@/components/FeaturedProducts';
 import useEmblaCarousel from 'embla-carousel-react';
+import SEO from '@/components/SEO';
 
 const Index = () => {
   // ... keep existing code (emblaRef, autoplayInterval, useState declarations)
@@ -131,6 +132,22 @@ const Index = () => {
 
   return (
     <div>
+      <SEO
+        title="Modern Online Shopping"
+        description="Discover trending electronics, fashion, home & beauty deals on StyleMart. Fast shipping, secure checkout."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "StyleMart",
+          url: "https://shop-smart-builder.lovable.app",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://shop-smart-builder.lovable.app/search?q={query}",
+            "query-input": "required name=query",
+          },
+        }}
+      />
       {/* Hero Carousel Section */}
       <section className="mb-8 relative">
         {/* ... keep existing code (hero carousel) */}
