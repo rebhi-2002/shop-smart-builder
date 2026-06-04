@@ -264,9 +264,9 @@ const ProductList = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <SEO
-        title={category ? `${category} Products` : "All Products"}
-        description={category ? `Shop ${category} on StyleMart with fast shipping and easy returns.` : "Browse all StyleMart products with filters, sorting and great deals."}
-        path={category ? `/categories/${category}` : "/products"}
+        title={categoryParam ? `${decodeURIComponent(categoryParam)} Products` : "All Products"}
+        description={categoryParam ? `Shop ${decodeURIComponent(categoryParam)} on StyleMart with fast shipping and easy returns.` : "Browse all StyleMart products with filters, sorting and great deals."}
+        path={categoryParam ? `/categories/${categoryParam}` : "/products"}
       />
       {/* Page Header */}
       <div className="mb-8">
