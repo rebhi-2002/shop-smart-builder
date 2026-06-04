@@ -168,6 +168,30 @@
 
 ---
 
-## ابدأ التنفيذ
+## حالة التقدم (محدّث)
 
-سأبدأ فورًا بعد موافقتك بترتيب المراحل أعلاه، وأبلغك بعد كل مرحلة. أول خطوة عملية ستكون: **تفعيل Lovable Cloud + إنشاء الـ schema + نظام الأدوار الآمن + حماية مسارات الأدمن** (المرحلة 1).
+| المرحلة | الحالة |
+|---|---|
+| 1. Backend + Auth + Roles | ✅ منجز — جداول + RLS + has_role + Google OAuth + ProtectedRoute + ResetPassword |
+| 2. Design System | 🟡 جزئي — tokens موجودة، أُضيف `overflow-x` clamp + design.md، يحتاج dark polish + price variants |
+| 3. صفحات أساسية | 🟡 Home/Products/PDP/Cart/Checkout/Orders/Admin متصلة بـ DB. ناقص: `/order/:id` tracking، `/track-order`، `/blog`، `/compare`، `/gift-cards`، صفحة 500 |
+| 4. SEO | ❌ react-helmet-async + JSON-LD + sitemap ديناميكي |
+| 5. الأداء | ❌ lazy routes، image optim، preload LCP |
+| 6. الجوال | 🟡 أُصلح overflow أفقي. ناقص: bottom nav، sticky Add to Cart، filters bottom sheet |
+| 7. CRO | ❌ trust bar، scarcity، exit-intent، upsell، cart-abandon |
+| 8. الدفع | ❌ Stripe عبر Lovable Payments |
+| 9. Admin | 🟡 CRUD متصل، يحتاج analytics + image upload |
+| 10. جودة + إطلاق | ❌ error boundaries، skeletons، a11y، analytics، cookie consent |
+
+## ملاحظات حرجة
+- **النسخة المنشورة قديمة** — تم نشرها قبل ربط الـ DB، لذلك تظهر فارغة. الحل: إعادة النشر من زر Publish.
+- على الـ preview الفئات تظهر فعلًا 0 لأن الصفحة كانت تحسب على mock — تم ربط `productService` بالـ DB والمنتجات تُحمَّل بنجاح؛ سيظهر العدد الصحيح فور تحديث الصفحة.
+
+## الخطوات التالية (متتابعة)
+1. المرحلة 4 — SEO (helmet + JSON-LD + sitemap).
+2. المرحلة 5 — lazy routes + image optim.
+3. المرحلة 6 — bottom nav + sticky CTA موبايل.
+4. المرحلة 7 — CRO bundle.
+5. المرحلة 8 — Stripe.
+6. المرحلة 10 — صقل وإطلاق.
+
