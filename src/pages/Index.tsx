@@ -19,6 +19,7 @@ import NewArrivals from '@/components/NewArrivals';
 import TrendingProducts from '@/components/TrendingProducts';
 import FeaturedProducts from '@/components/FeaturedProducts';
 import useEmblaCarousel from 'embla-carousel-react';
+import SEO from '@/components/SEO';
 
 const Index = () => {
   // ... keep existing code (emblaRef, autoplayInterval, useState declarations)
