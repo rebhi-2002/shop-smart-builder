@@ -87,10 +87,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
           </div>
         </CardContent>
         
-        <CardFooter className="flex justify-between items-center p-3 pt-0">
+        <CardFooter className="flex flex-col gap-2 items-stretch p-3 pt-0">
           <div>
             {discount && discount > 0 ? (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-wrap">
                 <span className="font-bold text-sm">${(price * (1 - discount/100)).toFixed(2)}</span>
                 <span className="text-xs text-muted-foreground line-through">${price.toFixed(2)}</span>
               </div>
@@ -98,7 +98,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
               <span className="font-bold text-sm">${price.toFixed(2)}</span>
             )}
           </div>
-          <Button onClick={onAddToCart} size="sm" className="text-xs px-2">Add</Button>
+          <Button onClick={onAddToCart} size="sm" className="w-full text-xs">
+            <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Add to Cart
+          </Button>
         </CardFooter>
       </Card>
     );
