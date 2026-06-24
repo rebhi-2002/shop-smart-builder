@@ -21,10 +21,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { getTotalItems } = useCart();
   const cartCount = getTotalItems();
   const { user, logout } = useAuth();
+
+  // Close mobile drawer whenever route changes
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
   
   // Add scroll listener
   useEffect(() => {
