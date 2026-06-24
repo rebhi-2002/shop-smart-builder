@@ -43,6 +43,11 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
     queryKey: ['products'],
     queryFn: productService.getProducts
   });
+  const { addToCart } = useCart();
+  const handleAdd = (product: any) => {
+    addToCart(product, 1);
+    toast.success(`${product.name} added to cart`);
+  };
 
   const filteredProducts = products
     .filter(filter)
