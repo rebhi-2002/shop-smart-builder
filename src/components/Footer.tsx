@@ -70,16 +70,16 @@ const Footer: React.FC = () => {
             </div>
             
             <h3 className="font-semibold text-lg mb-2">Newsletter</h3>
-            <div className="flex">
+            <form className="flex w-full max-w-full">
               <input 
                 type="email" 
                 placeholder="Your email"
-                className="flex-1 px-3 py-2 rounded-l-md border border-r-0 border-input focus:outline-none"
+                className="flex-1 min-w-0 px-3 py-2 rounded-l-md border border-r-0 border-input focus:outline-none"
               />
-              <button className="bg-primary text-primary-foreground px-3 py-2 rounded-r-md">
+              <button type="submit" className="bg-primary text-primary-foreground px-3 py-2 rounded-r-md shrink-0">
                 Subscribe
               </button>
-            </div>
+            </form>
           </div>
         </div>
         
