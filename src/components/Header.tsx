@@ -21,10 +21,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { getTotalItems } = useCart();
   const cartCount = getTotalItems();
   const { user, logout } = useAuth();
+
+  // Close mobile drawer whenever route changes
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
   
   // Add scroll listener
   useEffect(() => {
@@ -165,13 +169,13 @@ const Header = () => {
           </Button>
           
           {/* Mobile Menu Trigger */}
-          <Sheet>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent>
+            <SheetContent className="overflow-y-auto">
               <div className="flex flex-col h-full mt-6">
                 <div className="space-y-3">
                   <form onSubmit={handleSearch} className="flex w-full mb-6">

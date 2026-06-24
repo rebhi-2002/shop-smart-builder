@@ -70,21 +70,21 @@ const Footer: React.FC = () => {
             </div>
             
             <h3 className="font-semibold text-lg mb-2">Newsletter</h3>
-            <div className="flex">
+            <form className="flex w-full max-w-full">
               <input 
                 type="email" 
                 placeholder="Your email"
-                className="flex-1 px-3 py-2 rounded-l-md border border-r-0 border-input focus:outline-none"
+                className="flex-1 min-w-0 px-3 py-2 rounded-l-md border border-r-0 border-input focus:outline-none"
               />
-              <button className="bg-primary text-primary-foreground px-3 py-2 rounded-r-md">
+              <button type="submit" className="bg-primary text-primary-foreground px-3 py-2 rounded-r-md shrink-0">
                 Subscribe
               </button>
-            </div>
+            </form>
           </div>
         </div>
         
         <div className="border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-muted-foreground text-sm">© {year} ShopHub. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">© {year} StyleMart. All rights reserved.</p>
           <div className="mt-4 md:mt-0">
             <img 
               src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" 

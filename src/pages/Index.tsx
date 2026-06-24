@@ -444,10 +444,10 @@ const Index = () => {
             <input 
               type="email" 
               placeholder="Your email address" 
-              className="flex-1 p-3 rounded-md text-foreground" 
+              className="flex-1 min-w-0 px-4 py-3 rounded-md text-foreground" 
               required 
             />
-            <Button type="submit" className="bg-white text-primary hover:bg-gray-100">
+            <Button type="submit" size="lg" className="bg-white text-primary hover:bg-gray-100 px-6 shrink-0">
               Subscribe
             </Button>
           </form>
