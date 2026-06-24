@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/carousel';
 import ProductCard from '@/components/ProductCard';
 import { productService } from '@/services/productService';
+import { useCart } from '@/hooks/useCart';
+import { toast } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 
 interface FeaturedProductsProps {
