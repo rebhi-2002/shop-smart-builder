@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-muted-foreground text-sm">© {year} ShopHub. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">© {year} StyleMart. All rights reserved.</p>
           <div className="mt-4 md:mt-0">
             <img 
               src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" 
