@@ -235,7 +235,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       'SUMMER20': 0.2,     // 20% off
       'SALE25': 0.25,      // 25% off
       'DISCOUNT30': 0.3,   // 30% off
-      'SPECIAL50': 0.5     // 50% off
+      'SPECIAL50': 0.5,    // 50% off
+      'FREESHIP': 0.05,    // 5% off + free shipping
+      'STYLE15': 0.15,     // 15% off
     };
     
     const upperCaseCode = code.toUpperCase();
