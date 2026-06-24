@@ -169,13 +169,13 @@ const Header = () => {
           </Button>
           
           {/* Mobile Menu Trigger */}
-          <Sheet>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent>
+            <SheetContent className="overflow-y-auto">
               <div className="flex flex-col h-full mt-6">
                 <div className="space-y-3">
                   <form onSubmit={handleSearch} className="flex w-full mb-6">
