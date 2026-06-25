@@ -235,13 +235,12 @@ const ProductList = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
-  // Handle adding product to cart
+  // Handle adding product to cart (stay on page)
   const handleAddToCart = (productId: string) => {
     const product = products.find(p => p.id === productId);
     if (product) {
       addToCart(product);
       toast.success(`${product.name} added to cart`);
-      navigate('/cart');
     }
   };
   
