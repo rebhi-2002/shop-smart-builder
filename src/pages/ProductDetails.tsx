@@ -384,9 +384,9 @@ const ProductDetails = () => {
           
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <Button 
-              className="flex-1 h-12 px-6 text-base font-semibold" 
-              size="lg" 
+            <Button
+              className="flex-1 h-14 px-6 py-3 text-base font-semibold"
+              size="lg"
               onClick={handleAddToCart}
               disabled={isAddedToCart || (product.stock === 0)}
             >
@@ -402,22 +402,22 @@ const ProductDetails = () => {
                 </>
               )}
             </Button>
-            
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-12 w-12"
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-14 w-14"
               onClick={handleWishlistToggle}
             >
-              <Heart 
-                className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''}`} 
+              <Heart
+                className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''}`}
               />
             </Button>
-            
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-12 w-12"
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-14 w-14"
               onClick={handleShare}
             >
               <Share2 className="h-5 w-5" />

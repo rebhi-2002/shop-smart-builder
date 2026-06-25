@@ -331,10 +331,7 @@ const MyOrders: React.FC = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Recently Viewed */}
-      <div className="mt-10">
-        <RecentlyViewed variant="minimal" />
-      </div>
+
     </div>
   );
 };
