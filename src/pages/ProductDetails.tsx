@@ -385,7 +385,7 @@ const ProductDetails = () => {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <Button 
-              className="flex-1" 
+              className="flex-1 h-12 px-6 text-base font-semibold" 
               size="lg" 
               onClick={handleAddToCart}
               disabled={isAddedToCart || (product.stock === 0)}

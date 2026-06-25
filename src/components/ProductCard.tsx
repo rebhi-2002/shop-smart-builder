@@ -5,6 +5,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/hooks/useCart';
+import { toast } from '@/components/ui/sonner';
 
 export interface ProductCardProps {
   product: {
@@ -23,6 +25,17 @@ export interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default', onAddToCart }) => {
   const { id, name, price, description, image, category, rating, discount } = product;
+  const { addToCart } = useCart();
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onAddToCart) {
+      onAddToCart();
+    } else {
+      addToCart(product as any, 1);
+      toast.success(`${name} added to cart`);
+    }
+  };
   
   const renderRating = (rating?: number) => {
     if (!rating) return null;
@@ -98,7 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
               <span className="font-bold text-sm">${price.toFixed(2)}</span>
             )}
           </div>
-          <Button onClick={onAddToCart} size="sm" className="w-full text-xs">
+          <Button onClick={handleAdd} size="sm" className="w-full text-xs">
             <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Add to Cart
           </Button>
         </CardFooter>
@@ -148,7 +161,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
             <span className="font-bold text-lg">${price.toFixed(2)}</span>
           )}
         </div>
-        <Button onClick={onAddToCart} size="sm" className="w-full sm:w-auto shrink-0">
+        <Button onClick={handleAdd} size="sm" className="w-full sm:w-auto shrink-0">
           <ShoppingCart className="h-4 w-4 mr-1" /> Add to Cart
         </Button>
       </CardFooter>
