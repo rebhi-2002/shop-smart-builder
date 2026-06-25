@@ -25,6 +25,17 @@ export interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default', onAddToCart }) => {
   const { id, name, price, description, image, category, rating, discount } = product;
+  const { addToCart } = useCart();
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onAddToCart) {
+      onAddToCart();
+    } else {
+      addToCart(product as any, 1);
+      toast.success(`${name} added to cart`);
+    }
+  };
   
   const renderRating = (rating?: number) => {
     if (!rating) return null;
