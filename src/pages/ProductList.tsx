@@ -207,13 +207,22 @@ const ProductList = () => {
     setFiltersVisible(!filtersVisible);
   };
   
-  // Handle category selection with checkbox (allows multiple selections) - fixed to prevent reload
+  // Handle category selection with checkbox (allows multiple selections)
   const handleCategoryToggle = (category: string, checked: boolean) => {
     const newCategories = checked
       ? [...selectedCategories, category]
       : selectedCategories.filter(c => c !== category);
-      
+
     setSelectedCategories(newCategories);
+
+    // If we're on a single-category route (/products/:category) and the user
+    // toggles into a multi-selection, switch to /products with query params so
+    // the URL reflects the actual filter state and multiple categories work.
+    if (categoryParam) {
+      const params = new URLSearchParams();
+      newCategories.forEach(c => params.append('category', c));
+      navigate(`/products${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
+    }
   };
   
   // Select all categories
