@@ -111,7 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
               <span className="font-bold text-sm">${price.toFixed(2)}</span>
             )}
           </div>
-          <Button onClick={onAddToCart} size="sm" className="w-full text-xs">
+          <Button onClick={handleAdd} size="sm" className="w-full text-xs">
             <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Add to Cart
           </Button>
         </CardFooter>
@@ -161,7 +161,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
             <span className="font-bold text-lg">${price.toFixed(2)}</span>
           )}
         </div>
-        <Button onClick={onAddToCart} size="sm" className="w-full sm:w-auto shrink-0">
+        <Button onClick={handleAdd} size="sm" className="w-full sm:w-auto shrink-0">
           <ShoppingCart className="h-4 w-4 mr-1" /> Add to Cart
         </Button>
       </CardFooter>
