@@ -313,7 +313,6 @@ const Index = () => {
           </div>
           <div className="space-y-8">
             <TrendingProducts variant="compact" className="mb-6" />
-            <RecentlyViewed variant="floating" className="mb-6" />
           </div>
         </div>
       </div>
