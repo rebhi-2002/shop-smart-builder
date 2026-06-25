@@ -440,14 +440,14 @@ const Index = () => {
             Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
           </p>
           
-          <form className="max-w-md mx-auto flex gap-2">
+          <form className="max-w-md mx-auto flex flex-col sm:flex-row gap-2">
             <input 
               type="email" 
               placeholder="Your email address" 
-              className="flex-1 min-w-0 px-4 py-3 rounded-md text-foreground" 
+              className="flex-1 min-w-0 h-12 px-4 rounded-md text-foreground" 
               required 
             />
-            <Button type="submit" size="lg" className="bg-white text-primary hover:bg-gray-100 px-6 shrink-0">
+            <Button type="submit" className="bg-white text-primary hover:bg-gray-100 h-12 px-6 shrink-0">
               Subscribe
             </Button>
           </form>
