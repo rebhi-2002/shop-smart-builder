@@ -211,7 +211,7 @@ const MyAccount: React.FC = () => {
             </CardContent>
           </Card>
           
-          <RecentlyViewed variant="minimal" limit={3} />
+
           
           <Button variant="outline" onClick={logout} className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 mt-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
