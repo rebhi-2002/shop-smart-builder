@@ -177,8 +177,8 @@
 | 3. صفحات أساسية | 🟡 Home/Products/PDP/Cart/Checkout/Orders/Admin متصلة بـ DB. ناقص: `/order/:id` tracking، `/track-order`، `/blog`، `/compare`، `/gift-cards`، صفحة 500 |
 | 4. SEO | ❌ react-helmet-async + JSON-LD + sitemap ديناميكي |
 | 5. الأداء | ❌ lazy routes، image optim، preload LCP |
-| 6. الجوال | 🟡 أُصلح overflow أفقي. ناقص: bottom nav، sticky Add to Cart، filters bottom sheet |
-| 7. CRO | ❌ trust bar، scarcity، exit-intent، upsell، cart-abandon |
+| 6. الجوال | ✅ منجز — bottom nav + sticky CTA + overflow fixes + scroll-to-top بين الصفحات |
+| 7. CRO | 🟡 جزئي — TrustBar + ExitIntent + scarcity "Only X left" موجودة. ناقص: upsell PDP، cross-sell Cart، reviews verified badge، cart abandonment email |
 | 8. الدفع | ❌ Stripe عبر Lovable Payments |
 | 9. Admin | 🟡 CRUD متصل، يحتاج analytics + image upload |
 | 10. جودة + إطلاق | ❌ error boundaries، skeletons، a11y، analytics، cookie consent |
