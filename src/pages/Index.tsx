@@ -222,6 +222,8 @@ const Index = () => {
         </div>
       </section>
       
+      <TrustBar />
+
       {/* Categories Quick Links */}
       <section className="container mx-auto px-4 mb-12">
         {/* ... keep existing code (categories quick links) */}
