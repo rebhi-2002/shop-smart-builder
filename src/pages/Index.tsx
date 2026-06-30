@@ -18,6 +18,7 @@ import RecentlyViewed from '@/components/RecentlyViewed';
 import NewArrivals from '@/components/NewArrivals';
 import TrendingProducts from '@/components/TrendingProducts';
 import FeaturedProducts from '@/components/FeaturedProducts';
+import TrustBar from '@/components/TrustBar';
 import useEmblaCarousel from 'embla-carousel-react';
 import SEO from '@/components/SEO';
 
@@ -222,6 +223,8 @@ const Index = () => {
         </div>
       </section>
       
+      <TrustBar />
+
       {/* Categories Quick Links */}
       <section className="container mx-auto px-4 mb-12">
         {/* ... keep existing code (categories quick links) */}
