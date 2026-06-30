@@ -403,25 +403,29 @@ const ProductDetails = () => {
               )}
             </Button>
 
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-14 w-14"
-              onClick={handleWishlistToggle}
-            >
-              <Heart
-                className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''}`}
-              />
-            </Button>
+            <div className="flex flex-row gap-3 justify-start">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-14 w-14 shrink-0"
+                onClick={handleWishlistToggle}
+                aria-label="Toggle wishlist"
+              >
+                <Heart
+                  className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''}`}
+                />
+              </Button>
 
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-14 w-14"
-              onClick={handleShare}
-            >
-              <Share2 className="h-5 w-5" />
-            </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-14 w-14 shrink-0"
+                onClick={handleShare}
+                aria-label="Share product"
+              >
+                <Share2 className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
           
           {/* Product Info */}
