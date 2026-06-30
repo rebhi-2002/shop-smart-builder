@@ -18,6 +18,7 @@ import RecentlyViewed from '@/components/RecentlyViewed';
 import NewArrivals from '@/components/NewArrivals';
 import TrendingProducts from '@/components/TrendingProducts';
 import FeaturedProducts from '@/components/FeaturedProducts';
+import TrustBar from '@/components/TrustBar';
 import useEmblaCarousel from 'embla-carousel-react';
 import SEO from '@/components/SEO';
 
