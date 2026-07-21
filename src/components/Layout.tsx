@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
       <Header />
-      <main className="flex-grow pb-24 md:pb-0">
+      <main className="flex-grow">
         {children}
       </main>
       <Footer />
