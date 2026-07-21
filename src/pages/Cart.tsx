@@ -172,6 +172,28 @@ const Cart = () => {
           <Card>
             <CardContent className="p-6">
               <h3 className="text-xl font-bold mb-4">Order Summary</h3>
+
+              {/* Free shipping progress */}
+              {(() => {
+                const threshold = 50;
+                const remaining = Math.max(0, threshold - subtotal);
+                const pct = Math.min(100, (subtotal / threshold) * 100);
+                return (
+                  <div className="mb-4 rounded-lg bg-muted/50 p-3">
+                    {remaining > 0 ? (
+                      <p className="text-sm mb-2">
+                        Add <span className="font-semibold text-primary">${remaining.toFixed(2)}</span> more for <span className="font-semibold">FREE shipping</span>
+                      </p>
+                    ) : (
+                      <p className="text-sm mb-2 text-green-600 font-semibold">🎉 You've unlocked FREE shipping!</p>
+                    )}
+                    <div className="h-2 w-full rounded-full bg-background overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-primary to-accent transition-all" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })()}
+
               
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between">

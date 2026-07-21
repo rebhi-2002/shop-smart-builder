@@ -547,6 +547,25 @@ const ProductDetails = () => {
       {/* Related Products */}
       <Separator className="my-12" />
       <RelatedProducts category={product.category} currentProductId={product.id} />
+
+      {/* Mobile sticky Add-to-Cart bar */}
+      <div className="md:hidden fixed bottom-14 inset-x-0 z-30 bg-background/95 backdrop-blur border-t px-3 py-2 flex items-center gap-3 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex flex-col leading-tight">
+          <span className="font-bold text-base">
+            ${(product.price * (1 - (product.discount || 0) / 100)).toFixed(2)}
+          </span>
+          {product.discount ? (
+            <span className="text-[11px] text-muted-foreground line-through">${product.price.toFixed(2)}</span>
+          ) : null}
+        </div>
+        <Button
+          className="flex-1 h-11"
+          onClick={handleAddToCart}
+          disabled={isAddedToCart || product.stock === 0}
+        >
+          {product.stock === 0 ? 'Out of Stock' : isAddedToCart ? (<><Check className="mr-2 h-4 w-4" /> Added</>) : (<><ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart</>)}
+        </Button>
+      </div>
     </div>
   );
 };
