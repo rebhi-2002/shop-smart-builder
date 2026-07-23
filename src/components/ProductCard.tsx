@@ -77,6 +77,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
           <img
             src={image || "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop"}
             alt={name}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -126,6 +128,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
         <img
           src={image || "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop"}
           alt={name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
           onError={(e) => {
             const target = e.target as HTMLImageElement;

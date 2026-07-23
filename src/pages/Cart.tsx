@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
+import CartCrossSell from '@/components/CartCrossSell';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice, applyPromoCode, promoDiscount, activePromoCode } = useCart();
@@ -297,6 +298,8 @@ const Cart = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CartCrossSell />
     </div>
   );
 };

@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { Star } from 'lucide-react';
+import { Star, BadgeCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 // Sample review data
 const sampleReviews = [
@@ -13,6 +14,7 @@ const sampleReviews = [
     user: { name: 'John D.', avatar: 'https://i.pravatar.cc/150?img=1' },
     rating: 5,
     date: '2023-09-15',
+    verified: true,
     comment: 'This product exceeded my expectations! The quality is outstanding and I highly recommend it to anyone looking for reliability and performance.',
   },
   {
@@ -20,6 +22,7 @@ const sampleReviews = [
     user: { name: 'Sarah M.', avatar: 'https://i.pravatar.cc/150?img=5' },
     rating: 4,
     date: '2023-09-10',
+    verified: true,
     comment: 'Very good product overall. It works as described and the shipping was fast. The only small issue was the packaging, which could be improved.',
   },
   {
@@ -27,6 +30,7 @@ const sampleReviews = [
     user: { name: 'Michael T.', avatar: 'https://i.pravatar.cc/150?img=8' },
     rating: 5,
     date: '2023-09-01',
+    verified: false,
     comment: 'Absolutely worth every penny! This is my second time purchasing this product and I continue to be impressed with its durability and design.',
   },
 ];
@@ -166,7 +170,15 @@ const Reviews: React.FC<ReviewsProps> = ({ productId, rating = 0, reviewCount = 
                   <AvatarFallback>{review.user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h4 className="font-medium">{review.user.name}</h4>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-medium">{review.user.name}</h4>
+                    {review.verified && (
+                      <Badge variant="secondary" className="text-xs gap-1 bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-950 dark:text-green-400">
+                        <BadgeCheck className="h-3 w-3" />
+                        Verified Purchase
+                      </Badge>
+                    )}
+                  </div>
                   <div className="flex items-center">
                     <div className="flex text-amber-400 mr-2">
                       {[...Array(5)].map((_, i) => (
