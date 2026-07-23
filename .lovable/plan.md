@@ -168,30 +168,30 @@
 
 ---
 
-## حالة التقدم (محدّث)
+## حالة التقدم (محدّث + تحقق فعلي من الكود/DB)
 
-| المرحلة | الحالة |
-|---|---|
-| 1. Backend + Auth + Roles | ✅ منجز — جداول + RLS + has_role + Google OAuth + ProtectedRoute + ResetPassword |
-| 2. Design System | 🟡 جزئي — tokens موجودة، أُضيف `overflow-x` clamp + design.md، يحتاج dark polish + price variants |
-| 3. صفحات أساسية | 🟡 Home/Products/PDP/Cart/Checkout/Orders/Admin متصلة بـ DB. ناقص: `/order/:id` tracking، `/track-order`، `/blog`، `/compare`، `/gift-cards`، صفحة 500 |
-| 4. SEO | ❌ react-helmet-async + JSON-LD + sitemap ديناميكي |
-| 5. الأداء | ❌ lazy routes، image optim، preload LCP |
-| 6. الجوال | ✅ منجز — bottom nav + sticky CTA + overflow fixes + scroll-to-top بين الصفحات |
-| 7. CRO | 🟡 جزئي — TrustBar + ExitIntent + scarcity "Only X left" موجودة. ناقص: upsell PDP، cross-sell Cart، reviews verified badge، cart abandonment email |
-| 8. الدفع | ❌ Stripe عبر Lovable Payments |
-| 9. Admin | 🟡 CRUD متصل، يحتاج analytics + image upload |
-| 10. جودة + إطلاق | ❌ error boundaries، skeletons، a11y، analytics، cookie consent |
+| المرحلة | الحالة | تحقق |
+|---|---|---|
+| 1. Backend + Auth + Roles | ✅ منجز | جداول موجودة، `has_role` في `private` schema، Google OAuth مُفعّل، `ProtectedRoute` + `/reset-password` موجودة |
+| 2. Design System | 🟡 | tokens + `overflow-x` clamp + design.md. ناقص: dark polish + variants موحّدة (price/sale/stock) |
+| 3. صفحات أساسية | 🟡 | Home/Products/PDP/Cart/Checkout/Orders/Admin مربوطة بـ DB. ناقص: `/order/:id`، `/track-order`، `/blog`، `/compare`، `/gift-cards`، صفحة 500 |
+| 4. SEO | ✅ منجز | `react-helmet-async` مثبّت، `SEO.tsx` في Index/PDP/List/Categories/Cart، JSON-LD في PDP، `sitemap.xml`+`robots.txt` (ثابتة — لاحقًا ديناميكية) |
+| 5. الأداء | 🟡 | `React.lazy` مطبّق على routes. ناقص: تحسين الصور (webp/avif) + preload LCP + prefetch on hover |
+| 6. الجوال | ✅ منجز | `MobileBottomNav` + sticky Add-to-Cart PDP + `ScrollToTop` + `pb-24` على الـ footer فقط |
+| 7. CRO | 🟡 | TrustBar + ExitIntent (WELCOME10) + scarcity + Free-Shipping progress + sticky mobile CTA. ناقص: upsell PDP، cross-sell Cart، verified reviews، abandoned-cart email |
+| 8. الدفع | ❌ | Stripe عبر Lovable Payments — لم يُفعّل بعد |
+| 9. Admin | 🟡 | CRUD وOrders status مربوطة. ناقص: analytics + image upload لـ Storage |
+| 10. جودة + إطلاق | ❌ | error boundaries، skeletons موحّدة، a11y audit، analytics، cookie consent |
 
-## ملاحظات حرجة
-- **النسخة المنشورة قديمة** — تم نشرها قبل ربط الـ DB، لذلك تظهر فارغة. الحل: إعادة النشر من زر Publish.
-- على الـ preview الفئات تظهر فعلًا 0 لأن الصفحة كانت تحسب على mock — تم ربط `productService` بالـ DB والمنتجات تُحمَّل بنجاح؛ سيظهر العدد الصحيح فور تحديث الصفحة.
+## سجل الإصلاحات الأخيرة
+- **Premium Makeup Kit** — رابط Unsplash الأصلي 404؛ استُبدل بـ 4 صور صالحة (تحقق status 200).
+- فُحص كل روابط صور الـ27 منتج بـ curl — الوحيد المكسور كان Premium Makeup Kit (تم إصلاحه).
+- `has_role` في schema خاص `private` + إزالة قراءة `promo_codes` العامة (security fixes).
 
-## الخطوات التالية (متتابعة)
-1. المرحلة 4 — SEO (helmet + JSON-LD + sitemap).
-2. المرحلة 5 — lazy routes + image optim.
-3. المرحلة 6 — bottom nav + sticky CTA موبايل.
-4. المرحلة 7 — CRO bundle.
-5. المرحلة 8 — Stripe.
-6. المرحلة 10 — صقل وإطلاق.
+## الخطوات التالية
+1. المرحلة 8 — Stripe عبر Lovable Payments.
+2. إكمال 7 — upsell/cross-sell + verified reviews badge.
+3. المرحلة 9 — Admin analytics + image upload.
+4. المرحلة 5 — image optim + preload LCP.
+5. المرحلة 10 — صقل وإطلاق.
 
