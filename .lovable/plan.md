@@ -174,14 +174,14 @@
 |---|---|---|
 | 1. Backend + Auth + Roles | ✅ منجز | جداول موجودة، `has_role` في `private` schema، Google OAuth مُفعّل، `ProtectedRoute` + `/reset-password` موجودة |
 | 2. Design System | 🟡 | tokens + `overflow-x` clamp + design.md. ناقص: dark polish + variants موحّدة (price/sale/stock) |
-| 3. صفحات أساسية | 🟡 | Home/Products/PDP/Cart/Checkout/Orders/Admin مربوطة بـ DB. ناقص: `/order/:id`، `/track-order`، `/blog`، `/compare`، `/gift-cards`، صفحة 500 |
-| 4. SEO | ✅ منجز | `react-helmet-async` مثبّت، `SEO.tsx` في Index/PDP/List/Categories/Cart، JSON-LD في PDP، `sitemap.xml`+`robots.txt` (ثابتة — لاحقًا ديناميكية) |
-| 5. الأداء | 🟡 | `React.lazy` مطبّق على routes. ناقص: تحسين الصور (webp/avif) + preload LCP + prefetch on hover |
-| 6. الجوال | ✅ منجز | `MobileBottomNav` + sticky Add-to-Cart PDP + `ScrollToTop` + `pb-24` على الـ footer فقط |
-| 7. CRO | 🟡 | TrustBar + ExitIntent (WELCOME10) + scarcity + Free-Shipping progress + sticky mobile CTA. ناقص: upsell PDP، cross-sell Cart، verified reviews، abandoned-cart email |
+| 3. صفحات أساسية | 🟡 | Home/Products/PDP/Cart/Checkout/Orders/Admin مربوطة. ✅ أُضيفت `/order/:id` (tracking بخط زمني) و`/track-order`. ناقص: `/blog`، `/compare`، `/gift-cards` |
+| 4. SEO | ✅ منجز | `react-helmet-async` + `SEO.tsx` + JSON-LD + `sitemap.xml`+`robots.txt` |
+| 5. الأداء | 🟡 | `React.lazy` + `loading="lazy"` + `decoding="async"` على ProductCard. ناقص: webp/avif + preload LCP |
+| 6. الجوال | ✅ منجز | Bottom nav + sticky CTA + ScrollToTop + footer padding |
+| 7. CRO | ✅ منجز | TrustBar + ExitIntent + scarcity + Free-Shipping bar + sticky CTA + **CartCrossSell** ("You might also like") + **Verified Purchase badge** في المراجعات |
 | 8. الدفع | ❌ | Stripe عبر Lovable Payments — لم يُفعّل بعد |
-| 9. Admin | 🟡 | CRUD وOrders status مربوطة. ناقص: analytics + image upload لـ Storage |
-| 10. جودة + إطلاق | ❌ | error boundaries، skeletons موحّدة، a11y audit، analytics، cookie consent |
+| 9. Admin | 🟡 | CRUD + Orders status. ناقص: analytics + image upload |
+| 10. جودة + إطلاق | 🟡 | ✅ **ErrorBoundary** حول كل الصفحات + **CookieConsent** banner. ناقص: skeletons موحّدة، a11y audit، analytics |
 
 ## سجل الإصلاحات الأخيرة
 - **Premium Makeup Kit** — رابط Unsplash الأصلي 404؛ استُبدل بـ 4 صور صالحة (تحقق status 200).

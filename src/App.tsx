@@ -35,6 +35,8 @@ const ProductManagement = lazy(() => import('@/pages/admin/ProductManagement'));
 const UserManagement = lazy(() => import('@/pages/admin/UserManagement'));
 const Deals = lazy(() => import('@/pages/Deals'));
 const Careers = lazy(() => import('@/pages/Careers'));
+const TrackOrder = lazy(() => import('@/pages/TrackOrder'));
+const OrderTracking = lazy(() => import('@/pages/OrderTracking'));
 
 const queryClient = new QueryClient();
 
@@ -64,6 +66,8 @@ function App() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/deals" element={<Deals />} />
                 <Route path="/careers" element={<Careers />} />
+                <Route path="/track-order" element={<TrackOrder />} />
+                <Route path="/order/:id" element={<OrderTracking />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
