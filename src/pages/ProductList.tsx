@@ -554,17 +554,11 @@ const ProductList = () => {
           </div>
           
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array(6).fill(0).map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="aspect-square bg-muted rounded-md"></div>
-                  <div className="space-y-2 mt-2">
-                    <div className="h-4 bg-muted rounded w-3/4"></div>
-                    <div className="h-4 bg-muted rounded w-1/2"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ProductGridSkeleton
+              count={6}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            />
+
           ) : sortedProducts.length === 0 ? (
             <div className="text-center py-12">
               <h3 className="text-lg font-medium mb-2">No Products Found</h3>
