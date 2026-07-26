@@ -37,6 +37,11 @@ const Deals = lazy(() => import('@/pages/Deals'));
 const Careers = lazy(() => import('@/pages/Careers'));
 const TrackOrder = lazy(() => import('@/pages/TrackOrder'));
 const OrderTracking = lazy(() => import('@/pages/OrderTracking'));
+const Compare = lazy(() => import('@/pages/Compare'));
+const GiftCards = lazy(() => import('@/pages/GiftCards'));
+const Blog = lazy(() => import('@/pages/Blog'));
+const BlogPost = lazy(() => import('@/pages/BlogPost'));
+
 
 const queryClient = new QueryClient();
 
@@ -68,6 +73,11 @@ function App() {
                 <Route path="/careers" element={<Careers />} />
                 <Route path="/track-order" element={<TrackOrder />} />
                 <Route path="/order/:id" element={<OrderTracking />} />
+                <Route path="/compare" element={<Compare />} />
+                <Route path="/gift-cards" element={<GiftCards />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
+
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
