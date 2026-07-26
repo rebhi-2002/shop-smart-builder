@@ -1,4 +1,5 @@
 
+import ProductGridSkeleton from '@/components/ProductGridSkeleton';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
