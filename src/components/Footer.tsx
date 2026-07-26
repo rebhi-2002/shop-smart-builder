@@ -26,7 +26,10 @@ const Footer: React.FC = () => {
               <li><Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Contact Us</Link></li>
               <li><Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors">FAQ</Link></li>
               <li><Link to="/shipping-returns" className="text-muted-foreground hover:text-foreground transition-colors">Shipping & Returns</Link></li>
-              <li><Link to="/account/orders" className="text-muted-foreground hover:text-foreground transition-colors">Track Order</Link></li>
+             <li><Link to="/track-order" className="text-muted-foreground hover:text-foreground transition-colors">Track Order</Link></li>
+             <li><Link to="/gift-cards" className="text-muted-foreground hover:text-foreground transition-colors">Gift Cards</Link></li>
+             <li><Link to="/compare" className="text-muted-foreground hover:text-foreground transition-colors">Compare Products</Link></li>
+
             </ul>
           </div>
           
@@ -34,7 +37,9 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold text-lg mb-3">Company</h3>
             <ul className="space-y-2">
               <li><Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">About Us</Link></li>
-              <li><Link to="/careers" className="text-muted-foreground hover:text-foreground transition-colors">Careers</Link></li>
+             <li><Link to="/careers" className="text-muted-foreground hover:text-foreground transition-colors">Careers</Link></li>
+             <li><Link to="/blog" className="text-muted-foreground hover:text-foreground transition-colors">Blog</Link></li>
+
               <li><Link to="/terms-conditions" className="text-muted-foreground hover:text-foreground transition-colors">Terms & Conditions</Link></li>
               <li><Link to="/privacy-policy" className="text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</Link></li>
             </ul>
