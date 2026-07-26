@@ -462,14 +462,15 @@ const ProductManagement: React.FC = () => {
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel>Product Image</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com/image.jpg" {...field} />
+                      <ProductImageUpload value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
