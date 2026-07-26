@@ -20,7 +20,7 @@ interface OrderRow {
   status: string;
   total: number;
   created_at: string;
-  customer_name: string | null;
+  guest_email: string | null;
   user_id: string | null;
 }
 
@@ -51,10 +51,10 @@ const Dashboard: React.FC = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('orders')
-        .select('id, order_number, status, total, created_at, customer_name, user_id')
+        .select('id, order_number, status, total, created_at, guest_email, user_id')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data || []) as OrderRow[];
+      return (data || []) as unknown as OrderRow[];
     },
   });
 
@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
   const totalSales = paidOrders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   const avgOrderValue = paidOrders.length ? totalSales / paidOrders.length : 0;
   const customers = new Set(
-    orders.map((o) => o.user_id || o.customer_name).filter(Boolean)
+    orders.map((o) => o.user_id || o.guest_email).filter(Boolean)
   ).size;
 
   const now = new Date();
@@ -183,7 +183,7 @@ const Dashboard: React.FC = () => {
                             {o.order_number || o.id.slice(0, 8)}
                           </Link>
                         </td>
-                        <td className="py-2">{o.customer_name || '—'}</td>
+                        <td className="py-2">{o.guest_email || 'Registered user'}</td>
                         <td className="py-2 text-right">
                           ${Number(o.total || 0).toFixed(2)}
                         </td>
