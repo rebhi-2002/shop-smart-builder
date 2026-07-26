@@ -19,6 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
+import ProductImageUpload from '@/components/admin/ProductImageUpload';
 import { toast } from '@/components/ui/sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -462,14 +463,15 @@ const ProductManagement: React.FC = () => {
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel>Product Image</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com/image.jpg" {...field} />
+                      <ProductImageUpload value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField

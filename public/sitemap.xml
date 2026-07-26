@@ -4,6 +4,13 @@
   <url><loc>https://shop-smart-builder.lovable.app/products</loc><priority>0.9</priority></url>
   <url><loc>https://shop-smart-builder.lovable.app/categories</loc><priority>0.9</priority></url>
   <url><loc>https://shop-smart-builder.lovable.app/deals</loc><priority>0.8</priority></url>
+  <url><loc>https://shop-smart-builder.lovable.app/blog</loc><priority>0.7</priority></url>
+  <url><loc>https://shop-smart-builder.lovable.app/blog/how-to-choose-wireless-headphones</loc><priority>0.6</priority></url>
+  <url><loc>https://shop-smart-builder.lovable.app/blog/building-a-capsule-wardrobe</loc><priority>0.6</priority></url>
+  <url><loc>https://shop-smart-builder.lovable.app/blog/secure-online-shopping-checklist</loc><priority>0.6</priority></url>
+  <url><loc>https://shop-smart-builder.lovable.app/compare</loc><priority>0.6</priority></url>
+  <url><loc>https://shop-smart-builder.lovable.app/gift-cards</loc><priority>0.6</priority></url>
+  <url><loc>https://shop-smart-builder.lovable.app/track-order</loc><priority>0.5</priority></url>
   <url><loc>https://shop-smart-builder.lovable.app/search</loc><priority>0.6</priority></url>
   <url><loc>https://shop-smart-builder.lovable.app/about</loc><priority>0.5</priority></url>
   <url><loc>https://shop-smart-builder.lovable.app/contact</loc><priority>0.5</priority></url>

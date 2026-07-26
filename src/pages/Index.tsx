@@ -165,8 +165,13 @@ const Index = () => {
                   <img 
                     src={slide.image} 
                     alt={slide.title} 
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    // @ts-expect-error fetchpriority is a valid HTML attribute
+                    fetchpriority={index === 0 ? 'high' : 'low'}
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
+
                   <div className="absolute inset-0 flex flex-col justify-center p-10 md:p-20">
                     <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">{slide.title}</h1>
                     <p className="text-xl md:text-2xl mb-8 max-w-md drop-shadow-lg">{slide.description}</p>

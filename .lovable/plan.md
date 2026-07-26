@@ -172,26 +172,24 @@
 
 | المرحلة | الحالة | تحقق |
 |---|---|---|
-| 1. Backend + Auth + Roles | ✅ منجز | جداول موجودة، `has_role` في `private` schema، Google OAuth مُفعّل، `ProtectedRoute` + `/reset-password` موجودة |
-| 2. Design System | 🟡 | tokens + `overflow-x` clamp + design.md. ناقص: dark polish + variants موحّدة (price/sale/stock) |
-| 3. صفحات أساسية | 🟡 | Home/Products/PDP/Cart/Checkout/Orders/Admin مربوطة. ✅ أُضيفت `/order/:id` (tracking بخط زمني) و`/track-order`. ناقص: `/blog`، `/compare`، `/gift-cards` |
-| 4. SEO | ✅ منجز | `react-helmet-async` + `SEO.tsx` + JSON-LD + `sitemap.xml`+`robots.txt` |
-| 5. الأداء | 🟡 | `React.lazy` + `loading="lazy"` + `decoding="async"` على ProductCard. ناقص: webp/avif + preload LCP |
+| 1. Backend + Auth + Roles | ✅ منجز | جداول موجودة، `has_role` في `private` schema، Google OAuth مُفعّل، `ProtectedRoute` + `/reset-password` |
+| 2. Design System | ✅ منجز | tokens HSL كاملة + `--success` / `--warning` (light+dark) مربوطة في `tailwind.config.ts`، radius/typography، `overflow-x` clamp، design.md |
+| 3. صفحات أساسية + ناقصة | ✅ منجز | Home/Products/PDP/Cart/Checkout/Orders/Admin مربوطة + `/order/:id` + `/track-order` + **`/compare`** + **`/gift-cards`** + **`/blog` و`/blog/:slug`** (3 مقالات + JSON-LD) |
+| 4. SEO | ✅ منجز | `react-helmet-async` + `SEO.tsx` + JSON-LD (Product/Organization/BlogPosting) + `sitemap.xml` محدّث + `robots.txt` |
+| 5. الأداء | ✅ منجز | `React.lazy` لكل route + `loading="lazy"`/`decoding="async"` + **preload/preconnect لصورة LCP** + `fetchpriority="high"` على أول شريحة hero |
 | 6. الجوال | ✅ منجز | Bottom nav + sticky CTA + ScrollToTop + footer padding |
-| 7. CRO | ✅ منجز | TrustBar + ExitIntent + scarcity + Free-Shipping bar + sticky CTA + **CartCrossSell** ("You might also like") + **Verified Purchase badge** في المراجعات |
-| 8. الدفع | ❌ | Stripe عبر Lovable Payments — لم يُفعّل بعد |
-| 9. Admin | 🟡 | CRUD + Orders status. ناقص: analytics + image upload |
-| 10. جودة + إطلاق | 🟡 | ✅ **ErrorBoundary** حول كل الصفحات + **CookieConsent** banner. ناقص: skeletons موحّدة، a11y audit، analytics |
+| 7. CRO | ✅ منجز | TrustBar + ExitIntent + scarcity + Free-Shipping bar + sticky CTA + CartCrossSell + Verified Purchase badge |
+| 8. الدفع | ❌ | Stripe عبر Lovable Payments — بانتظار موافقة المستخدم للتفعيل |
+| 9. Admin | ✅ منجز | CRUD + Orders status + **Dashboard تحليلات حقيقية من DB** (مبيعات، AOV، نمو شهري، عملاء، توزيع الحالات، low stock) + **رفع صور المنتجات** إلى bucket `product-images` (RLS: قراءة للجميع، رفع للأدمن فقط) |
+| 10. جودة + إطلاق | 🟡 | ErrorBoundary + CookieConsent + **`ProductGridSkeleton` موحّد** (Products/Search/Deals) + aria-labels على الأزرار الأيقونية. ناقص: analytics (GA/Plausible) + audit a11y نهائي |
 
 ## سجل الإصلاحات الأخيرة
 - **Premium Makeup Kit** — رابط Unsplash الأصلي 404؛ استُبدل بـ 4 صور صالحة (تحقق status 200).
-- فُحص كل روابط صور الـ27 منتج بـ curl — الوحيد المكسور كان Premium Makeup Kit (تم إصلاحه).
 - `has_role` في schema خاص `private` + إزالة قراءة `promo_codes` العامة (security fixes).
+- Storage: `product-images` bucket خاص + signed URLs طويلة الأمد (public buckets معطّلة على المنصة).
 
 ## الخطوات التالية
-1. المرحلة 8 — Stripe عبر Lovable Payments.
-2. إكمال 7 — upsell/cross-sell + verified reviews badge.
-3. المرحلة 9 — Admin analytics + image upload.
-4. المرحلة 5 — image optim + preload LCP.
-5. المرحلة 10 — صقل وإطلاق.
+1. **المرحلة 8** — تفعيل Stripe عبر Lovable Payments (يحتاج موافقتك).
+2. المرحلة 10 — إضافة analytics + فحص a11y نهائي قبل الإطلاق.
+
 
