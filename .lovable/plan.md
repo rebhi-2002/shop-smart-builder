@@ -181,7 +181,7 @@
 | 7. CRO | ✅ منجز | TrustBar + ExitIntent + scarcity + Free-Shipping bar + sticky CTA + CartCrossSell + Verified Purchase badge |
 | 8. الدفع | ❌ | Stripe عبر Lovable Payments — بانتظار موافقة المستخدم للتفعيل |
 | 9. Admin | ✅ منجز | CRUD + Orders status + **Dashboard تحليلات حقيقية من DB** (مبيعات، AOV، نمو شهري، عملاء، توزيع الحالات، low stock) + **رفع صور المنتجات** إلى bucket `product-images` (RLS: قراءة للجميع، رفع للأدمن فقط) |
-| 10. جودة + إطلاق | 🟡 | ErrorBoundary + CookieConsent + **`ProductGridSkeleton` موحّد** (Products/Search/Deals) + aria-labels على الأزرار الأيقونية. ناقص: analytics (GA/Plausible) + audit a11y نهائي |
+| 10. جودة + إطلاق | ✅ منجز | ErrorBoundary + CookieConsent + `ProductGridSkeleton` موحّد + **analytics layer** (`src/lib/analytics.ts` + `AnalyticsTracker`: page_view / view_item / add_to_cart / begin_checkout / purchase، متوافق GA4-GTM-Plausible ومربوط بموافقة الكوكيز) + **صفحة 404 محسّنة** (بحث + روابط + noindex) + **skip-to-content** و`<main id="main-content">` لتحسين a11y |
 
 ## سجل الإصلاحات الأخيرة
 - **Premium Makeup Kit** — رابط Unsplash الأصلي 404؛ استُبدل بـ 4 صور صالحة (تحقق status 200).
@@ -189,7 +189,8 @@
 - Storage: `product-images` bucket خاص + signed URLs طويلة الأمد (public buckets معطّلة على المنصة).
 
 ## الخطوات التالية
-1. **المرحلة 8** — تفعيل Stripe عبر Lovable Payments (يحتاج موافقتك).
-2. المرحلة 10 — إضافة analytics + فحص a11y نهائي قبل الإطلاق.
+1. **المرحلة 8 (الأخيرة المتبقية)** — الدفع. فحص الأهلية: Stripe المدمج غير متاح لبلد البائع (PS)، وPaddle لا يقبل المنتجات الفيزيائية. الخيارات: **Shopify** أو **Stripe BYOK** بمفتاح حسابك.
+2. عند تفعيل مزود الدفع: استبدال نموذج البطاقة الوهمي في `Checkout.tsx` بجلسة دفع حقيقية + webhook لتحديث حالة الطلب.
+3. اختياري بعد الإطلاق: توصيل GA4/Plausible script (طبقة الأحداث جاهزة وتنتظر السكربت فقط).
 
 
