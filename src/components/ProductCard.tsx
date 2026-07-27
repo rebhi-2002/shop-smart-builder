@@ -33,6 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
       onAddToCart();
     } else {
       addToCart(product as any, 1);
+      trackAddToCart({ id: String(id), name, price, quantity: 1 });
       toast.success(`${name} added to cart`);
     }
   };
