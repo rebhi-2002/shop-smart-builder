@@ -21,6 +21,7 @@ import { toast } from '@/components/ui/sonner';
 import { CreditCard, Truck, Check, Shield, CreditCard as CreditCardIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { trackBeginCheckout, trackPurchase } from '@/lib/analytics';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -52,6 +53,17 @@ const Checkout: React.FC = () => {
       navigate('/cart');
     }
   }, [cartItems, navigate, orderCompleted]);
+
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      trackBeginCheckout(
+        getTotalPrice() * 1.1,
+        cartItems.reduce((n, i) => n + i.quantity, 0)
+      );
+    }
+    // fire once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const discountAmount = subtotal * promoDiscount;
@@ -135,6 +147,11 @@ const Checkout: React.FC = () => {
       }
 
       setOrderNumber(generatedOrderNumber);
+      trackPurchase(
+        generatedOrderNumber,
+        finalTotal,
+        cartItems.reduce((n, i) => n + i.quantity, 0)
+      );
       toast.success('Payment successful! Your order is being processed.');
 
       const orderData = {

@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Reviews from '@/components/Reviews';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '@/components/SEO';
+import { trackAddToCart, trackViewItem } from '@/lib/analytics';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,6 +52,8 @@ const ProductDetails = () => {
         ...recentlyViewed.filter((item: Product) => item.id !== product.id)
       ].slice(0, 6); // Keep only latest 6 items
       localStorage.setItem('recentlyViewed', JSON.stringify(updatedRecentlyViewed));
+
+      trackViewItem({ id: String(product.id), name: product.name, price: product.price });
     }
   }, [product]);
   
@@ -123,6 +126,7 @@ const ProductDetails = () => {
     };
     
     addToCart(productToAdd, quantity);
+    trackAddToCart({ id: String(product.id), name: product.name, price: product.price, quantity });
     
     // Show animation
     setIsAddedToCart(true);
