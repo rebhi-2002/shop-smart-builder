@@ -147,6 +147,11 @@ const Checkout: React.FC = () => {
       }
 
       setOrderNumber(generatedOrderNumber);
+      trackPurchase(
+        generatedOrderNumber,
+        finalTotal,
+        cartItems.reduce((n, i) => n + i.quantity, 0)
+      );
       toast.success('Payment successful! Your order is being processed.');
 
       const orderData = {
