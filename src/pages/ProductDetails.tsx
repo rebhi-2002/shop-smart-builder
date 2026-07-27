@@ -52,6 +52,8 @@ const ProductDetails = () => {
         ...recentlyViewed.filter((item: Product) => item.id !== product.id)
       ].slice(0, 6); // Keep only latest 6 items
       localStorage.setItem('recentlyViewed', JSON.stringify(updatedRecentlyViewed));
+
+      trackViewItem({ id: String(product.id), name: product.name, price: product.price });
     }
   }, [product]);
   
