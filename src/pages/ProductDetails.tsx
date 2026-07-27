@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Reviews from '@/components/Reviews';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '@/components/SEO';
+import { trackAddToCart, trackViewItem } from '@/lib/analytics';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
