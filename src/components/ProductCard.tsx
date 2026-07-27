@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { toast } from '@/components/ui/sonner';
+import { trackAddToCart } from '@/lib/analytics';
 
 export interface ProductCardProps {
   product: {
