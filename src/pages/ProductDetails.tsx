@@ -123,6 +123,7 @@ const ProductDetails = () => {
     };
     
     addToCart(productToAdd, quantity);
+    trackAddToCart({ id: String(product.id), name: product.name, price: product.price, quantity });
     
     // Show animation
     setIsAddedToCart(true);
