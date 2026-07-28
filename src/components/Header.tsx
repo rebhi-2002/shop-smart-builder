@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, User, Search, Heart, Menu, X } from 'lucide-react';
+import { User, Search, Heart, Menu, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useCart } from '@/hooks/useCart';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
+import { CartDrawer } from '@/components/CartDrawer';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
