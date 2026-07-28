@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, ShoppingCart } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
+import { useCartStore, buildShopifyCartItem } from '@/stores/cartStore';
 import { toast } from '@/components/ui/sonner';
 import { trackAddToCart } from '@/lib/analytics';
 
