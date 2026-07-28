@@ -110,7 +110,9 @@ const ProductDetails = () => {
     }
   };
   
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    if (!product) return;
+
     // Check if required options are selected
     if ((product.colors && product.colors.length > 0 && !selectedColor) || 
         (product.sizes && product.sizes.length > 0 && !selectedSize)) {
@@ -118,29 +120,26 @@ const ProductDetails = () => {
       return;
     }
     
-    // Create product with selected options
-    const productToAdd = {
-      ...product,
-      selectedColor,
-      selectedSize,
-      quantity
-    };
-    
-    addToCart(productToAdd, quantity);
-    trackAddToCart({ id: String(product.id), name: product.name, price: product.price, quantity });
-    
-    // Show animation
-    setIsAddedToCart(true);
-    setTimeout(() => setIsAddedToCart(false), 2000);
-    
-    toast("Added to Cart", {
-      description: `${product.name} has been added to your cart.`,
-      action: {
-        label: "View Cart",
-        onClick: () => navigate('/cart')
-      },
-      icon: <ShoppingCart className="h-4 w-4 text-green-500" />
-    });
+    try {
+      const item = buildShopifyCartItem(product, quantity);
+      await addItem(item);
+      trackAddToCart({ id: String(product.id), name: product.name, price: product.price, quantity });
+      
+      // Show animation
+      setIsAddedToCart(true);
+      setTimeout(() => setIsAddedToCart(false), 2000);
+      
+      toast("Added to Cart", {
+        description: `${product.name} has been added to your cart.`,
+        action: {
+          label: "View Cart",
+          onClick: () => navigate('/cart')
+        },
+        icon: <ShoppingCart className="h-4 w-4 text-green-500" />
+      });
+    } catch (err) {
+      toast.error((err as Error).message || "Failed to add to cart");
+    }
   };
   
   const handleWishlistToggle = () => {
