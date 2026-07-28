@@ -156,14 +156,9 @@ const Header = () => {
             </Link>
           </Button>
           
-          <Button asChild variant="ghost" size="icon" className="relative cart-icon">
-            <Link to="/cart">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="cart-badge cart-badge-pulse">{cartCount}</span>
-              )}
-            </Link>
-          </Button>
+          <div className="hidden md:block">
+            <CartDrawer />
+          </div>
           
           {/* Mobile Menu Trigger */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
