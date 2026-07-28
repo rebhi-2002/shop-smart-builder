@@ -26,16 +26,22 @@ export interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default', onAddToCart }) => {
   const { id, name, price, description, image, category, rating, discount } = product;
-  const { addToCart } = useCart();
-  const handleAdd = (e: React.MouseEvent) => {
+  const addItem = useCartStore((state) => state.addItem);
+  const isLoading = useCartStore((state) => state.isLoading);
+  const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (onAddToCart) {
       onAddToCart();
-    } else {
-      addToCart(product as any, 1);
+      return;
+    }
+    try {
+      const item = buildShopifyCartItem(product as any, 1);
+      await addItem(item);
       trackAddToCart({ id: String(id), name, price, quantity: 1 });
       toast.success(`${name} added to cart`);
+    } catch (err) {
+      toast.error((err as Error).message || "Failed to add to cart");
     }
   };
   
