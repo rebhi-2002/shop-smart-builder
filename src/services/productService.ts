@@ -20,6 +20,8 @@ export interface Product {
   additionalImages?: string[];
   longDescription?: string;
   specifications?: Record<string, string | number>;
+  shopifyProductId?: string;
+  shopifyVariantId?: string;
 }
 
 const FALLBACK_IMAGE =
