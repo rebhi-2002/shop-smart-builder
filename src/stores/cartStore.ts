@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { storefrontApiRequest, ShopifyProduct } from "@/services/shopifyService";
+import type { Product } from "@/services/productService";
 
 export interface CartItem {
   lineId: string | null;
@@ -10,6 +11,60 @@ export interface CartItem {
   price: { amount: string; currencyCode: string };
   quantity: number;
   selectedOptions: Array<{ name: string; value: string }>;
+}
+
+export function buildShopifyCartItem(
+  product: Product,
+  quantity = 1
+): Omit<CartItem, "lineId"> {
+  const variantId = product.shopifyVariantId;
+  if (!variantId) {
+    throw new Error(`Product ${product.name} does not have a Shopify variant ID`);
+  }
+
+  const shopifyProduct: ShopifyProduct = {
+    node: {
+      id: product.shopifyProductId || product.id,
+      title: product.name,
+      description: product.description,
+      handle: product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+      priceRange: {
+        minVariantPrice: {
+          amount: product.price.toFixed(2),
+          currencyCode: "USD",
+        },
+      },
+      images: {
+        edges: [
+          { node: { url: product.image, altText: product.name } },
+          ...(product.additionalImages || []).map((url) => ({ node: { url, altText: product.name } })),
+        ],
+      },
+      variants: {
+        edges: [
+          {
+            node: {
+              id: variantId,
+              title: "Default",
+              price: { amount: product.price.toFixed(2), currencyCode: "USD" },
+              availableForSale: (product.stock ?? 0) > 0,
+              selectedOptions: [],
+            },
+          },
+        ],
+      },
+      options: [],
+    },
+  };
+
+  return {
+    product: shopifyProduct,
+    variantId,
+    variantTitle: "Default",
+    price: { amount: product.price.toFixed(2), currencyCode: "USD" },
+    quantity,
+    selectedOptions: [],
+  };
 }
 
 interface CartStore {
