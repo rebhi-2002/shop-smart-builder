@@ -225,6 +225,8 @@ export type Database = {
           price: number
           rating: number | null
           review_count: number
+          shopify_product_id: string | null
+          shopify_variant_id: string | null
           sizes: Json
           slug: string
           specs: Json
@@ -248,6 +250,8 @@ export type Database = {
           price: number
           rating?: number | null
           review_count?: number
+          shopify_product_id?: string | null
+          shopify_variant_id?: string | null
           sizes?: Json
           slug: string
           specs?: Json
@@ -271,6 +275,8 @@ export type Database = {
           price?: number
           rating?: number | null
           review_count?: number
+          shopify_product_id?: string | null
+          shopify_variant_id?: string | null
           sizes?: Json
           slug?: string
           specs?: Json

@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, ShoppingCart } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
+import { useCartStore, buildShopifyCartItem } from '@/stores/cartStore';
 import { toast } from '@/components/ui/sonner';
 import { trackAddToCart } from '@/lib/analytics';
 
@@ -26,16 +26,22 @@ export interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default', onAddToCart }) => {
   const { id, name, price, description, image, category, rating, discount } = product;
-  const { addToCart } = useCart();
-  const handleAdd = (e: React.MouseEvent) => {
+  const addItem = useCartStore((state) => state.addItem);
+  const isLoading = useCartStore((state) => state.isLoading);
+  const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (onAddToCart) {
       onAddToCart();
-    } else {
-      addToCart(product as any, 1);
+      return;
+    }
+    try {
+      const item = buildShopifyCartItem(product as any, 1);
+      await addItem(item);
       trackAddToCart({ id: String(id), name, price, quantity: 1 });
       toast.success(`${name} added to cart`);
+    } catch (err) {
+      toast.error((err as Error).message || "Failed to add to cart");
     }
   };
   
@@ -115,7 +121,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
               <span className="font-bold text-sm">${price.toFixed(2)}</span>
             )}
           </div>
-          <Button onClick={handleAdd} size="sm" className="w-full text-xs">
+          <Button onClick={handleAdd} size="sm" className="w-full text-xs" disabled={isLoading}>
             <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Add to Cart
           </Button>
         </CardFooter>
@@ -167,7 +173,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
             <span className="font-bold text-lg">${price.toFixed(2)}</span>
           )}
         </div>
-        <Button onClick={handleAdd} size="sm" className="w-full sm:w-auto shrink-0">
+        <Button onClick={handleAdd} size="sm" className="w-full sm:w-auto shrink-0" disabled={isLoading}>
           <ShoppingCart className="h-4 w-4 mr-1" /> Add to Cart
         </Button>
       </CardFooter>

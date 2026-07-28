@@ -20,6 +20,8 @@ export interface Product {
   additionalImages?: string[];
   longDescription?: string;
   specifications?: Record<string, string | number>;
+  shopifyProductId?: string;
+  shopifyVariantId?: string;
 }
 
 const FALLBACK_IMAGE =
@@ -44,6 +46,8 @@ type DBProduct = {
   specs: unknown;
   category_id: string | null;
   categories?: { name: string } | null;
+  shopify_product_id: string | null;
+  shopify_variant_id: string | null;
 };
 
 function toArray<T = string>(v: unknown): T[] {
@@ -78,6 +82,8 @@ function mapProduct(p: DBProduct): Product {
     sizes: toArray<string>(p.sizes),
     colors: toArray<string>(p.colors),
     specifications: (p.specs as Record<string, string | number>) || {},
+    shopifyProductId: p.shopify_product_id || undefined,
+    shopifyVariantId: p.shopify_variant_id || undefined,
   };
 }
 

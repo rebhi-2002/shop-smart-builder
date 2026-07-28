@@ -6,6 +6,7 @@ import Layout from '@/components/Layout';
 import { FramerMotionProvider } from '@/providers/FramerMotionProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { useCartSync } from '@/hooks/useCartSync';
 import Index from '@/pages/Index';
 
 const ProductDetails = lazy(() => import('@/pages/ProductDetails'));
@@ -52,6 +53,7 @@ const PageFallback = () => (
 );
 
 function App() {
+  useCartSync();
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

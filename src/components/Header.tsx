@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, User, Search, Heart, Menu, X } from 'lucide-react';
+import { User, Search, Heart, Menu, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useCart } from '@/hooks/useCart';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
+import { CartDrawer } from '@/components/CartDrawer';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -23,8 +22,6 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const { getTotalItems } = useCart();
-  const cartCount = getTotalItems();
   const { user, logout } = useAuth();
 
   // Close mobile drawer whenever route changes
@@ -159,14 +156,9 @@ const Header = () => {
             </Link>
           </Button>
           
-          <Button asChild variant="ghost" size="icon" className="relative cart-icon">
-            <Link to="/cart">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="cart-badge cart-badge-pulse">{cartCount}</span>
-              )}
-            </Link>
-          </Button>
+          <div className="hidden md:block">
+            <CartDrawer />
+          </div>
           
           {/* Mobile Menu Trigger */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

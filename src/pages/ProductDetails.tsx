@@ -7,9 +7,9 @@ import { ShoppingCart, Heart, Share2, ChevronRight, Star, Info, ShieldCheck, Tru
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { productService } from '@/services/productService';
-import { useCart, useWishlist } from '@/hooks/useCart';
-import { Product } from '@/contexts/CartContext';
+import { productService, Product } from '@/services/productService';
+import { useWishlist } from '@/hooks/useCart';
+import { useCartStore, buildShopifyCartItem } from '@/stores/cartStore';
 import RelatedProducts from '@/components/RelatedProducts';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -21,7 +21,8 @@ import { trackAddToCart, trackViewItem } from '@/lib/analytics';
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const addItem = useCartStore((state) => state.addItem);
+  const isCartLoading = useCartStore((state) => state.isLoading);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   const [quantity, setQuantity] = useState(1);
@@ -109,7 +110,9 @@ const ProductDetails = () => {
     }
   };
   
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    if (!product) return;
+
     // Check if required options are selected
     if ((product.colors && product.colors.length > 0 && !selectedColor) || 
         (product.sizes && product.sizes.length > 0 && !selectedSize)) {
@@ -117,29 +120,26 @@ const ProductDetails = () => {
       return;
     }
     
-    // Create product with selected options
-    const productToAdd = {
-      ...product,
-      selectedColor,
-      selectedSize,
-      quantity
-    };
-    
-    addToCart(productToAdd, quantity);
-    trackAddToCart({ id: String(product.id), name: product.name, price: product.price, quantity });
-    
-    // Show animation
-    setIsAddedToCart(true);
-    setTimeout(() => setIsAddedToCart(false), 2000);
-    
-    toast("Added to Cart", {
-      description: `${product.name} has been added to your cart.`,
-      action: {
-        label: "View Cart",
-        onClick: () => navigate('/cart')
-      },
-      icon: <ShoppingCart className="h-4 w-4 text-green-500" />
-    });
+    try {
+      const item = buildShopifyCartItem(product, quantity);
+      await addItem(item);
+      trackAddToCart({ id: String(product.id), name: product.name, price: product.price, quantity });
+      
+      // Show animation
+      setIsAddedToCart(true);
+      setTimeout(() => setIsAddedToCart(false), 2000);
+      
+      toast("Added to Cart", {
+        description: `${product.name} has been added to your cart.`,
+        action: {
+          label: "View Cart",
+          onClick: () => navigate('/cart')
+        },
+        icon: <ShoppingCart className="h-4 w-4 text-green-500" />
+      });
+    } catch (err) {
+      toast.error((err as Error).message || "Failed to add to cart");
+    }
   };
   
   const handleWishlistToggle = () => {
@@ -392,7 +392,7 @@ const ProductDetails = () => {
               className="flex-1 h-14 px-6 py-3 text-base font-semibold"
               size="lg"
               onClick={handleAddToCart}
-              disabled={isAddedToCart || (product.stock === 0)}
+              disabled={isAddedToCart || isCartLoading || (product.stock === 0)}
             >
               {isAddedToCart ? (
                 <>
@@ -565,7 +565,7 @@ const ProductDetails = () => {
         <Button
           className="flex-1 h-11"
           onClick={handleAddToCart}
-          disabled={isAddedToCart || product.stock === 0}
+          disabled={isAddedToCart || isCartLoading || product.stock === 0}
         >
           {product.stock === 0 ? 'Out of Stock' : isAddedToCart ? (<><Check className="mr-2 h-4 w-4" /> Added</>) : (<><ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart</>)}
         </Button>
