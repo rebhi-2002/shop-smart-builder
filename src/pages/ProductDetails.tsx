@@ -21,7 +21,8 @@ import { trackAddToCart, trackViewItem } from '@/lib/analytics';
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const addItem = useCartStore((state) => state.addItem);
+  const isCartLoading = useCartStore((state) => state.isLoading);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   const [quantity, setQuantity] = useState(1);
