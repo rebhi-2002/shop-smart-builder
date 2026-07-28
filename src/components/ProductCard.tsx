@@ -121,7 +121,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
               <span className="font-bold text-sm">${price.toFixed(2)}</span>
             )}
           </div>
-          <Button onClick={handleAdd} size="sm" className="w-full text-xs">
+          <Button onClick={handleAdd} size="sm" className="w-full text-xs" disabled={isLoading}>
             <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Add to Cart
           </Button>
         </CardFooter>
