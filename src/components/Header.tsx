@@ -22,8 +22,6 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const { getTotalItems } = useCart();
-  const cartCount = getTotalItems();
   const { user, logout } = useAuth();
 
   // Close mobile drawer whenever route changes
