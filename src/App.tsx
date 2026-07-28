@@ -53,6 +53,7 @@ const PageFallback = () => (
 );
 
 function App() {
+  useCartSync();
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
