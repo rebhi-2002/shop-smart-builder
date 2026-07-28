@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Minus, RefreshCcw, ShoppingBag } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
+import { Trash2, Plus, Minus, RefreshCcw, ShoppingBag, ExternalLink } from 'lucide-react';
+import { useCartStore } from '@/stores/cartStore';
 import { toast } from '@/components/ui/sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, 
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter, 
