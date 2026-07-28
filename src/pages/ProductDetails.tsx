@@ -392,7 +392,7 @@ const ProductDetails = () => {
               className="flex-1 h-14 px-6 py-3 text-base font-semibold"
               size="lg"
               onClick={handleAddToCart}
-              disabled={isAddedToCart || (product.stock === 0)}
+              disabled={isAddedToCart || isCartLoading || (product.stock === 0)}
             >
               {isAddedToCart ? (
                 <>
