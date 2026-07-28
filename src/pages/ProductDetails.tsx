@@ -7,9 +7,9 @@ import { ShoppingCart, Heart, Share2, ChevronRight, Star, Info, ShieldCheck, Tru
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { productService } from '@/services/productService';
-import { useCart, useWishlist } from '@/hooks/useCart';
-import { Product } from '@/contexts/CartContext';
+import { productService, Product } from '@/services/productService';
+import { useWishlist } from '@/hooks/useCart';
+import { useCartStore, buildShopifyCartItem } from '@/stores/cartStore';
 import RelatedProducts from '@/components/RelatedProducts';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
