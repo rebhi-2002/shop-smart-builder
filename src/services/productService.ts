@@ -82,6 +82,8 @@ function mapProduct(p: DBProduct): Product {
     sizes: toArray<string>(p.sizes),
     colors: toArray<string>(p.colors),
     specifications: (p.specs as Record<string, string | number>) || {},
+    shopifyProductId: p.shopify_product_id || undefined,
+    shopifyVariantId: p.shopify_variant_id || undefined,
   };
 }
 
