@@ -565,7 +565,7 @@ const ProductDetails = () => {
         <Button
           className="flex-1 h-11"
           onClick={handleAddToCart}
-          disabled={isAddedToCart || product.stock === 0}
+          disabled={isAddedToCart || isCartLoading || product.stock === 0}
         >
           {product.stock === 0 ? 'Out of Stock' : isAddedToCart ? (<><Check className="mr-2 h-4 w-4" /> Added</>) : (<><ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart</>)}
         </Button>
