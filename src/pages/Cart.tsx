@@ -12,7 +12,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel,
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
 import CartCrossSell from '@/components/CartCrossSell';
-import { formatPrice } from '@/lib/currency';
 import { formatMoney, formatPrice, STORE_CURRENCY, FREE_SHIPPING_THRESHOLD } from "@/lib/currency";
 
 
