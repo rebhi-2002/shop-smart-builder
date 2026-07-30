@@ -1,3 +1,4 @@
+import { formatPrice } from '@/lib/currency';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { productService } from '@/services/productService';
 import {
-import { formatPrice } from '@/lib/currency';
   ShoppingBag,
   Users,
   DollarSign,
