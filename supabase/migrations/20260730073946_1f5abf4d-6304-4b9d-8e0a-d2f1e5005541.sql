@@ -1,0 +1,2 @@
+UPDATE public.products SET shopify_product_id='gid://shopify/Product/15410104631407', shopify_variant_id='gid://shopify/ProductVariant/53895919698031' WHERE slug='basketball';
+UPDATE public.products SET shopify_product_id='gid://shopify/Product/15410104828015', shopify_variant_id='gid://shopify/ProductVariant/53895919894639' WHERE slug='best-selling-novel';
