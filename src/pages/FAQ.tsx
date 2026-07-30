@@ -71,7 +71,7 @@ const FAQ = () => {
             <AccordionItem value="shipping-3">
               <AccordionTrigger>Is free shipping available?</AccordionTrigger>
               <AccordionContent>
-                <p>We offer free standard shipping on all domestic orders over $50. International orders over $100 may qualify for free shipping depending on the destination.</p>
+                <p>We offer free standard shipping on all domestic orders over ₪50. International orders over ₪100 may qualify for free shipping depending on the destination.</p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>

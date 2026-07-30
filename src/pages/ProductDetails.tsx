@@ -448,7 +448,7 @@ const ProductDetails = () => {
               <Truck className="h-5 w-5 text-primary mr-3 mt-0.5" />
               <div>
                 <span className="font-medium">Free delivery</span>
-                <div className="text-sm text-muted-foreground">Orders over $50 qualify for free shipping</div>
+                <div className="text-sm text-muted-foreground">Orders over ₪50 qualify for free shipping</div>
               </div>
             </div>
             

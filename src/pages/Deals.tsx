@@ -142,7 +142,7 @@ const Deals = () => {
               </div>
               <div className="bg-primary text-white text-sm font-medium px-2 py-1 rounded">15% OFF</div>
             </div>
-            <p className="mb-4">Get 15% off and free shipping on orders $75+.</p>
+            <p className="mb-4">Get 15% off and free shipping on orders ₪75+.</p>
             <Button variant="outline" onClick={() => {
               navigator.clipboard.writeText('FREESHIP');
               toast("Code Copied", {

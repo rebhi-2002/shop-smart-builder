@@ -67,7 +67,7 @@ const Header = () => {
       {/* Promo Banner */}
       <div className="bg-gradient-to-r from-primary/90 to-accent/90 text-white py-2">
         <div className="container mx-auto px-4 text-center text-sm">
-          <span className="font-medium">FREE SHIPPING</span> on orders over $50 | Use code <span className="font-bold">WELCOME10</span> for 10% off your first order!
+          <span className="font-medium">FREE SHIPPING</span> on orders over ₪50 | Use code <span className="font-bold">WELCOME10</span> for 10% off your first order!
         </div>
       </div>
       

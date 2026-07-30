@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { storefrontApiRequest } from "@/services/shopifyService";
 import type { Product } from "@/services/productService";
+import { STORE_CURRENCY } from "@/lib/currency";
 
 export interface CartItem {
   lineId: string | null;
@@ -26,7 +27,7 @@ export function buildShopifyCartItem(
     product,
     variantId,
     variantTitle: "Default",
-    price: { amount: product.price.toFixed(2), currencyCode: "USD" },
+    price: { amount: product.price.toFixed(2), currencyCode: STORE_CURRENCY },
     quantity,
     selectedOptions: [],
   };

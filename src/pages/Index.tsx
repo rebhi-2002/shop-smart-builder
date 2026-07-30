@@ -404,7 +404,7 @@ const Index = () => {
           <div className="flex flex-col items-center text-center p-6 border rounded-lg">
             <Truck className="h-10 w-10 text-primary mb-4" />
             <h3 className="text-lg font-bold mb-2">Free Shipping</h3>
-            <p className="text-muted-foreground text-sm">On orders over $50</p>
+            <p className="text-muted-foreground text-sm">On orders over ₪50</p>
           </div>
           
           <div className="flex flex-col items-center text-center p-6 border rounded-lg">

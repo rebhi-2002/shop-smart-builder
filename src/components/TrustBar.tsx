@@ -2,7 +2,7 @@ import React from 'react';
 import { Truck, ShieldCheck, RotateCcw, Headphones } from 'lucide-react';
 
 const items = [
-  { icon: Truck, title: 'Free Shipping', desc: 'On orders over $50' },
+  { icon: Truck, title: 'Free Shipping', desc: 'On orders over ₪50' },
   { icon: RotateCcw, title: '30-Day Returns', desc: 'Hassle-free returns' },
   { icon: ShieldCheck, title: 'Secure Checkout', desc: 'SSL & PCI compliant' },
   { icon: Headphones, title: '24/7 Support', desc: 'We are here to help' },

@@ -47,17 +47,17 @@ const ShippingReturns = () => {
                     <tr>
                       <td className="p-3">Standard Shipping</td>
                       <td className="p-3">3-5 business days</td>
-                      <td className="p-3">$4.99 (Free over $50)</td>
+                      <td className="p-3">₪4.99 (Free over ₪50)</td>
                     </tr>
                     <tr>
                       <td className="p-3">Express Shipping</td>
                       <td className="p-3">1-2 business days</td>
-                      <td className="p-3">$12.99</td>
+                      <td className="p-3">₪12.99</td>
                     </tr>
                     <tr>
                       <td className="p-3">International Shipping</td>
                       <td className="p-3">7-14 business days</td>
-                      <td className="p-3">$24.99+ (varies by location)</td>
+                      <td className="p-3">₪24.99+ (varies by location)</td>
                     </tr>
                   </tbody>
                 </table>
@@ -156,7 +156,7 @@ const ShippingReturns = () => {
           <h2 className="text-2xl font-semibold mb-4">Return Shipping</h2>
           <p className="text-muted-foreground">
             Return shipping is free for defective or incorrectly shipped items. For all other returns, a 
-            shipping fee of $5.99 will be deducted from your refund amount.
+            shipping fee of ₪5.99 will be deducted from your refund amount.
           </p>
         </section>
         

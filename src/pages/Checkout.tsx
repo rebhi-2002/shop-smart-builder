@@ -7,6 +7,7 @@ import { useCartStore } from '@/stores/cartStore';
 import { toast } from '@/components/ui/sonner';
 import { trackBeginCheckout } from '@/lib/analytics';
 import SEO from '@/components/SEO';
+import { formatMoney, formatPrice, STORE_CURRENCY, FREE_SHIPPING_THRESHOLD } from "@/lib/currency";
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Checkout: React.FC = () => {
   if (items.length === 0) return null;
 
   const subtotal = items.reduce((total, item) => total + parseFloat(item.price.amount) * item.quantity, 0);
-  const currencyCode = items[0]?.price.currencyCode || 'USD';
+  const currencyCode = items[0]?.price.currencyCode || STORE_CURRENCY;
   const shipping = subtotal >= 50 ? 0 : 0;
   const tax = subtotal * 0.07;
   const total = subtotal + shipping + tax;
@@ -66,7 +67,7 @@ const Checkout: React.FC = () => {
               <div className="flex items-start gap-3">
                 <Truck className="h-5 w-5 text-primary mt-0.5" />
                 <div>
-                  <p className="font-medium">Free shipping over $50</p>
+                  <p className="font-medium">Free shipping over {formatPrice(FREE_SHIPPING_THRESHOLD)}</p>
                   <p className="text-sm text-muted-foreground">Shipping options are calculated in Shopify checkout.</p>
                 </div>
               </div>
@@ -99,7 +100,7 @@ const Checkout: React.FC = () => {
                     <span className="text-muted-foreground truncate max-w-[70%]">
                       {item.product.name} x {item.quantity}
                     </span>
-                    <span>{currencyCode} {(parseFloat(item.price.amount) * item.quantity).toFixed(2)}</span>
+                    <span>{formatMoney(parseFloat(item.price.amount) * item.quantity, currencyCode)}</span>
                   </div>
                 ))}
               </div>
@@ -107,7 +108,7 @@ const Checkout: React.FC = () => {
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>{currencyCode} {subtotal.toFixed(2)}</span>
+                  <span>{formatMoney(subtotal, currencyCode)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
@@ -115,14 +116,14 @@ const Checkout: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax</span>
-                  <span>{currencyCode} {tax.toFixed(2)}</span>
+                  <span>{formatMoney(tax, currencyCode)}</span>
                 </div>
               </div>
 
               <div className="border-t pt-4">
                 <div className="flex justify-between font-bold text-lg">
                   <span>Estimated Total</span>
-                  <span>{currencyCode} {total.toFixed(2)}</span>
+                  <span>{formatMoney(total, currencyCode)}</span>
                 </div>
               </div>
 
