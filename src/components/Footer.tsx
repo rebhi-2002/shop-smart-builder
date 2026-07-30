@@ -88,14 +88,14 @@ const Footer: React.FC = () => {
           </div>
         </div>
         
-        <div className="border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-muted-foreground text-sm">© {year} StyleMart. All rights reserved.</p>
-          <div className="mt-4 md:mt-0">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" 
-              alt="Payment Methods"
-              className="h-6"
-            />
+        <div className="border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Logo size={24} showWordmark={false} />
+            <p className="text-muted-foreground text-sm">© {year} StyleMart. All rights reserved.</p>
+          </div>
+          <div className="mt-2 md:mt-0 flex items-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="h-4 w-4 text-success" aria-hidden="true" />
+            <span>Secure checkout powered by Shopify</span>
           </div>
         </div>
       </div>
