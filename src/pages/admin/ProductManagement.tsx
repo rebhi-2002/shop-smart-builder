@@ -45,6 +45,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 // Define a validation schema for the product form
 const productSchema = z.object({
@@ -285,7 +286,7 @@ const ProductManagement: React.FC = () => {
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>{product.category}</TableCell>
-                  <TableCell>${product.price.toFixed(2)}</TableCell>
+                  <TableCell>{formatPrice(product.price)}</TableCell>
                   <TableCell>{product.discount ? `${product.discount}%` : 'None'}</TableCell>
                   <TableCell>{product.stock || 'Unlimited'}</TableCell>
                   <TableCell>

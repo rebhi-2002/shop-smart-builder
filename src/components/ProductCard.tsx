@@ -8,6 +8,7 @@ import { Star, ShoppingCart } from 'lucide-react';
 import { useCartStore, buildShopifyCartItem } from '@/stores/cartStore';
 import { toast } from '@/components/ui/sonner';
 import { trackAddToCart } from '@/lib/analytics';
+import { formatPrice } from '@/lib/currency';
 
 export interface ProductCardProps {
   product: {
@@ -114,11 +115,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
           <div>
             {discount && discount > 0 ? (
               <div className="flex items-center gap-1 flex-wrap">
-                <span className="font-bold text-sm">${(price * (1 - discount/100)).toFixed(2)}</span>
-                <span className="text-xs text-muted-foreground line-through">${price.toFixed(2)}</span>
+                <span className="font-bold text-sm">{formatPrice((price * (1 - discount/100)))}</span>
+                <span className="text-xs text-muted-foreground line-through">{formatPrice(price)}</span>
               </div>
             ) : (
-              <span className="font-bold text-sm">${price.toFixed(2)}</span>
+              <span className="font-bold text-sm">{formatPrice(price)}</span>
             )}
           </div>
           <Button onClick={handleAdd} size="sm" className="w-full text-xs" disabled={isLoading}>
@@ -166,11 +167,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'default',
         <div>
           {discount && discount > 0 ? (
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-bold text-lg">${(price * (1 - discount/100)).toFixed(2)}</span>
-              <span className="text-sm text-muted-foreground line-through">${price.toFixed(2)}</span>
+              <span className="font-bold text-lg">{formatPrice((price * (1 - discount/100)))}</span>
+              <span className="text-sm text-muted-foreground line-through">{formatPrice(price)}</span>
             </div>
           ) : (
-            <span className="font-bold text-lg">${price.toFixed(2)}</span>
+            <span className="font-bold text-lg">{formatPrice(price)}</span>
           )}
         </div>
         <Button onClick={handleAdd} size="sm" className="w-full sm:w-auto shrink-0" disabled={isLoading}>

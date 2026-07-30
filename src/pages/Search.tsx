@@ -19,6 +19,7 @@ import ProductCard from '@/components/ProductCard';
 import { Product } from '@/contexts/CartContext';
 import { productService } from '@/services/productService';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import { formatPrice } from '@/lib/currency';
 
 const PAGE_SIZE = 8;
 
@@ -164,7 +165,7 @@ const Search: React.FC = () => {
                   <p className="text-muted-foreground mt-2">{product.description}</p>
                 </div>
                 <div className="flex justify-between items-end mt-4">
-                  <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
+                  <span className="font-bold text-lg">{formatPrice(product.price)}</span>
                   <Button>Add to Cart</Button>
                 </div>
               </div>

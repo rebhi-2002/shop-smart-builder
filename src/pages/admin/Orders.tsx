@@ -42,6 +42,7 @@ import { MoreHorizontal, Search, Eye, RotateCw, Check, X, Trash2, Edit, Printer,
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { formatPrice } from '@/lib/currency';
 
 interface Order {
   id: string;            // order_number (display)
@@ -278,7 +279,7 @@ const OrdersPage: React.FC = () => {
                   <TableCell className="hidden md:table-cell">
                     {new Date(order.date).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>${order.total.toFixed(2)}</TableCell>
+                  <TableCell>{formatPrice(order.total)}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(order.status)}>
                       {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
@@ -430,13 +431,13 @@ const OrdersPage: React.FC = () => {
                     <TableRow key={item.id}>
                       <TableCell>{item.name}</TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
-                      <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">${(item.quantity * item.price).toFixed(2)}</TableCell>
+                      <TableCell className="text-right">{formatPrice(item.price)}</TableCell>
+                      <TableCell className="text-right">{formatPrice((item.quantity * item.price))}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
                     <TableCell colSpan={3} className="text-right font-bold">Total</TableCell>
-                    <TableCell className="text-right font-bold">${selectedOrder?.total.toFixed(2)}</TableCell>
+                    <TableCell className="text-right font-bold">{formatPrice(selectedOrder?.total)}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -491,7 +492,7 @@ const OrdersPage: React.FC = () => {
             <p className="font-medium">Order Summary:</p>
             <p>Customer: {selectedOrder?.customer}</p>
             <p>Date: {selectedOrder?.date && new Date(selectedOrder.date).toLocaleDateString()}</p>
-            <p>Total: ${selectedOrder?.total.toFixed(2)}</p>
+            <p>Total: {formatPrice(selectedOrder?.total)}</p>
           </div>
           <DialogFooter className="flex space-x-2 justify-end">
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>

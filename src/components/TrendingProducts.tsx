@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Flame, TrendingUp } from 'lucide-react';
 import { productService } from '@/services/productService';
 import { cn } from '@/lib/utils';
+import { formatPrice } from '@/lib/currency';
 
 interface TrendingProductsProps {
   limit?: number;
@@ -66,7 +67,7 @@ const TrendingProducts: React.FC<TrendingProductsProps> = ({
                 <h4 className="text-sm font-medium line-clamp-1 group-hover:text-primary transition-colors">
                   {product.name}
                 </h4>
-                <p className="text-xs text-muted-foreground">${product.price.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">{formatPrice(product.price)}</p>
               </div>
             </Link>
           ))}
@@ -121,7 +122,7 @@ const TrendingProducts: React.FC<TrendingProductsProps> = ({
                   {product.name}
                 </h3>
                 <div className="mt-1 flex items-center justify-between">
-                  <span className="font-bold">${product.price.toFixed(2)}</span>
+                  <span className="font-bold">{formatPrice(product.price)}</span>
                   {product.rating && (
                     <div className="flex items-center">
                       <div className="text-amber-400">★</div>

@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Check, CheckCircle, Truck, Clock, Package, CalendarClock } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -85,7 +86,7 @@ const OrderConfirmation = () => {
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <h4 className="font-medium">{item.name}</h4>
-                      <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-medium">{formatPrice((item.price * item.quantity))}</p>
                     </div>
                     <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
@@ -111,29 +112,29 @@ const OrderConfirmation = () => {
               <div className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${payment.subtotal.toFixed(2)}</span>
+                  <span>{formatPrice(payment.subtotal)}</span>
                 </div>
                 
                 {payment.discount > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
                     <span>Discount</span>
-                    <span>-${payment.discount.toFixed(2)}</span>
+                    <span>-{formatPrice(payment.discount)}</span>
                   </div>
                 )}
                 
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>{payment.shipping > 0 ? `$${payment.shipping.toFixed(2)}` : 'Free'}</span>
+                  <span>{payment.shipping > 0 ? `${formatPrice(payment.shipping)}` : 'Free'}</span>
                 </div>
                 
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax</span>
-                  <span>${payment.tax.toFixed(2)}</span>
+                  <span>{formatPrice(payment.tax)}</span>
                 </div>
                 
                 <div className="flex justify-between font-bold text-base pt-2 border-t mt-2">
                   <span>Total</span>
-                  <span>${payment.total.toFixed(2)}</span>
+                  <span>{formatPrice(payment.total)}</span>
                 </div>
               </div>
             </div>

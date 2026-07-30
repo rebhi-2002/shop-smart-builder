@@ -8,6 +8,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { ArrowRight, Clock } from 'lucide-react';
 import { productService } from '@/services/productService';
 import { cn } from '@/lib/utils';
+import { formatPrice } from '@/lib/currency';
 
 interface NewArrivalsProps {
   className?: string;
@@ -59,7 +60,7 @@ const NewArrivals: React.FC<NewArrivalsProps> = ({
               <div className="flex-1">
                 <h4 className="text-sm font-medium line-clamp-1">{product.name}</h4>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-sm font-bold">${product.price.toFixed(2)}</span>
+                  <span className="text-sm font-bold">{formatPrice(product.price)}</span>
                   <Badge variant="outline" className="text-xs">New</Badge>
                 </div>
               </div>
@@ -109,7 +110,7 @@ const NewArrivals: React.FC<NewArrivalsProps> = ({
                     {product.name}
                   </h3>
                   <div className="flex items-center justify-between">
-                    <p className="font-bold">${product.price.toFixed(2)}</p>
+                    <p className="font-bold">{formatPrice(product.price)}</p>
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Clock className="h-3 w-3 mr-1" />
                       Just arrived
@@ -163,7 +164,7 @@ const NewArrivals: React.FC<NewArrivalsProps> = ({
                 <Badge className="absolute top-2 right-2 bg-primary">New</Badge>
               </div>
               <h3 className="font-medium line-clamp-1 group-hover:text-primary transition-colors">{product.name}</h3>
-              <p className="font-bold mt-1">${product.price.toFixed(2)}</p>
+              <p className="font-bold mt-1">{formatPrice(product.price)}</p>
             </Link>
           ))}
         </div>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CheckCircle2, Circle, Package, Truck, Home, Clock } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { formatPrice } from '@/lib/currency';
 
 const STATUS_STEPS = [
   { key: 'pending', label: 'Order Placed', icon: Clock },
@@ -104,13 +105,13 @@ const OrderTracking: React.FC = () => {
             {(order.order_items as any[])?.map((item) => (
               <div key={item.id} className="flex justify-between text-sm">
                 <span>{item.product_name} × {item.quantity}</span>
-                <span className="font-medium">${Number(item.subtotal).toFixed(2)}</span>
+                <span className="font-medium">{formatPrice(Number(item.subtotal))}</span>
               </div>
             ))}
           </div>
           <div className="border-t mt-4 pt-4 flex justify-between font-bold">
             <span>Total</span>
-            <span>${Number(order.total).toFixed(2)}</span>
+            <span>{formatPrice(Number(order.total))}</span>
           </div>
         </CardContent>
       </Card>

@@ -26,6 +26,7 @@ import { productService } from '@/services/productService';
 import { toast } from "sonner";
 import { useCart } from '@/hooks/useCart';
 import { motion } from 'framer-motion';
+import { formatPrice } from '@/lib/currency';
 
 // Promotional deals data
 const promotionalDeals = [
@@ -602,7 +603,7 @@ const ProductList = () => {
                       <p className="text-muted-foreground mt-2">{product.description}</p>
                     </div>
                     <div className="flex justify-between items-end mt-4">
-                      <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
+                      <span className="font-bold text-lg">{formatPrice(product.price)}</span>
                       <Button onClick={() => handleAddToCart(product.id)}>Add to Cart</Button>
                     </div>
                   </div>

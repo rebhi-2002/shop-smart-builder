@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel,
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
 import CartCrossSell from '@/components/CartCrossSell';
+import { formatPrice } from '@/lib/currency';
 
 const FREE_SHIPPING_THRESHOLD = 50;
 
@@ -198,7 +199,7 @@ const Cart = () => {
               <div className="mb-4 rounded-lg bg-muted/50 p-3">
                 {remainingForFreeShipping > 0 ? (
                   <p className="text-sm mb-2">
-                    Add <span className="font-semibold text-primary">${remainingForFreeShipping.toFixed(2)}</span> more for <span className="font-semibold">FREE shipping</span>
+                    Add <span className="font-semibold text-primary">{formatPrice(remainingForFreeShipping)}</span> more for <span className="font-semibold">FREE shipping</span>
                   </p>
                 ) : (
                   <p className="text-sm mb-2 text-green-600 font-semibold">🎉 You've unlocked FREE shipping!</p>
