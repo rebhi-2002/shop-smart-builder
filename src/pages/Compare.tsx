@@ -15,6 +15,7 @@ import {
 import { Star, X, Check, Minus } from 'lucide-react';
 import SEO from '@/components/SEO';
 import ProductGridSkeleton from '@/components/ProductGridSkeleton';
+import { formatPrice } from '@/lib/currency';
 
 const MAX = 4;
 
@@ -122,7 +123,7 @@ const Compare: React.FC = () => {
               <tr className="border-t">
                 <td className="p-3 font-medium">Price</td>
                 {items.map((p) => (
-                  <td key={p.id} className="p-3 font-bold">${p.price.toFixed(2)}</td>
+                  <td key={p.id} className="p-3 font-bold">{formatPrice(p.price)}</td>
                 ))}
               </tr>
               <tr className="border-t bg-muted/40">

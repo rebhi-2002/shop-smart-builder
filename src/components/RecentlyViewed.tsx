@@ -14,6 +14,7 @@ import {
   CarouselPrevious 
 } from './ui/carousel';
 import { cn } from '@/lib/utils';
+import { formatPrice } from '@/lib/currency';
 
 interface RecentlyViewedProps {
   limit?: number;
@@ -62,7 +63,7 @@ const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
                   {product.name}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </p>
               </div>
             </Link>
@@ -108,7 +109,7 @@ const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
                 </p>
                 <div className="flex justify-between items-center mt-1">
                   <p className="text-sm font-bold">
-                    ${product.price.toFixed(2)}
+                    {formatPrice(product.price)}
                   </p>
                   {product.discount && (
                     <Badge variant="outline" className="text-xs bg-red-100 border-red-200 text-red-700 px-1.5 py-0">

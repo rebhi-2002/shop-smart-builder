@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import { supabase } from '@/integrations/supabase/client';
+import { formatPrice } from '@/lib/currency';
 
 interface Order {
   id: string;
@@ -158,7 +159,7 @@ const MyOrders: React.FC = () => {
                   </Badge>
                 </div>
                 <CardDescription>
-                  Placed on {new Date(order.date).toLocaleDateString()} • ${order.total.toFixed(2)}
+                  Placed on {new Date(order.date).toLocaleDateString()} • {formatPrice(order.total)}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -176,13 +177,13 @@ const MyOrders: React.FC = () => {
                           <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                         </div>
                       </div>
-                      <p className="font-medium">${item.price.toFixed(2)}</p>
+                      <p className="font-medium">{formatPrice(item.price)}</p>
                     </div>
                   ))}
                 </div>
                 
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-4 pt-2">
-                  <p className="font-bold text-lg">Total: ${order.total.toFixed(2)}</p>
+                  <p className="font-bold text-lg">Total: {formatPrice(order.total)}</p>
                   <Button size="sm" className="mt-2 sm:mt-0" onClick={() => viewOrderDetails(order)}>
                     View Order Details
                   </Button>
@@ -298,15 +299,15 @@ const MyOrders: React.FC = () => {
                           </div>
                         </td>
                         <td className="text-center p-3">{item.quantity}</td>
-                        <td className="text-right p-3">${item.price.toFixed(2)}</td>
-                        <td className="text-right p-3">${(item.price * item.quantity).toFixed(2)}</td>
+                        <td className="text-right p-3">{formatPrice(item.price)}</td>
+                        <td className="text-right p-3">{formatPrice((item.price * item.quantity))}</td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
                     <tr className="border-t font-medium">
                       <td colSpan={3} className="text-right p-3">Subtotal:</td>
-                      <td className="text-right p-3">${selectedOrder?.total.toFixed(2)}</td>
+                      <td className="text-right p-3">{formatPrice(selectedOrder?.total)}</td>
                     </tr>
                     <tr>
                       <td colSpan={3} className="text-right p-3">Shipping:</td>
@@ -314,7 +315,7 @@ const MyOrders: React.FC = () => {
                     </tr>
                     <tr className="font-bold">
                       <td colSpan={3} className="text-right p-3">Total:</td>
-                      <td className="text-right p-3">${selectedOrder?.total.toFixed(2)}</td>
+                      <td className="text-right p-3">{formatPrice(selectedOrder?.total)}</td>
                     </tr>
                   </tfoot>
                 </table>

@@ -17,6 +17,7 @@ import { productService } from '@/services/productService';
 import { useCart } from '@/hooks/useCart';
 import { toast } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
+import { formatPrice } from '@/lib/currency';
 
 interface FeaturedProductsProps {
   title: string;
@@ -136,7 +137,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     />
                   </div>
                   <h3 className="text-sm font-medium line-clamp-1">{product.name}</h3>
-                  <p className="text-xs text-muted-foreground">${product.price.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{formatPrice(product.price)}</p>
                 </Link>
               ))}
             </div>

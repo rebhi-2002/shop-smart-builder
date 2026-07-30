@@ -12,8 +12,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel,
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
 import CartCrossSell from '@/components/CartCrossSell';
+import { formatMoney, formatPrice, STORE_CURRENCY, FREE_SHIPPING_THRESHOLD } from "@/lib/currency";
 
-const FREE_SHIPPING_THRESHOLD = 50;
 
 const Cart = () => {
   const items = useCartStore((state) => state.items);
@@ -74,7 +74,7 @@ const Cart = () => {
   };
 
   const subtotal = items.reduce((total, item) => total + parseFloat(item.price.amount) * item.quantity, 0);
-  const currencyCode = items[0]?.price.currencyCode || 'USD';
+  const currencyCode = items[0]?.price.currencyCode || STORE_CURRENCY;
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 0;
   const tax = subtotal * 0.07;
   const finalTotal = subtotal + shipping + tax;
@@ -132,7 +132,7 @@ const Cart = () => {
                         <h3 className="font-semibold text-lg mb-1">{item.product.name}</h3>
                       </Link>
                       <p className="text-sm text-muted-foreground mb-2">{item.product.category}</p>
-                      <p className="font-bold">{item.price.currencyCode} {parseFloat(item.price.amount).toFixed(2)}</p>
+                      <p className="font-bold">{formatMoney(item.price.amount, item.price.currencyCode)}</p>
                       {item.selectedOptions?.length > 0 && (
                         <p className="text-xs text-muted-foreground mt-1">
                           {item.selectedOptions.map(o => `${o.name}: ${o.value}`).join(' • ')}
@@ -198,7 +198,7 @@ const Cart = () => {
               <div className="mb-4 rounded-lg bg-muted/50 p-3">
                 {remainingForFreeShipping > 0 ? (
                   <p className="text-sm mb-2">
-                    Add <span className="font-semibold text-primary">${remainingForFreeShipping.toFixed(2)}</span> more for <span className="font-semibold">FREE shipping</span>
+                    Add <span className="font-semibold text-primary">{formatPrice(remainingForFreeShipping)}</span> more for <span className="font-semibold">FREE shipping</span>
                   </p>
                 ) : (
                   <p className="text-sm mb-2 text-green-600 font-semibold">🎉 You've unlocked FREE shipping!</p>
@@ -211,7 +211,7 @@ const Cart = () => {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>{currencyCode} {subtotal.toFixed(2)}</span>
+                  <span>{formatMoney(subtotal, currencyCode)}</span>
                 </div>
 
                 <div className="flex justify-between">
@@ -220,14 +220,14 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax</span>
-                  <span>{currencyCode} {tax.toFixed(2)}</span>
+                  <span>{formatMoney(tax, currencyCode)}</span>
                 </div>
               </div>
 
               <div className="border-t pt-4 mb-6">
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>{currencyCode} {finalTotal.toFixed(2)}</span>
+                  <span>{formatMoney(finalTotal, currencyCode)}</span>
                 </div>
               </div>
 
@@ -277,7 +277,7 @@ const Cart = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                 </svg>
-                Free shipping on orders over $50
+                Free shipping on orders over {formatPrice(FREE_SHIPPING_THRESHOLD)}
               </div>
               <div className="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">

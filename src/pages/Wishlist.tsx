@@ -1,4 +1,5 @@
 
+import { formatPrice } from '@/lib/currency';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -200,14 +201,14 @@ const Wishlist = () => {
                           {item.discount ? (
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-lg">
-                                ${(item.price * (1 - item.discount / 100)).toFixed(2)}
+                                {formatPrice((item.price * (1 - item.discount / 100)))}
                               </span>
                               <span className="text-sm text-muted-foreground line-through">
-                                ${item.price.toFixed(2)}
+                                {formatPrice(item.price)}
                               </span>
                             </div>
                           ) : (
-                            <span className="font-bold text-lg">${item.price.toFixed(2)}</span>
+                            <span className="font-bold text-lg">{formatPrice(item.price)}</span>
                           )}
                         </div>
                         

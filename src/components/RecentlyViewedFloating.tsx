@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from "@/hooks/use-toast";
 import { useCart, useWishlist } from '@/hooks/useCart';
+import { formatPrice } from '@/lib/currency';
 
 const RecentlyViewedFloating = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -145,13 +146,13 @@ const RecentlyViewedFloating = () => {
                     <div className="flex justify-between items-center mt-1">
                       <div className="flex flex-col">
                         <span className="text-sm font-bold">
-                          ${product.discount
+                          {formatPrice(product.discount
                             ? (product.price * (1 - product.discount / 100)).toFixed(2)
-                            : product.price.toFixed(2)}
+                            : product.price)}
                         </span>
                         {product.discount && (
                           <span className="text-xs text-muted-foreground line-through">
-                            ${product.price.toFixed(2)}
+                            {formatPrice(product.price)}
                           </span>
                         )}
                       </div>

@@ -21,6 +21,7 @@ import FeaturedProducts from '@/components/FeaturedProducts';
 import TrustBar from '@/components/TrustBar';
 import useEmblaCarousel from 'embla-carousel-react';
 import SEO from '@/components/SEO';
+import { formatPrice } from '@/lib/currency';
 
 const Index = () => {
   // ... keep existing code (emblaRef, autoplayInterval, useState declarations)
@@ -300,10 +301,10 @@ const Index = () => {
                   <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="font-bold text-sm">
-                      ${(product.price * (1 - (product.discount || 0) / 100)).toFixed(2)}
+                      {formatPrice((product.price * (1 - (product.discount || 0) / 100)))}
                     </span>
                     <span className="text-xs text-muted-foreground line-through">
-                      ${product.price.toFixed(2)}
+                      {formatPrice(product.price)}
                     </span>
                   </div>
                 </div>
@@ -403,7 +404,7 @@ const Index = () => {
           <div className="flex flex-col items-center text-center p-6 border rounded-lg">
             <Truck className="h-10 w-10 text-primary mb-4" />
             <h3 className="text-lg font-bold mb-2">Free Shipping</h3>
-            <p className="text-muted-foreground text-sm">On orders over $50</p>
+            <p className="text-muted-foreground text-sm">On orders over ₪50</p>
           </div>
           
           <div className="flex flex-col items-center text-center p-6 border rounded-lg">

@@ -1,4 +1,5 @@
 
+import Logo from '@/components/Logo';
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -67,7 +68,7 @@ const Header = () => {
       {/* Promo Banner */}
       <div className="bg-gradient-to-r from-primary/90 to-accent/90 text-white py-2">
         <div className="container mx-auto px-4 text-center text-sm">
-          <span className="font-medium">FREE SHIPPING</span> on orders over $50 | Use code <span className="font-bold">WELCOME10</span> for 10% off your first order!
+          <span className="font-medium">FREE SHIPPING</span> on orders over ₪50 | Use code <span className="font-bold">WELCOME10</span> for 10% off your first order!
         </div>
       </div>
       
@@ -75,7 +76,7 @@ const Header = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <span className="font-bold text-2xl">StyleMart</span>
+          <Logo size={30} />
         </Link>
         
         {/* Search - Hidden on mobile */}

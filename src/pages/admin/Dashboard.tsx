@@ -1,3 +1,4 @@
+import { formatPrice } from '@/lib/currency';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -99,7 +100,7 @@ const Dashboard: React.FC = () => {
   const cards = [
     {
       title: 'Total Sales',
-      value: `$${totalSales.toFixed(2)}`,
+      value: `${formatPrice(totalSales)}`,
       hint: lastMonth
         ? `${growth >= 0 ? '+' : ''}${growth.toFixed(0)}% vs last month`
         : 'All-time revenue',
@@ -119,7 +120,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Average Order Value',
-      value: `$${avgOrderValue.toFixed(2)}`,
+      value: `${formatPrice(avgOrderValue)}`,
       hint: `${products.length} active products`,
       icon: TrendingUp,
     },
@@ -185,7 +186,7 @@ const Dashboard: React.FC = () => {
                         </td>
                         <td className="py-2">{o.guest_email || 'Registered user'}</td>
                         <td className="py-2 text-right">
-                          ${Number(o.total || 0).toFixed(2)}
+                          {formatPrice(Number(o.total || 0))}
                         </td>
                         <td className="py-2 text-right">
                           <Badge className={statusColor(o.status)}>{o.status}</Badge>

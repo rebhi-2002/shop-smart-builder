@@ -17,6 +17,7 @@ import Reviews from '@/components/Reviews';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '@/components/SEO';
 import { trackAddToCart, trackViewItem } from '@/lib/analytics';
+import { formatPrice } from '@/lib/currency';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -266,9 +267,9 @@ const ProductDetails = () => {
           <div className="flex items-end mt-2 mb-4">
             {discountedPrice ? (
               <>
-                <span className="text-3xl font-bold">${discountedPrice.toFixed(2)}</span>
+                <span className="text-3xl font-bold">{formatPrice(discountedPrice)}</span>
                 <span className="text-xl text-muted-foreground line-through ml-2">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </span>
                 <Badge 
                   className="ml-2 bg-red-500 text-white px-2 py-0.5 text-sm rounded"
@@ -277,7 +278,7 @@ const ProductDetails = () => {
                 </Badge>
               </>
             ) : (
-              <span className="text-3xl font-bold">${product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold">{formatPrice(product.price)}</span>
             )}
           </div>
           
@@ -447,7 +448,7 @@ const ProductDetails = () => {
               <Truck className="h-5 w-5 text-primary mr-3 mt-0.5" />
               <div>
                 <span className="font-medium">Free delivery</span>
-                <div className="text-sm text-muted-foreground">Orders over $50 qualify for free shipping</div>
+                <div className="text-sm text-muted-foreground">Orders over ₪50 qualify for free shipping</div>
               </div>
             </div>
             
@@ -556,10 +557,10 @@ const ProductDetails = () => {
       <div className="md:hidden fixed bottom-14 inset-x-0 z-30 bg-background/95 backdrop-blur border-t px-3 py-2 flex items-center gap-3 pb-[env(safe-area-inset-bottom)]">
         <div className="flex flex-col leading-tight">
           <span className="font-bold text-base">
-            ${(product.price * (1 - (product.discount || 0) / 100)).toFixed(2)}
+            {formatPrice((product.price * (1 - (product.discount || 0) / 100)))}
           </span>
           {product.discount ? (
-            <span className="text-[11px] text-muted-foreground line-through">${product.price.toFixed(2)}</span>
+            <span className="text-[11px] text-muted-foreground line-through">{formatPrice(product.price)}</span>
           ) : null}
         </div>
         <Button
