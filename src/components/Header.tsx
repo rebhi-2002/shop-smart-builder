@@ -75,7 +75,7 @@ const Header = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <span className="font-bold text-2xl">StyleMart</span>
+          <Logo size={30} />
         </Link>
         
         {/* Search - Hidden on mobile */}
