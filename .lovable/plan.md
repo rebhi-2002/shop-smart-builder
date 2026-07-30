@@ -107,8 +107,7 @@
 
 ## المرحلة 8 — الدفع
 
-- تفعيل **Lovable Payments**: نوصي بـ **Stripe** (الجاهز للمنتجات الفيزيائية والرقمية) أو **Shopify** إذا كانت منتجات فيزيائية فقط مع شحن وإدارة مخزون.
-- سنشغّل `recommend_payment_provider` قبل التفعيل ليحدد الأنسب.
+- ✅ **Shopify** هو مزوّد الدفع المعتمد (منتجات فيزيائية + مخزون + شحن). المتجر مُطالَب به (claimed) والدفع يتم عبر Shopify Checkout.
 
 ## المرحلة 9 — Admin
 
@@ -152,7 +151,7 @@
 
 ## التفاصيل التقنية
 
-- **Stack**: React 18 + Vite + Tailwind + shadcn + Framer Motion + React Query + react-router + react-helmet-async + Lovable Cloud (Supabase) + Lovable Payments (Stripe).
+- **Stack**: React 18 + Vite + Tailwind + shadcn + Framer Motion + React Query + react-router + react-helmet-async + Lovable Cloud (Supabase) + Shopify Storefront API (Cart/Checkout) + Zustand.
 - **DB schema** (نسخة أولية):
   - `profiles(id uuid pk → auth.users, full_name, avatar_url, phone)`
   - `user_roles(id, user_id, role app_role)` + `has_role()` security definer
@@ -164,33 +163,50 @@
   - `order_items(id, order_id, product_id, qty, price)`
   - `promo_codes(code, discount_pct, expires_at, usage_limit)`
 - **RLS**: المستخدم يقرأ/يعدّل بياناته فقط؛ admin عبر `has_role(auth.uid(),'admin')`؛ products/categories قراءة عامة.
-- **Edge Functions**: `create-checkout`, `stripe-webhook`, `send-order-email`, `abandoned-cart-cron`.
+- **الدفع**: Shopify Storefront API — `cartCreate` / `cartLinesAdd` / `cartLinesUpdate` / `cartLinesRemove` ثم `checkoutUrl` (مع `channel=online_store`).
 
 ---
 
-## حالة التقدم (محدّث + تحقق فعلي من الكود/DB)
+## حالة التقدم (محدّث — تحقق فعلي من الكود/DB/Shopify)
 
 | المرحلة | الحالة | تحقق |
 |---|---|---|
-| 1. Backend + Auth + Roles | ✅ منجز | جداول موجودة، `has_role` في `private` schema، Google OAuth مُفعّل، `ProtectedRoute` + `/reset-password` |
-| 2. Design System | ✅ منجز | tokens HSL كاملة + `--success` / `--warning` (light+dark) مربوطة في `tailwind.config.ts`، radius/typography، `overflow-x` clamp، design.md |
-| 3. صفحات أساسية + ناقصة | ✅ منجز | Home/Products/PDP/Cart/Checkout/Orders/Admin مربوطة + `/order/:id` + `/track-order` + **`/compare`** + **`/gift-cards`** + **`/blog` و`/blog/:slug`** (3 مقالات + JSON-LD) |
-| 4. SEO | ✅ منجز | `react-helmet-async` + `SEO.tsx` + JSON-LD (Product/Organization/BlogPosting) + `sitemap.xml` محدّث + `robots.txt` |
-| 5. الأداء | ✅ منجز | `React.lazy` لكل route + `loading="lazy"`/`decoding="async"` + **preload/preconnect لصورة LCP** + `fetchpriority="high"` على أول شريحة hero |
-| 6. الجوال | ✅ منجز | Bottom nav + sticky CTA + ScrollToTop + footer padding |
-| 7. CRO | ✅ منجز | TrustBar + ExitIntent + scarcity + Free-Shipping bar + sticky CTA + CartCrossSell + Verified Purchase badge |
-| 8. الدفع | ❌ | Stripe عبر Lovable Payments — بانتظار موافقة المستخدم للتفعيل |
-| 9. Admin | ✅ منجز | CRUD + Orders status + **Dashboard تحليلات حقيقية من DB** (مبيعات، AOV، نمو شهري، عملاء، توزيع الحالات، low stock) + **رفع صور المنتجات** إلى bucket `product-images` (RLS: قراءة للجميع، رفع للأدمن فقط) |
-| 10. جودة + إطلاق | ✅ منجز | ErrorBoundary + CookieConsent + `ProductGridSkeleton` موحّد + **analytics layer** (`src/lib/analytics.ts` + `AnalyticsTracker`: page_view / view_item / add_to_cart / begin_checkout / purchase، متوافق GA4-GTM-Plausible ومربوط بموافقة الكوكيز) + **صفحة 404 محسّنة** (بحث + روابط + noindex) + **skip-to-content** و`<main id="main-content">` لتحسين a11y |
+| 1. Backend + Auth + Roles | ✅ | جداول + `private.has_role` + Google OAuth + `ProtectedRoute` |
+| 2. Design System | ✅ | HSL tokens كاملة (success/warning) + dark mode + design.md |
+| 3. الصفحات | ✅ | كل الصفحات الأساسية + blog/compare/gift-cards/track-order |
+| 4. SEO | ✅ | Helmet + JSON-LD + sitemap + robots + favicon SVG جديد |
+| 5. الأداء | ✅ | lazy routes + preload LCP + lazy images |
+| 6. الجوال | ✅ | Bottom nav + sticky CTA + tap targets |
+| 7. CRO | ✅ | TrustBar + ExitIntent + scarcity + cross-sell + free-shipping bar |
+| 8. الدفع | ✅ | **Shopify** — المتجر مُطالَب به، السلة والدفع عبر Storefront API، المخزون مفعّل للشراء |
+| 9. Admin | ✅ | Dashboard تحليلي + CRUD + رفع صور |
+| 10. جودة + إطلاق | ✅ | ErrorBoundary + CookieConsent + Analytics layer + a11y + 404 |
 
-## سجل الإصلاحات الأخيرة
-- **Premium Makeup Kit** — رابط Unsplash الأصلي 404؛ استُبدل بـ 4 صور صالحة (تحقق status 200).
-- `has_role` في schema خاص `private` + إزالة قراءة `promo_codes` العامة (security fixes).
-- Storage: `product-images` bucket خاص + signed URLs طويلة الأمد (public buckets معطّلة على المنصة).
+## الفحص الشامل (آخر تشغيل)
 
-## الخطوات التالية
-1. **المرحلة 8 (الأخيرة المتبقية)** — الدفع. فحص الأهلية: Stripe المدمج غير متاح لبلد البائع (PS)، وPaddle لا يقبل المنتجات الفيزيائية. الخيارات: **Shopify** أو **Stripe BYOK** بمفتاح حسابك.
-2. عند تفعيل مزود الدفع: استبدال نموذج البطاقة الوهمي في `Checkout.tsx` بجلسة دفع حقيقية + webhook لتحديث حالة الطلب.
-3. اختياري بعد الإطلاق: توصيل GA4/Plausible script (طبقة الأحداث جاهزة وتنتظر السكربت فقط).
+- **Security scan**: 0 نتائج ✅
+- **TypeScript**: نظيف ✅
+- **E2E smoke** (Playwright): Home → Products → PDP → Add to Cart → Cart → Checkout يعمل، بدون أخطاء console ✅
+- **العملة**: موحّدة على **₪ ILS** عبر `src/lib/currency.ts` (`formatPrice` / `formatMoney`) في كل الصفحات والنصوص التسويقية ✅
+- **العلامة التجارية**: شعار SVG جديد (`src/components/Logo.tsx` + `public/logo.svg`) — حقيبة تسوّق بمقبض ومونوجرام S بتدرّج الهوية؛ مستخدم في الهيدر والفوتر والـfavicon ✅
+- **تنظيف Stripe**: أُزيلت شارة Stripe من الفوتر واستُبدلت بـ "Secure checkout powered by Shopify" ✅
 
+## خطة التطوير القادمة (بعد الإطلاق)
 
+**أولوية عالية**
+1. مزامنة المخزون الحقيقي من Shopify بدل `stock` في Supabase (مصدر حقيقة واحد).
+2. مزامنة الطلبات: Shopify Order → Supabase `orders` (حاليًا الطلب يُنشأ محليًا فقط) عبر webhook.
+3. مراجعات حقيقية للمنتجات (Reviews table + شراء موثّق) بدل التقييمات الثابتة.
+4. لغة عربية كاملة (i18n + RTL) — الجمهور المستهدف.
+
+**أولوية متوسطة**
+5. صفحات مخصصة لكل فئة بمحتوى SEO (وصف + FAQ + JSON-LD ItemList).
+6. بحث ذكي مع autocomplete وتصحيح إملائي.
+7. Abandoned cart email عبر Edge Function.
+8. Wishlist مزامَنة مع الحساب بدل localStorage.
+
+**أولوية منخفضة**
+9. تعدد العملات (Shopify Markets).
+10. توصيات مبنية على السلوك (recently viewed → related).
+11. GA4/Plausible script (طبقة الأحداث جاهزة).
+12. برنامج ولاء / نقاط.
